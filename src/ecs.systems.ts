@@ -29,7 +29,7 @@ export function Systems(world: World, viewport: Bitmap) {
           y[e] < 0
             ? ((y[e] = 0), (vy[e] = 0))
             : y[e] + h[e] > height &&
-              ((y[e] = height - h[e]), ((vy[e] = 0), (air[e] = false)));
+            ((y[e] = height - h[e]), ((vy[e] = 0), (air[e] = false)));
         }
       },
     ),
