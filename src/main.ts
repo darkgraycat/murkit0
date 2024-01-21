@@ -1,4 +1,3 @@
-import { IImage } from "./common/types";
 import { Adapter } from "./adapter";
 import { Engine } from "./engine";
 import { Bitmap } from "./bitmap";
