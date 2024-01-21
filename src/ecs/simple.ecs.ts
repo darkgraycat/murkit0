@@ -1,5 +1,6 @@
 import { Imutable } from "../common/types";
 
+/* EntityManager */
 export class EntityManager<T extends Record<string, Component<any>>> {
   private idx = 0;
   constructor(
@@ -37,9 +38,9 @@ export class EntityManager<T extends Record<string, Component<any>>> {
   }
 }
 
-
 /* Component */
 export type Storage<T> = { [K in keyof T]: T[K][] };
+
 export class Component<T> {
   readonly schema: Imutable<T>;
   readonly storage: Imutable<Storage<T>>;
@@ -50,17 +51,20 @@ export class Component<T> {
       {} as Storage<T>,
     );
   }
+
   get(idx: number): T {
     const { storage } = this;
     const element: any = {};
     for (const prop in storage) element[prop] = storage[prop][idx];
     return element;
   }
+
   set(idx: number, data: T): number {
     const { storage } = this;
     for (const prop in storage) storage[prop][idx] = data?.[prop];
     return idx;
   }
+
   reset(): void {
     const { storage } = this;
     for (const prop in storage) storage[prop].length = 0;
@@ -73,7 +77,9 @@ export type SystemHandler<T> = (
   components: T,
   ...entities: number[][]
 ) => void;
+
 export type SystemCallback = (delta: number) => void;
+
 export class System<T extends Record<string, Component<any>>> {
   constructor(
     readonly components: T,

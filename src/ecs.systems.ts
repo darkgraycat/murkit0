@@ -14,6 +14,7 @@ import {
 export function Systems(world: World, viewport: Bitmap) {
   const { width, height } = world;
   return {
+    /* Collide entities with world bounds */
     sCollideBounds: new System(
       { cPosition, cVelocity, cShape, cMeta },
       (_, comp, entities) => {
@@ -33,6 +34,43 @@ export function Systems(world: World, viewport: Bitmap) {
       },
     ),
 
+    /* Collide entities from groupA with entities from groupB */
+    sCollideShapes: new System(
+      { cPosition, cVelocity, cShape },
+      (_, comp, units, blocks) => {
+        const { x, y } = comp.cPosition.storage;
+        const { vx, vy } = comp.cVelocity.storage;
+        const { w, h } = comp.cShape.storage;
+        for (const u of units) {
+          const ur = x[u] + w[u];
+          const ub = y[u] + h[u];
+          let total_collitions = 0;
+          for (const b of blocks) {
+            // theoreticaly it is not possible to have more then 2 collisions
+            if (total_collitions >= 2) break;
+            const br = x[b] + w[b];
+            const bb = y[b] + h[b];
+            // fast way to detect if collistion in place using || operator
+            if (x[u] > br || ur < x[b] || y[u] > bb || ub < y[b]) continue;
+            total_collitions++;
+            const overlapX = Math.min(ur - x[b], br - x[u]);
+            const overlapY = Math.min(ub - y[b], bb - y[u]);
+            // define which side if colliding
+            if (overlapX < overlapY && overlapX > 0) {
+              x[u] < x[b]
+                ? ((vx[u] = 0), (x[u] = x[b] - w[u]))
+                : ((vx[u] = 0), (x[u] = x[b] + w[u]));
+            } else if (overlapY > 0) {
+              y[u] < y[b]
+                ? ((vy[u] = 1), (y[u] = y[b] - h[u]))
+                : ((vy[u] = 0), (y[u] = y[b] + h[u]));
+            }
+          }
+        }
+      },
+    ),
+
+    /* Move entity using velocity values */
     sMovement: new System({ cPosition, cVelocity }, (dt, comp, entities) => {
       const { x, y } = comp.cPosition.storage;
       const { vx, vy } = comp.cVelocity.storage;
@@ -45,6 +83,7 @@ export function Systems(world: World, viewport: Bitmap) {
       }
     }),
 
+    /* Render frame of spritesheet by index */
     sDrawing: new System({ cSprite, cPosition }, (_, comp, entities) => {
       const { sprites, spriteIdx, flipped } = comp.cSprite.storage;
       const { x, y } = comp.cPosition.storage;
@@ -56,6 +95,7 @@ export function Systems(world: World, viewport: Bitmap) {
       }
     }),
 
+    /* Calculate next frame needed to draw */
     sAnimation: new System({ cAnimation, cSprite }, (dt, comp, entities) => {
       const { animations, current, length, time, coef } =
         comp.cAnimation.storage;
@@ -67,6 +107,7 @@ export function Systems(world: World, viewport: Bitmap) {
       }
     }),
 
+    /* Listen for user input */
     sController: new System(
       { cVelocity, cInput, cSprite, cMeta, cAnimation },
       (_, comp, entities) => {
