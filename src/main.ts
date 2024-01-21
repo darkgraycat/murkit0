@@ -9,27 +9,24 @@ import * as components from "./ecs.components";
 
 import { bulkTileableBitmapLoad } from "./helpers";
 
-export type CoreConfig = {
+export type MainConfig = {
   width: number;
   height: number;
   keys: Set<string>;
   screen: HTMLCanvasElement;
-  gui: HTMLDivElement;
   fps: number;
 };
 
-export const init = async (config: CoreConfig): Promise<void> => {
+export const init = async (config: MainConfig): Promise<void> => {
   console.debug("MAIN: init");
-  const { width, height, keys, gui, screen, fps } = config;
+  const { width, height, keys, screen, fps } = config;
   const screenCtx = screen.getContext("2d");
   const screenImageData = screenCtx.getImageData(0, 0, width, height);
-
-  const guiSet = (msg: string) => (gui.innerHTML = msg);
 
   const screenBitmap = Bitmap.from(screenImageData.data.buffer, width, height);
   const adapter = new Adapter();
 
-  console.debug("MAIN: load assets 2");
+  console.debug("MAIN: load assets");
   const [playerTiles, blocksTiles, bgTiles, bgHouseTiles] =
     await bulkTileableBitmapLoad(
       adapter,
@@ -96,15 +93,17 @@ export const init = async (config: CoreConfig): Promise<void> => {
     });
 
   const houseBlocks = [
-    createHouseBlockEntity(0, 48 * 4, 208),
-    createHouseBlockEntity(1, 48 * 5, 208),
+    createHouseBlockEntity(0, 48 * 3, 208),
+    createHouseBlockEntity(1, 48 * 4, 208),
   ];
 
   console.debug("MAIN: attach entities with systems");
   const collideBounds = sCollideBounds.setup([player]);
   const collideBlocks = sCollideShapes.setup([player], houseBlocks);
   const move = sMovement.setup([player]);
-  const draw = sDrawing.setup([player, ...houseBlocks]);
+  // const draw = sDrawing.setup([player, ...houseBlocks]);
+  const draw = sDrawing.setup([player]);
+  const drawBg = sDrawing.setup(houseBlocks)
   const control = sController.setup([player]);
   const animate = sAnimation.setup([player]);
 
@@ -113,19 +112,22 @@ export const init = async (config: CoreConfig): Promise<void> => {
   const { vx, vy } = components.cVelocity.storage;
 
   const render = (dt: number) => {
-    guiSet(
-      `POS ${x[player].toFixed(2)}:${y[player].toFixed(2)} | VEL ${vx[player].toFixed(2)}:${vy[player].toFixed(2)}`,
-    );
+    console.time("render")
+    screenBitmap.fill(world.skyColor);
     animate(dt);
+    drawBg(dt);
     draw(dt);
     screenCtx.putImageData(screenImageData, 0, 0);
+    console.timeEnd("render")
   };
 
   const update = (dt: number) => {
+    console.time("update")
     move(dt);
-    collideBounds(dt);
-    collideBlocks(dt);
     control(dt);
+    collideBounds(dt);
+    console.timeEnd("update")
+    // collideBlocks(dt);
   };
 
   console.debug("MAIN: run engine");

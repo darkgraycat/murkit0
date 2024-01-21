@@ -1,25 +1,30 @@
-import { init } from './main';
+import { init } from "./main";
 
-window.addEventListener('load', () => {
+export const debug: any = {};
+
+window.addEventListener("load", () => {
+  const debugEl = document.getElementById("debug") as HTMLDivElement;
+  debug.set = (...msg: string[]) => (debugEl.innerHTML = msg.join(", "));
+  debug.add = (...msg: string[]) =>
+    (debugEl.innerHTML += "<br>" + msg.join(", "));
+
   const keys: Set<string> = new Set();
-  window.addEventListener('keydown', ({ code }) => keys.add(code));
-  window.addEventListener('keyup', ({ code }) => keys.delete(code));
+  window.addEventListener("keydown", ({ code }) => keys.add(code));
+  window.addEventListener("keyup", ({ code }) => keys.delete(code));
 
   const width = 320;
   const height = 240;
 
-  const screen = document.getElementById('screen') as HTMLCanvasElement;
-  const gui = document.getElementById('gui') as HTMLDivElement;
+  const screen = document.getElementById("screen") as HTMLCanvasElement;
 
   screen.width = width;
   screen.height = height;
 
   init({
     screen,
-    gui,
     width,
     height,
     keys,
     fps: 1000 / 60,
-  })
+  });
 });
