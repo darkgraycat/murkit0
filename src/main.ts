@@ -5,7 +5,7 @@ import { Engine } from "./engine";
 import { EntityManager } from "./ecs/simple.ecs";
 import { World } from "./ecs.world";
 import { Systems } from "./ecs.systems";
-import * as components from "./ecs.components"
+import * as components from "./ecs.components";
 
 export type CoreConfig = {
   width: number;
@@ -13,7 +13,7 @@ export type CoreConfig = {
   keys: Set<string>;
   screen: HTMLCanvasElement;
   gui: HTMLDivElement;
-  fps: number,
+  fps: number;
 };
 
 export const init = async (config: CoreConfig): Promise<void> => {
@@ -43,27 +43,29 @@ export const init = async (config: CoreConfig): Promise<void> => {
   );
   const playerSprites = playerTiles.splitToBitmaps();
   playerSprites.push(...playerTiles.flipV().splitToBitmaps());
+  const bgHouseSprites = bgHouseTiles.splitToBitmaps();
 
-  console.debug("MAIN: init world")
+  console.debug("MAIN: init world");
   const world = new World({
     width,
     height,
     gravity: 0.9,
     friction: 0.9,
     skyColor: 0xffff8822,
-  })
+  });
 
-  console.debug("MAIN: init systems")
+  console.debug("MAIN: init systems");
   const {
     sMovement,
     sAnimation,
     sCollideBounds,
+    sCollideShapes,
     sDrawing,
     sController,
   } = Systems(world, screenBitmap);
 
-  console.debug("MAIN: init entities")
-  const em = new EntityManager(components)
+  console.debug("MAIN: init entities");
+  const em = new EntityManager(components);
 
   const player = em.add({
     cPosition: { x: 32, y: 32 },
@@ -88,10 +90,23 @@ export const init = async (config: CoreConfig): Promise<void> => {
     },
   });
 
-  console.debug("MAIN: attach entities with systems")
+  const createHouseBlockEntity = (spriteIdx: number, x: number, y: number) =>
+    em.add({
+      cPosition: { x, y },
+      cShape: { w: 48, h: 32 },
+      cSprite: { sprites: bgHouseSprites, spriteIdx, flipped: false },
+    });
+
+  const houseBlocks = [
+    createHouseBlockEntity(0, 48 * 4, 208),
+    createHouseBlockEntity(1, 48 * 5, 208),
+  ];
+
+  console.debug("MAIN: attach entities with systems");
   const collideBounds = sCollideBounds.setup([player]);
+  const collideBlocks = sCollideShapes.setup([player], houseBlocks);
   const move = sMovement.setup([player]);
-  const draw = sDrawing.setup([player]);
+  const draw = sDrawing.setup([player, ...houseBlocks]);
   const control = sController.setup([player]);
   const animate = sAnimation.setup([player]);
 
@@ -111,10 +126,11 @@ export const init = async (config: CoreConfig): Promise<void> => {
   const update = (dt: number) => {
     move(dt);
     collideBounds(dt);
+    collideBlocks(dt);
     control(dt);
   };
 
-  console.debug("MAIN: run engine")
+  console.debug("MAIN: run engine");
   const engine = new Engine(adapter, fps, update, render, 0.03);
   engine.start();
   // TODO: live limited time. for dev only
