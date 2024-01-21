@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": "./src/",
     "outDir": "./dist/",
     "noImplicitAny": false,
     "module": "es6",
@@ -7,9 +8,10 @@
     "allowJs": true,
     "checkJs": false,
     "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "strict": false,
-    "strictPropertyInitialization": false
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]

@@ -3,11 +3,13 @@ import { Engine } from "./engine";
 import { Bitmap } from "./bitmap";
 
 import { EntityManager } from "./ecs/simple.ecs";
-import { World } from "./ecs.world";
+import { World, Level } from "./ecs.world";
 import { Systems } from "./ecs.systems";
 import * as components from "./ecs.components";
 
 import { bulkTileableBitmapLoad } from "./helpers";
+
+import levelsData from "./jsondata/levels.json"
 
 export type MainConfig = {
   width: number;
@@ -31,7 +33,7 @@ export const init = async (config: MainConfig): Promise<void> => {
     await bulkTileableBitmapLoad(
       adapter,
       ["./assets/player.png", 16, 16, 4, 1],
-      ["./assets/platforms1.png", 16, 16, 4, 1],
+      ["./assets/platforms.png", 16, 16, 4, 1],
       ["./assets/backgrounds.png", 32, 32, 6, 1],
       ["./assets/backgrounds_houses.png", 48, 32, 5, 1],
     );
@@ -48,6 +50,8 @@ export const init = async (config: MainConfig): Promise<void> => {
     friction: 0.9,
     skyColor: 0xffff8822,
   });
+  const testLevel = Level.from("testLevel", levelsData.testLevel);
+  console.log(testLevel);
 
   console.debug("MAIN: init systems");
   const {
@@ -66,7 +70,7 @@ export const init = async (config: MainConfig): Promise<void> => {
     cPosition: { x: 32, y: 32 },
     cVelocity: { vx: 0, vy: 0 },
     cShape: { w: 16, h: 16 },
-    cMeta: { air: false, speed: 0.6 },
+    cMeta: { air: true, speed: 0.6 },
     cInput: { keys },
     cSprite: {
       spriteIdx: 0,
@@ -112,27 +116,27 @@ export const init = async (config: MainConfig): Promise<void> => {
   const { vx, vy } = components.cVelocity.storage;
 
   const render = (dt: number) => {
-    console.time("render")
+    // console.time("render")
     screenBitmap.fill(world.skyColor);
     animate(dt);
     drawBg(dt);
     draw(dt);
     screenCtx.putImageData(screenImageData, 0, 0);
-    console.timeEnd("render")
+    // console.timeEnd("render")
   };
 
   const update = (dt: number) => {
-    console.time("update")
+    // console.time("update")
     move(dt);
     control(dt);
     collideBounds(dt);
-    console.timeEnd("update")
-    // collideBlocks(dt);
+    collideBlocks(dt);
+    // console.timeEnd("update")
   };
 
   console.debug("MAIN: run engine");
   const engine = new Engine(adapter, fps, update, render, 0.03);
   engine.start();
   // TODO: live limited time. for dev only
-  setTimeout(() => engine.stop(), 1000 * 30); // for development only, to stop after 30 sec
+  setTimeout(() => engine.stop(), 1000 * 5); // for development only, to stop after 30 sec
 };

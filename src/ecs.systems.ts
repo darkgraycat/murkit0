@@ -76,7 +76,9 @@ export function Systems(world: World, viewport: Bitmap) {
         for (const u of units) {
           const uRight = x[u] + w[u];
           const uBottom = y[u] + h[u];
+          let totalCollisions = 0;
           for (const b of blocks) {
+            if (totalCollisions > 3) break;
             const bRight = x[b] + w[b];
             const bBottom = y[b] + h[b];
             const collisionSide = detectCollision(
@@ -90,7 +92,7 @@ export function Systems(world: World, viewport: Bitmap) {
               bBottom,
             );
             if (collisionSide == CollisionSide.None) continue;
-            console.log(collisionSide);
+            totalCollisions++;
             switch (collisionSide) {
               case CollisionSide.Left:
                 vx[u] = 0;

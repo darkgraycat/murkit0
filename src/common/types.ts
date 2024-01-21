@@ -12,3 +12,4 @@ export interface IAdapter {
   sleep(ms: number): Promise<void>;
   now(): number;
 }
+
