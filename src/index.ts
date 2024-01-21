@@ -1,4 +1,4 @@
-import { init } from './core';
+import { init } from './main';
 
 window.addEventListener('load', () => {
   const keys: Set<string> = new Set();
@@ -20,5 +20,6 @@ window.addEventListener('load', () => {
     width,
     height,
     keys,
+    fps: 1000 / 60,
   })
 });
