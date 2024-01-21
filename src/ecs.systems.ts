@@ -10,7 +10,11 @@ import {
   cInput,
   cMeta,
 } from "./ecs.components";
-import { CollisionSide, detectCollision, detectCollisionBounds } from "./helpers";
+import {
+  CollisionSide,
+  detectCollision,
+  detectCollisionBounds,
+} from "./helpers";
 
 import { debug } from ".";
 
@@ -29,15 +33,34 @@ export function Systems(world: World, viewport: Bitmap) {
           const eRight = x[e] + w[e];
           const eBottom = y[e] + h[e];
           const collisionSide = detectCollisionBounds(
-            x[e], y[e], eRight, eBottom,
-            0, 0, width, height, 
-          )
+            x[e],
+            y[e],
+            eRight,
+            eBottom,
+            0,
+            0,
+            width,
+            height,
+          );
           if (collisionSide == CollisionSide.None) continue;
-          switch(collisionSide) {
-            case CollisionSide.Left: vx[e] = 0; x[e] = 0; break
-            case CollisionSide.Right: vx[e] = 0; x[e] = width - w[e]; break
-            case CollisionSide.Top: vy[e] = 1; y[e] = 0; break
-            case CollisionSide.Bottom: vy[e] = 0; y[e] = height - h[e]; air[e] = false; break
+          switch (collisionSide) {
+            case CollisionSide.Left:
+              vx[e] = 0;
+              x[e] = 0;
+              break;
+            case CollisionSide.Right:
+              vx[e] = 0;
+              x[e] = width - w[e];
+              break;
+            case CollisionSide.Top:
+              vy[e] = 1;
+              y[e] = 0;
+              break;
+            case CollisionSide.Bottom:
+              vy[e] = 0;
+              y[e] = height - h[e];
+              air[e] = false;
+              break;
           }
         }
       },
@@ -57,17 +80,34 @@ export function Systems(world: World, viewport: Bitmap) {
             const bRight = x[b] + w[b];
             const bBottom = y[b] + h[b];
             const collisionSide = detectCollision(
-              x[u], y[u], uRight, uBottom,
-              x[b], y[b], bRight, bBottom,
-              b
-            )
+              x[u],
+              y[u],
+              uRight,
+              uBottom,
+              x[b],
+              y[b],
+              bRight,
+              bBottom,
+            );
             if (collisionSide == CollisionSide.None) continue;
-            console.log(collisionSide)
+            console.log(collisionSide);
             switch (collisionSide) {
-              case CollisionSide.Left: vx[u] = 0; x[u] = bRight; break;
-              case CollisionSide.Right: vx[u] = 0; x[u] = x[b] - w[u]; break;
-              case CollisionSide.Top: vy[u] = 1; y[u] = bBottom; break;
-              case CollisionSide.Bottom: vy[u] = 0; y[u] = y[b] - h[u]; break;
+              case CollisionSide.Left:
+                vx[u] = 0;
+                x[u] = bRight;
+                break;
+              case CollisionSide.Right:
+                vx[u] = 0;
+                x[u] = x[b] - w[u];
+                break;
+              case CollisionSide.Top:
+                vy[u] = 1;
+                y[u] = bBottom;
+                break;
+              case CollisionSide.Bottom:
+                vy[u] = 0;
+                y[u] = y[b] - h[u];
+                break;
             }
           }
         }
@@ -75,19 +115,22 @@ export function Systems(world: World, viewport: Bitmap) {
     ),
 
     /* Move entity using velocity values */
-    sMovement: new System({ cPosition, cVelocity, cMeta }, (dt, comp, entities) => {
-      const { x, y } = comp.cPosition.storage;
-      const { vx, vy } = comp.cVelocity.storage;
-      const { air } = comp.cMeta.storage;
-      const { friction, gravity } = world;
-      for (const e of entities) {
-        x[e] += vx[e] * dt;
-        y[e] += vy[e] * dt;
-        // TODO: think to move it separately, to avoid dependency with cMeta.air
-        vx[e] *= friction;
-        if (air[e]) vy[e] += gravity;
-      }
-    }),
+    sMovement: new System(
+      { cPosition, cVelocity, cMeta },
+      (dt, comp, entities) => {
+        const { x, y } = comp.cPosition.storage;
+        const { vx, vy } = comp.cVelocity.storage;
+        const { air } = comp.cMeta.storage;
+        const { friction, gravity } = world;
+        for (const e of entities) {
+          x[e] += vx[e] * dt;
+          y[e] += vy[e] * dt;
+          // TODO: think to move it separately, to avoid dependency with cMeta.air
+          vx[e] *= friction;
+          if (air[e]) vy[e] += gravity;
+        }
+      },
+    ),
 
     /* Render frame of spritesheet by index */
     sDrawing: new System({ cSprite, cPosition }, (_, comp, entities) => {
@@ -122,8 +165,8 @@ export function Systems(world: World, viewport: Bitmap) {
         const { vx, vy } = comp.cVelocity.storage;
         const { air, speed } = comp.cMeta.storage;
         for (const e of entities) {
-          debug.set(air, vx[e].toFixed(), vy[e].toFixed())
-          if (air[e] == true, vy[e] == 0) air[e] = false;
+          debug.set(air, vx[e].toFixed(), vy[e].toFixed());
+          if ((air[e] == true, vy[e] == 0)) air[e] = false;
           if (!keys[e].size) {
             current[e] = 0;
             continue;

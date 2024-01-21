@@ -43,13 +43,6 @@ export const createStaticDrawableEntity = (
     cSprite: { sprites, spriteIdx, flipped: false },
   });
 
-// export enum CollisionSide {
-//   None = 0,
-//   Left = 1,
-//   Right = 2,
-//   Top = 3,
-//   Bottom = 4,
-// }
 export enum CollisionSide {
   None = "none",
   Left = "left",
@@ -62,14 +55,10 @@ export const detectCollision = (
   r0: number, b0: number,
   x1: number, y1: number,
   r1: number, b1: number,
-  debugEntityNum: number,
 ): CollisionSide => {
-  // console.log( [x0, y0, r0, b0], [x1, y1, r1, b1], debugEntityNum)
   if (x0 >= r1 || x1 >= r0 || y0 >= b1 || y1 >= b0) return CollisionSide.None;
   const overlapX = Math.min(r0 - x1, r1 - x0);
   const overlapY = Math.min(b0 - y1, b1 - y0);
-
-  debug.add(overlapX.toFixed(2), overlapY.toFixed(2))
 
   if (overlapX > 0 && overlapX < overlapY) {
     return x0 > x1
