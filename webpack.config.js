@@ -10,10 +10,6 @@ module.exports = {
         use: 'ts-loader',
         exclude: [/node_modules/, /old_files/, /devtools/],
       },
-      // {
-      //   test: /\.json$/,
-      //   use: 'json-loader',
-      // },
     ],
   },
   output: {
