@@ -1,11 +1,14 @@
 import { IImage } from "./common/types";
 import { Adapter } from "./adapter";
-import { Bitmap, TileableBitmap } from "./bitmap";
 import { Engine } from "./engine";
+import { Bitmap } from "./bitmap";
+
 import { EntityManager } from "./ecs/simple.ecs";
 import { World } from "./ecs.world";
 import { Systems } from "./ecs.systems";
 import * as components from "./ecs.components";
+
+import { bulkTileableBitmapLoad } from "./helpers";
 
 export type CoreConfig = {
   width: number;
@@ -27,20 +30,16 @@ export const init = async (config: CoreConfig): Promise<void> => {
   const screenBitmap = Bitmap.from(screenImageData.data.buffer, width, height);
   const adapter = new Adapter();
 
-  console.debug("MAIN: load sprites");
-  type TilesheetTuple = [string, number, number, number, number];
-  const [playerTiles, blocksTiles, bgTiles, bgHouseTiles] = await Promise.all(
-    [
+  console.debug("MAIN: load assets 2");
+  const [playerTiles, blocksTiles, bgTiles, bgHouseTiles] =
+    await bulkTileableBitmapLoad(
+      adapter,
       ["./assets/player.png", 16, 16, 4, 1],
-      ["./assets/platforms.png", 16, 16, 4, 1],
+      ["./assets/platforms1.png", 16, 16, 4, 1],
       ["./assets/backgrounds.png", 32, 32, 6, 1],
       ["./assets/backgrounds_houses.png", 48, 32, 5, 1],
-    ].map(([file, w, h, cols, rows]: TilesheetTuple) =>
-      adapter
-        .loadImage(file)
-        .then((img: IImage) => TileableBitmap.from(img.data, w, h, cols, rows)),
-    ),
-  );
+    );
+
   const playerSprites = playerTiles.splitToBitmaps();
   playerSprites.push(...playerTiles.flipV().splitToBitmaps());
   const bgHouseSprites = bgHouseTiles.splitToBitmaps();
