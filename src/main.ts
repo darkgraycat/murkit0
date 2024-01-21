@@ -29,7 +29,7 @@ export const init = async (config: CoreConfig): Promise<void> => {
   const screenBitmap = Bitmap.from(screenImageData.data.buffer, width, height);
   const adapter = new Adapter();
 
-  console.debug("MAIN: load assets 2");
+  console.debug("MAIN: load assets");
   const [playerTiles, blocksTiles, bgTiles, bgHouseTiles] =
     await bulkTileableBitmapLoad(
       adapter,
