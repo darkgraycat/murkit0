@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": "./src/",
     "outDir": "./dist/",
     "noImplicitAny": false,
     "module": "es6",
@@ -7,22 +8,11 @@
     "allowJs": true,
     "checkJs": false,
     "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "strict": false,
-    "strictPropertyInitialization": false
+    "strict": false
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
 }
-
-// {
-//   "compilerOptions": {
-//     "outDir": "./dist/",
-//     "target": "es5",
-//     "module": "commonjs",
-//     "strict": true,
-//     "esModuleInterop": true
-//   },
-//   "include": ["src/**/*.ts"],
-//   "exclude": ["node_modules"]
-// }
