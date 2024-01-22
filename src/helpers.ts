@@ -92,7 +92,14 @@ export const detectCollisionBounds = (
   return CollisionSide.None;
 }
 
+export const detectCollision2 = (
+  x0: number, y0: number,
+  r0: number, b0: number,
+  x1: number, y1: number,
+  r1: number, b1: number,
+) => {
 
+}
 
 
 
