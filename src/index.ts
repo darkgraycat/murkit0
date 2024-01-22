@@ -1,5 +1,7 @@
 import { init } from "./main";
 
+// require('file-loader?name=[name].[ext]!../index.html');
+
 export const debug: any = {};
 
 window.addEventListener("load", () => {
@@ -15,6 +17,7 @@ window.addEventListener("load", () => {
   const width = 320;
   const height = 240;
 
+  console.log(document);
   const screen = document.getElementById("screen") as HTMLCanvasElement;
 
   screen.width = width;

@@ -1,5 +1,5 @@
 import { System } from "./ecs/simple.ecs";
-import { World } from "./ecs.world";
+import { World } from "./world";
 import { Bitmap } from "./bitmap";
 import {
   cPosition,
@@ -9,7 +9,7 @@ import {
   cAnimation,
   cInput,
   cMeta,
-} from "./ecs.components";
+} from "./components";
 import {
   CollisionSide,
   detectCollision,

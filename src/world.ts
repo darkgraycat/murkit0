@@ -36,17 +36,18 @@ export enum LevelCellType {
 }
 
 export type LevelCell = {
-  sprite: string,
-  spriteIdx: number,
-  type: LevelCellType,
-} 
+  sprite: string;
+  spriteIdx: number;
+  type: number;
+};
 
 export type LevelConfig = {
   map: number[][];
-  mapping: { [key: string]: Object };
+  mapping: { [key: number]: LevelCell };
 };
 
 export class Level {
+  // TODO: use LevelCell type for map property
   public collisions: boolean[][];
   readonly width: number;
   readonly height: number;
@@ -74,23 +75,12 @@ export class Level {
     return new Level(name, map, parsedMapping);
   }
 
-  private fillterMap(type: LevelCellType): boolean[][] {
-    // TODO: use this to generate collisions
-    return [[false]];
+  private filterMap(type: LevelCellType): boolean[][] {
+    const filtered = this.map.map((row) => row.map((col) => !!(col & type)));
+    return filtered;
   }
 
   private refreshCollistions(): void {
-    const tst = Array(this.height).fill(Array(this.width).fill(false));
-    const { collisions, map, mapping } = this;
-    let length = this.width * this.height;
-    while(length--) {
-      const col = (length % this.width);
-      const row = (length / this.width | 0);
-      const cell = map[row][col];
-      // const { type } = mapping.get(cell);
-      console.log(cell, cell & LevelCellType.Block);
-      tst[row][col] = cell;
-    }
-    console.log("TST", tst)
+    this.collisions = this.filterMap(LevelCellType.Block);
   }
 }

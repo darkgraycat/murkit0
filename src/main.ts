@@ -3,13 +3,11 @@ import { Engine } from "./engine";
 import { Bitmap } from "./bitmap";
 
 import { EntityManager } from "./ecs/simple.ecs";
-import { World, Level } from "./ecs.world";
-import { Systems } from "./ecs.systems";
-import * as components from "./ecs.components";
+import { World, Level } from "./world";
+import { Systems } from "./systems";
+import * as components from "./components";
 
 import { bulkTileableBitmapLoad } from "./helpers";
-
-import levelsData from "./jsondata/levels.json"
 
 export type MainConfig = {
   width: number;
@@ -50,8 +48,6 @@ export const init = async (config: MainConfig): Promise<void> => {
     friction: 0.9,
     skyColor: 0xffff8822,
   });
-  const testLevel = Level.from("testLevel", levelsData.testLevel);
-  console.log(testLevel);
 
   console.debug("MAIN: init systems");
   const {
