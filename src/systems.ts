@@ -12,11 +12,12 @@ import {
 } from "./components";
 import {
   CollisionSide,
-  detectCollision,
-  detectCollisionBounds,
+  collision,
 } from "./helpers";
 
 import { debug } from ".";
+
+const { rectangle, bounds } = collision;
 
 export function Systems(world: World, viewport: Bitmap) {
   const { width, height } = world;
@@ -32,35 +33,16 @@ export function Systems(world: World, viewport: Bitmap) {
         for (const e of entities) {
           const eRight = x[e] + w[e];
           const eBottom = y[e] + h[e];
-          const collisionSide = detectCollisionBounds(
-            x[e],
-            y[e],
-            eRight,
-            eBottom,
-            0,
-            0,
-            width,
-            height,
-          );
+          const collisionSide = bounds(
+            x[e], y[e], eRight, eBottom,
+            0, 0, width, height,
+          )
           if (collisionSide == CollisionSide.None) continue;
           switch (collisionSide) {
-            case CollisionSide.Left:
-              vx[e] = 0;
-              x[e] = 0;
-              break;
-            case CollisionSide.Right:
-              vx[e] = 0;
-              x[e] = width - w[e];
-              break;
-            case CollisionSide.Top:
-              vy[e] = 1;
-              y[e] = 0;
-              break;
-            case CollisionSide.Bottom:
-              vy[e] = 0;
-              y[e] = height - h[e];
-              air[e] = false;
-              break;
+            case CollisionSide.Left: vx[e] = 0; x[e] = 0; break;
+            case CollisionSide.Right: vx[e] = 0; x[e] = width - w[e]; break;
+            case CollisionSide.Top: vy[e] = 1; y[e] = 0; break;
+            case CollisionSide.Bottom: vy[e] = 0; y[e] = height - h[e]; air[e] = false; break;
           }
         }
       },
@@ -68,48 +50,35 @@ export function Systems(world: World, viewport: Bitmap) {
 
     /* Collide entities from groupA with entities from groupB */
     sCollideShapes: new System(
-      { cPosition, cVelocity, cShape },
+      { cPosition, cVelocity, cShape, cMeta },
       (_, comp, units, blocks) => {
         const { x, y } = comp.cPosition.storage;
         const { vx, vy } = comp.cVelocity.storage;
         const { w, h } = comp.cShape.storage;
-        for (const u of units) {
-          const uRight = x[u] + w[u];
-          const uBottom = y[u] + h[u];
+        const { air } = comp.cMeta.storage;
+        for (const e of units) {
+          const uRight = x[e] + w[e];
+          const uBottom = y[e] + h[e];
           let totalCollisions = 0;
           for (const b of blocks) {
-            if (totalCollisions > 3) break;
+            if (totalCollisions > 2) break;
             const bRight = x[b] + w[b];
             const bBottom = y[b] + h[b];
-            const collisionSide = detectCollision(
-              x[u],
-              y[u],
-              uRight,
-              uBottom,
-              x[b],
-              y[b],
-              bRight,
-              bBottom,
+            const collisionSide = rectangle(
+              x[e], y[e], uRight, uBottom,
+              x[b], y[b], bRight, bBottom,
             );
-            if (collisionSide == CollisionSide.None) continue;
+            debug.set(collisionSide)
+            if (collisionSide == CollisionSide.None) {
+              // air[e] = true;
+              continue;
+            }
             totalCollisions++;
             switch (collisionSide) {
-              case CollisionSide.Left:
-                vx[u] = 0;
-                x[u] = bRight;
-                break;
-              case CollisionSide.Right:
-                vx[u] = 0;
-                x[u] = x[b] - w[u];
-                break;
-              case CollisionSide.Top:
-                vy[u] = 1;
-                y[u] = bBottom;
-                break;
-              case CollisionSide.Bottom:
-                vy[u] = 0;
-                y[u] = y[b] - h[u];
-                break;
+              case CollisionSide.Left: vx[e] = 0; x[e] = bRight; break;
+              case CollisionSide.Right: vx[e] = 0; x[e] = x[b] - w[e]; break;
+              case CollisionSide.Top: vy[e] = 1; y[e] = bBottom; break;
+              case CollisionSide.Bottom: vy[e] = 0; y[e] = y[b] - h[e]; air[e] = false; break;
             }
           }
         }
@@ -167,7 +136,7 @@ export function Systems(world: World, viewport: Bitmap) {
         const { vx, vy } = comp.cVelocity.storage;
         const { air, speed } = comp.cMeta.storage;
         for (const e of entities) {
-          debug.set(air, vx[e].toFixed(), vy[e].toFixed());
+          // debug.set(air, vx[e].toFixed(), vy[e].toFixed());
           if ((air[e] == true, vy[e] == 0)) air[e] = false;
           if (!keys[e].size) {
             current[e] = 0;

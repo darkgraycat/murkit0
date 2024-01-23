@@ -43,6 +43,21 @@ export const createStaticDrawableEntity = (
     cSprite: { sprites, spriteIdx, flipped: false },
   });
 
+export const detectCollision = (
+  x0: number, y0: number,
+  r0: number, b0: number,
+  x1: number, y1: number,
+  r1: number, b1: number,
+): CollisionSide => {
+  const dx = Math.min(r0 - x1, r1 - x0);
+  const dy = Math.min(b0 - y1, b1 - y0);
+  debug.set(dx.toFixed(2), dy.toFixed(2));
+  if (x0 >= r1 || x1 >= r0 || y0 >= b1 || y1 >= b0) return CollisionSide.None;
+  return dx < dy
+    ? x0 > x1 ? CollisionSide.Left : CollisionSide.Right
+    : y0 > y1 ? CollisionSide.Top : CollisionSide.Bottom;
+};
+
 export enum CollisionSide {
   None = "none",
   Left = "left",
@@ -50,68 +65,40 @@ export enum CollisionSide {
   Top = "top",
   Bottom = "bottom",
 }
-export const detectCollision = (
-  x0: number, y0: number,
-  r0: number, b0: number,
-  x1: number, y1: number,
-  r1: number, b1: number,
-): CollisionSide => {
-  if (x0 >= r1 || x1 >= r0 || y0 >= b1 || y1 >= b0) return CollisionSide.None;
-  const overlapX = Math.min(r0 - x1, r1 - x0);
-  const overlapY = Math.min(b0 - y1, b1 - y0);
-
-  if (overlapX > 0 && overlapX < overlapY) {
-    return x0 > x1
-      ? CollisionSide.Left
-      : CollisionSide.Right;
-  } else if (overlapY > 0) {
-    return y0 > y1
-      ? CollisionSide.Top
-      : CollisionSide.Bottom;
+export const collision = {
+  sphere(
+    x0: number, y0: number, d0: number,
+    x1: number, y1: number, d1: number,
+  ): boolean {
+    const dist = Math.sqrt(
+      (x1 - x0) ** 2 + 
+      (y1 - y0) ** 2
+    );
+    return dist < (d0 + d1) / 2;
+  },
+  rectangle(
+    x0: number, y0: number,
+    r0: number, b0: number,
+    x1: number, y1: number,
+    r1: number, b1: number,
+  ): CollisionSide {
+    const dx = Math.min(r0 - x1, r1 - x0);
+    const dy = Math.min(b0 - y1, b1 - y0);
+    if (x0 >= r1 || x1 >= r0 || y0 >= b1 || y1 >= b0) return CollisionSide.None;
+    return dx < dy
+      ? x0 > x1 ? CollisionSide.Left : CollisionSide.Right
+      : y0 > y1 ? CollisionSide.Top : CollisionSide.Bottom;
+  },
+  bounds(
+    x0: number, y0: number,
+    r0: number, b0: number,
+    bl: number, bt: number,
+    br: number, bb: number,
+  ): CollisionSide {
+    if (y0 < bt) return CollisionSide.Top;
+    if (b0 > bb) return CollisionSide.Bottom;
+    if (x0 < bl) return CollisionSide.Left;
+    if (r0 > br) return CollisionSide.Right;
+    return CollisionSide.None;
   }
-
-  return CollisionSide.None;
 };
-
-export const detectCollisionBounds = (
-  x0: number, y0: number,
-  r0: number, b0: number,
-  x1: number, y1: number,
-  r1: number, b1: number,
-): CollisionSide => {
-  if (x0 < x1) {
-    return CollisionSide.Left;
-  } else if (r0 > r1) {
-    return CollisionSide.Right;
-  }
-  if (y0 < y1) {
-    return CollisionSide.Top;
-  } else if (b0 > b1) {
-    return CollisionSide.Bottom;
-  }
-  return CollisionSide.None;
-}
-
-export const detectCollision2 = (
-  x0: number, y0: number,
-  r0: number, b0: number,
-  x1: number, y1: number,
-  r1: number, b1: number,
-) => {
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

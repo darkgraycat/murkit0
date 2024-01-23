@@ -40,7 +40,6 @@ export class EntityManager<T extends Record<string, Component<any>>> {
 
 /* Component */
 export type Storage<T> = { [K in keyof T]: T[K][] };
-
 export class Component<T> {
   readonly schema: Imutable<T>;
   readonly storage: Imutable<Storage<T>>;

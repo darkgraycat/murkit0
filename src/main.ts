@@ -7,7 +7,7 @@ import { World, Level } from "./world";
 import { Systems } from "./systems";
 import * as components from "./components";
 
-import { bulkTileableBitmapLoad } from "./helpers";
+import { bulkTileableBitmapLoad, createStaticDrawableEntity } from "./helpers";
 
 export type MainConfig = {
   width: number;
@@ -27,7 +27,7 @@ export const init = async (config: MainConfig): Promise<void> => {
   const adapter = new Adapter();
 
   console.debug("MAIN: load assets");
-  const [playerTiles, blocksTiles, bgTiles, bgHouseTiles] =
+  const [playerTiles, boxTiles, bgTiles, bgHouseTiles] =
     await bulkTileableBitmapLoad(
       adapter,
       ["./assets/player.png", 16, 16, 4, 1],
@@ -39,6 +39,7 @@ export const init = async (config: MainConfig): Promise<void> => {
   const playerSprites = playerTiles.splitToBitmaps();
   playerSprites.push(...playerTiles.flipV().splitToBitmaps());
   const bgHouseSprites = bgHouseTiles.splitToBitmaps();
+  const boxSprites = boxTiles.splitToBitmaps();
 
   console.debug("MAIN: init world");
   const world = new World({
@@ -61,9 +62,8 @@ export const init = async (config: MainConfig): Promise<void> => {
 
   console.debug("MAIN: init entities");
   const em = new EntityManager(components);
-
   const player = em.add({
-    cPosition: { x: 32, y: 32 },
+    cPosition: { x: 32, y: 128 },
     cVelocity: { vx: 0, vy: 0 },
     cShape: { w: 16, h: 16 },
     cMeta: { air: true, speed: 0.6 },
@@ -85,16 +85,15 @@ export const init = async (config: MainConfig): Promise<void> => {
     },
   });
 
-  const createHouseBlockEntity = (spriteIdx: number, x: number, y: number) =>
-    em.add({
-      cPosition: { x, y },
-      cShape: { w: 48, h: 32 },
-      cSprite: { sprites: bgHouseSprites, spriteIdx, flipped: false },
-    });
+  const createHouseBlock = (idx: number, x: number, y: number) =>
+    createStaticDrawableEntity(em, bgHouseSprites, idx, x, y, 48, 32);
+  const createBoxBlock = (idx: number, x: number, y: number) =>
+    createStaticDrawableEntity(em, boxSprites, idx, x, y, 16, 16);
 
   const houseBlocks = [
-    createHouseBlockEntity(0, 48 * 3, 208),
-    createHouseBlockEntity(1, 48 * 4, 208),
+    createHouseBlock(0, 48 * 3, 208),
+    createHouseBlock(1, 48 * 4, 208),
+    createBoxBlock(0, 15 * 16, 224),
   ];
 
   console.debug("MAIN: attach entities with systems");
@@ -103,7 +102,7 @@ export const init = async (config: MainConfig): Promise<void> => {
   const move = sMovement.setup([player]);
   // const draw = sDrawing.setup([player, ...houseBlocks]);
   const draw = sDrawing.setup([player]);
-  const drawBg = sDrawing.setup(houseBlocks)
+  const drawBg = sDrawing.setup(houseBlocks);
   const control = sController.setup([player]);
   const animate = sAnimation.setup([player]);
 
@@ -134,5 +133,5 @@ export const init = async (config: MainConfig): Promise<void> => {
   const engine = new Engine(adapter, fps, update, render, 0.03);
   engine.start();
   // TODO: live limited time. for dev only
-  setTimeout(() => engine.stop(), 1000 * 5); // for development only, to stop after 30 sec
+  setTimeout(() => engine.stop(), 1000 * 60); // for development only, to stop after 30 sec
 };
