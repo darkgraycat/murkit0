@@ -43,21 +43,6 @@ export const createStaticDrawableEntity = (
     cSprite: { sprites, spriteIdx, flipped: false },
   });
 
-export const detectCollision = (
-  x0: number, y0: number,
-  r0: number, b0: number,
-  x1: number, y1: number,
-  r1: number, b1: number,
-): CollisionSide => {
-  const dx = Math.min(r0 - x1, r1 - x0);
-  const dy = Math.min(b0 - y1, b1 - y0);
-  debug.set(dx.toFixed(2), dy.toFixed(2));
-  if (x0 >= r1 || x1 >= r0 || y0 >= b1 || y1 >= b0) return CollisionSide.None;
-  return dx < dy
-    ? x0 > x1 ? CollisionSide.Left : CollisionSide.Right
-    : y0 > y1 ? CollisionSide.Top : CollisionSide.Bottom;
-};
-
 export enum CollisionSide {
   None = "none",
   Left = "left",
