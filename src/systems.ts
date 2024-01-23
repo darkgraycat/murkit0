@@ -68,18 +68,38 @@ export function Systems(world: World, viewport: Bitmap) {
               x[e], y[e], uRight, uBottom,
               x[b], y[b], bRight, bBottom,
             );
-            debug.set(collisionSide)
+            debug.set(collisionSide, air[e], vy[e].toFixed(2), height)
             if (collisionSide == CollisionSide.None) {
+              // if (y[e] + h[e] < height) air[e] = true;
               // air[e] = true;
               continue;
             }
+            // console.log(collisionSide)
             totalCollisions++;
-            switch (collisionSide) {
-              case CollisionSide.Left: vx[e] = 0; x[e] = bRight; break;
-              case CollisionSide.Right: vx[e] = 0; x[e] = x[b] - w[e]; break;
-              case CollisionSide.Top: vy[e] = 1; y[e] = bBottom; break;
-              case CollisionSide.Bottom: vy[e] = 0; y[e] = y[b] - h[e]; air[e] = false; break;
+            if (collisionSide === CollisionSide.Left) {
+              vx[e] = 0
+              x[e] = bRight;
             }
+            if (collisionSide === CollisionSide.Right) {
+              vx[e] = 0
+              x[e] = x[b] - w[e];
+            }
+            if (collisionSide === CollisionSide.Top) {
+              vy[e] = 1
+              y[e] = bBottom;
+            }
+            if (collisionSide === CollisionSide.Bottom) {
+              // vy[e] *= -0.001;
+              vy[e] = 0;
+              y [e] = y[b] - h[e]; 
+              air[e] = false;
+						}
+            // switch (collisionSide) {
+            //   case CollisionSide.Left: vx[e] = 0; x[e] = bRight; break;
+            //   case CollisionSide.Right: vx[e] = 0; x[e] = x[b] - w[e]; break;
+            //   case CollisionSide.Top: vy[e] = 1; y[e] = bBottom; break;
+            //   case CollisionSide.Bottom: vy[e] = 0; y[e] = y[b] - h[e]; air[e] = false; break;
+            // }
           }
         }
       },
@@ -98,7 +118,8 @@ export function Systems(world: World, viewport: Bitmap) {
           y[e] += vy[e] * dt;
           // TODO: think to move it separately, to avoid dependency with cMeta.air
           vx[e] *= friction;
-          if (air[e]) vy[e] += gravity;
+          vy[e] += gravity;
+          // if (air[e]) vy[e] += gravity;
         }
       },
     ),
@@ -142,7 +163,7 @@ export function Systems(world: World, viewport: Bitmap) {
             current[e] = 0;
             continue;
           }
-          current[e] = 1;
+          current[e] = 1; // TODO: fix false firing on any key
           if (keys[e].has("KeyQ")) (vx[e] -= speed[e]), (flipped[e] = true);
           if (keys[e].has("KeyW")) (vx[e] += speed[e]), (flipped[e] = false);
           if (keys[e].has("KeyP")) !air[e] && ((air[e] = true), (vy[e] = -12));

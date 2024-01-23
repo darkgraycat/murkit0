@@ -91,9 +91,27 @@ export const init = async (config: MainConfig): Promise<void> => {
     createStaticDrawableEntity(em, boxSprites, idx, x, y, 16, 16);
 
   const houseBlocks = [
-    createHouseBlock(0, 48 * 3, 208),
-    createHouseBlock(1, 48 * 4, 208),
-    createBoxBlock(0, 15 * 16, 224),
+    createHouseBlock(1, 48 * 2, 13 * 16),
+    createHouseBlock(2, 48 * 2, 11 * 16),
+
+    createHouseBlock(0, 48 * 3, 13 * 16),
+    createHouseBlock(2, 48 * 3, 11 * 16),
+
+    createHouseBlock(3, 48 * 4, 13 * 16),
+    createHouseBlock(2, 48 * 4, 11 * 16),
+
+    createHouseBlock(0, 48 * 5, 13 * 16),
+    createHouseBlock(1, 48 * 5, 11 * 16),
+
+    createHouseBlock(1, 48 * 6, 13 * 16),
+    createHouseBlock(2, 48 * 6, 11 * 16),
+
+    createHouseBlock(4, 48 * 4.5, 9 * 16),
+
+    createBoxBlock(1, 4 * 16, 224),
+    createBoxBlock(1, 3 * 16, 224),
+    createBoxBlock(0, 3.5 * 16, 224 - 16),
+
   ];
 
   console.debug("MAIN: attach entities with systems");
@@ -133,5 +151,5 @@ export const init = async (config: MainConfig): Promise<void> => {
   const engine = new Engine(adapter, fps, update, render, 0.03);
   engine.start();
   // TODO: live limited time. for dev only
-  setTimeout(() => engine.stop(), 1000 * 60); // for development only, to stop after 30 sec
+  setTimeout(() => engine.stop(), 1000 * 120); // for development only, to stop after 30 sec
 };
