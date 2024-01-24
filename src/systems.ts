@@ -116,10 +116,11 @@ export function Systems(world: World, viewport: Bitmap) {
         for (const e of entities) {
           x[e] += vx[e] * dt;
           y[e] += vy[e] * dt;
+          // note: switching pos and vel makes player unable to jump
           // TODO: think to move it separately, to avoid dependency with cMeta.air
           vx[e] *= friction;
           vy[e] += gravity;
-          // if (air[e]) vy[e] += gravity;
+          //if (air[e]) vy[e] += gravity;
         }
       },
     ),
@@ -131,7 +132,10 @@ export function Systems(world: World, viewport: Bitmap) {
       for (const e of entities) {
         const half = sprites[e].length / 2;
         const idx = flipped[e] ? spriteIdx[e] + half : spriteIdx[e];
-        viewport.draw(sprites[e][idx], x[e] | 0, y[e] | 0);
+        const px = Math.round(x[e])
+        const py = Math.round(y[e])
+        viewport.draw(sprites[e][idx], px,  py);
+        //viewport.draw(sprites[e][idx], x[e] | 0, y[e] | 0);
       }
     }),
 

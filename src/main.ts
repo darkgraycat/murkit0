@@ -47,7 +47,7 @@ export const init = async (config: MainConfig): Promise<void> => {
     height,
     gravity: 0.9,
     friction: 0.9,
-    skyColor: 0xffff8822,
+    skyColor: 0xff708090,
   });
 
   console.debug("MAIN: init systems");
