@@ -143,6 +143,12 @@ export const init = async (config: MainConfig): Promise<void> => {
     animate(dt);
     drawBg(dt);
     draw(dt);
+
+    screenBitmap.copy(
+      bgHouseTiles,
+      20, 20, 48, 32
+    );
+
     screenCtx.putImageData(screenImageData, 0, 0);
     // console.timeEnd("render")
   };
