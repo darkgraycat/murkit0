@@ -19,8 +19,6 @@ import { debug } from ".";
 
 const { rectangle, bounds } = collision;
 
-let [lastx, lasty] = [0, 0];
-
 export function Systems(world: World, viewport: Bitmap) {
   const { width, height } = world;
   return {
@@ -112,8 +110,6 @@ export function Systems(world: World, viewport: Bitmap) {
         for (const e of entities) {
           x[e] += vx[e] * dt;
           y[e] += vy[e] * dt;
-          lastx = x[e];
-          lasty = y[e];
           // TODO: think to move it separately, to avoid dependency with cMeta.air
           vx[e] *= friction;
           vy[e] += gravity;
@@ -155,8 +151,6 @@ export function Systems(world: World, viewport: Bitmap) {
         const { vx, vy } = comp.cVelocity.storage;
         const { air, speed } = comp.cMeta.storage;
         for (const e of entities) {
-          // debug.set(air, vx[e].toFixed(), vy[e].toFixed());
-          // if ((air[e] == true, vy[e] == 0)) air[e] = false;
           if (!keys[e].size) {
             current[e] = 0;
             continue;
