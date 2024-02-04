@@ -4,7 +4,10 @@ describe("helpers/collision", () => {
   describe("rectangle", () => {
     type Bounds = [ x: number, y: number, w: number, h: number ];
     it.each([
-      // [ [20, 20, 10, 10], [30, 20, 20, 20], CollisionSide.None ],
+      [ [50 + 1, 20, 10, 10], [30, 20, 20, 20], CollisionSide.None ],
+      [ [20 - 1, 20, 10, 10], [30, 20, 20, 20], CollisionSide.None ],
+      [ [30, 40 + 1, 10, 10], [30, 20, 20, 20], CollisionSide.None ],
+      [ [30, 10 - 1, 10, 10], [30, 20, 20, 20], CollisionSide.None ],
       [ [50, 20, 10, 10], [30, 20, 20, 20], CollisionSide.Left ],
       [ [20, 20, 10, 10], [30, 20, 20, 20], CollisionSide.Right ],
       [ [30, 40, 10, 10], [30, 20, 20, 20], CollisionSide.Top ],
@@ -21,7 +24,8 @@ describe("helpers/collision", () => {
       [ [20, 20, 10], [50, 20, 20], true ],
       [ [20, 20, 15], [40, 25, 15], true ],
       [ [20, 20, 10], [50, 22, 20], false ],
-      // [ [20, 20, 10], [50, 20, 20], true ],
+      [ [20, 20, 10], [50, 20, 20], true ],
+      [ [0, 0, 10], [-12, -12, 2], false ],
     ] as [Circle, Circle, boolean][])
     ("test circle", ([x, y, d], [bx, by, bd], expectation) => expect(collision.circle(
       x, y, d,
