@@ -79,7 +79,7 @@ export function Systems(world: World, viewport: Bitmap) {
           const eBottom = y[e] + h[e];
           let totalCollisions = 0;
           for (const b of blocks) {
-            if (totalCollisions > 3) break;
+            if (totalCollisions > 1) break;
             const bRight = x[b] + w[b];
             const bBottom = y[b] + h[b];
             const collisionSide = rectangle(
