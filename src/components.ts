@@ -48,3 +48,18 @@ export const cMeta = new Component<{ air: boolean; speed: number }>({
   air: false,
   speed: 0,
 });
+
+// TODO: investigate possibility of using world as a component
+export const cWorld = new Component<{
+  width: number,
+  height: number,
+  gravity: number,
+  friction: number,
+  viewport: Bitmap,
+}>({
+  width: 0,
+  height: 0,
+  gravity: 0,
+  friction: 0,
+  viewport: new Bitmap(0, 0),
+});

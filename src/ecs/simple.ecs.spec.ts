@@ -224,4 +224,51 @@ describe("ecs/simple.ecs", () => {
       expect(getStats(enemy0)).toEqual([50, -20]);
     });
   });
+
+  describe("ECS experimental features", () => {
+    it("Compoment with method", () => {
+      const cCompWithMethod = new Component({
+        a: 0,
+        b: 0,
+        op: () => 0,
+      });
+      const [a, b]  = [
+        cCompWithMethod.set(0, { a: 2, b: 3, op: () => 0 }),
+        cCompWithMethod.set(1, { a: 2, b: 3, op: () => 0 }),
+      ];
+    });
+    it("System controls System", () => {
+      const cComp = new Component({ val: 0, acc: 0 });
+      const entities = [0, 1, 2, 3].map(id => cComp.set(id, { val: 0, acc: id + 2 }));
+      const sAddVal = new System(
+        { cComp },
+        (_, { cComp }, entities) => {
+          const { val, acc } = cComp.storage;
+          for (const e of entities) val[e] += acc[e];
+        }
+      );
+      let ents = entities;
+      let cb = sAddVal.setup(ents);
+      const sFilterBy10 = new System(
+        { cComp },
+        (_, { cComp }, entities) => {
+          const { val } = cComp.storage;
+          for (const e of entities) {
+            if (val[e] < 10) continue;
+            ents.splice(e, 1); // dont care that its inefective
+            cb = sAddVal.setup(ents);
+          }
+          cb();
+        }
+      );
+      const tick = sFilterBy10.setup(ents);
+      const { storage } = cComp;
+      expect(storage.val).toEqual([0, 0, 0, 0]);
+      tick(); expect(storage.val).toEqual([2, 3, 4, 5]);
+      tick(); expect(storage.val).toEqual([4, 6, 8, 10]);
+      tick(); expect(storage.val).toEqual([6, 9, 12, 10]);
+      tick(); expect(storage.val).toEqual([8, 12, 12, 10]);
+      tick(); expect(storage.val).toEqual([10, 12, 12, 10]);
+    })
+  });
 });

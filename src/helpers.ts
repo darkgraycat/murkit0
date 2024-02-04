@@ -7,10 +7,8 @@ import { debug } from ".";
 
 export type BulkTileableBitmapLoadingConfig = [
   path: string,
-  w: number,
-  h: number,
-  cols: number,
-  rows: number,
+  w: number, h: number,
+  cols: number, rows: number,
 ];
 export const bulkTileableBitmapLoad = (
   adapter: Adapter,
@@ -32,10 +30,8 @@ export const createStaticDrawableEntity = (
   em: EntityManager<any>,
   sprites: Bitmap[],
   spriteIdx: number,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
+  x: number, y: number,
+  w: number, h: number,
 ) =>
   em.add({
     cPosition: { x, y },
@@ -51,7 +47,7 @@ export enum CollisionSide {
   Bottom = "bottom",
 }
 export const collision = {
-  sphere(
+  circle(
     x0: number, y0: number, d0: number,
     x1: number, y1: number, d1: number,
   ): boolean {
@@ -59,7 +55,7 @@ export const collision = {
       (x1 - x0) ** 2 + 
       (y1 - y0) ** 2
     );
-    return dist < (d0 + d1) / 2;
+    return dist <= (d0 + d1);
   },
   rectangle(
     x0: number, y0: number,
@@ -67,9 +63,9 @@ export const collision = {
     x1: number, y1: number,
     r1: number, b1: number,
   ): CollisionSide {
+    if (x0 > r1 || x1 > r0 || y0 > b1 || y1 > b0) return CollisionSide.None;
     const dx = Math.min(r0 - x1, r1 - x0);
     const dy = Math.min(b0 - y1, b1 - y0);
-    if (x0 >= r1 || x1 >= r0 || y0 >= b1 || y1 >= b0) return CollisionSide.None;
     return dx < dy
       ? x0 > x1 ? CollisionSide.Left : CollisionSide.Right
       : y0 > y1 ? CollisionSide.Top : CollisionSide.Bottom;

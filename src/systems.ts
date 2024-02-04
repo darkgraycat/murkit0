@@ -36,7 +36,7 @@ export function Systems(world: World, viewport: Bitmap) {
           const collisionSide = bounds(
             x[e], y[e], eRight, eBottom,
             0, 0, width, height,
-          )
+          );
           if (collisionSide == CollisionSide.None) continue;
           switch (collisionSide) {
             case CollisionSide.Left: vx[e] = 0; x[e] = 0; break;
@@ -48,37 +48,51 @@ export function Systems(world: World, viewport: Bitmap) {
       },
     ),
 
+    /* Collide entities with a world tiles */
+    sCollideLevel: new System(
+      { cPosition, cVelocity, cShape, cMeta },
+      (_, comp, entities) => {
+        throw new Error("Not implemented yet");
+        // get entity cell cx, cy - current row and column
+        // get index world.level.collisions[top * columns + left]
+        // and collide with top, left, bottom, right
+        // input: same as collide shapes + level collision map
+        // algo:
+        // for all entities:
+        //  get top, left, right, bottom cells (ghost, no actualy an object)
+        //  check if collide for each side
+      }
+    ),
+
     /* Collide entities from groupA with entities from groupB */
     sCollideShapes: new System(
       { cPosition, cVelocity, cShape, cMeta },
-      (_, comp, units, blocks) => {
+      (_, comp, entities, blocks) => {
         const { x, y } = comp.cPosition.storage;
         const { vx, vy } = comp.cVelocity.storage;
         const { w, h } = comp.cShape.storage;
         const { air } = comp.cMeta.storage;
-        for (const e of units) {
-          const uRight = x[e] + w[e];
-          const uBottom = y[e] + h[e];
+        for (const e of entities) {
+          const eRight = x[e] + w[e];
+          const eBottom = y[e] + h[e];
           let totalCollisions = 0;
           for (const b of blocks) {
-            if (totalCollisions > 2) break;
+            if (totalCollisions > 1) break;
             const bRight = x[b] + w[b];
             const bBottom = y[b] + h[b];
             const collisionSide = rectangle(
-              x[e], y[e], uRight, uBottom,
+              x[e], y[e], eRight, eBottom,
               x[b], y[b], bRight, bBottom,
             );
-            debug.set(collisionSide)
-            if (collisionSide == CollisionSide.None) {
-              // air[e] = true;
-              continue;
-            }
+            // TODO: remove debug
+            debug.set(collisionSide.toUpperCase(), air[e] ? "^" : "_", `${x[e].toFixed(2)}:${y[e].toFixed(2)}`, vy[e].toFixed(2));
+            if (collisionSide === CollisionSide.None) continue;
             totalCollisions++;
             switch (collisionSide) {
-              case CollisionSide.Left: vx[e] = 0; x[e] = bRight; break;
-              case CollisionSide.Right: vx[e] = 0; x[e] = x[b] - w[e]; break;
-              case CollisionSide.Top: vy[e] = 1; y[e] = bBottom; break;
               case CollisionSide.Bottom: vy[e] = 0; y[e] = y[b] - h[e]; air[e] = false; break;
+              case CollisionSide.Right: vx[e] = 0; x[e] = x[b] - w[e] - 0.01; break;
+              case CollisionSide.Left: vx[e] = 0; x[e] = bRight + 0.01; break;
+              case CollisionSide.Top: vy[e] = 1; y[e] = bBottom; break;
             }
           }
         }
@@ -98,7 +112,7 @@ export function Systems(world: World, viewport: Bitmap) {
           y[e] += vy[e] * dt;
           // TODO: think to move it separately, to avoid dependency with cMeta.air
           vx[e] *= friction;
-          if (air[e]) vy[e] += gravity;
+          vy[e] += gravity;
         }
       },
     ),
@@ -110,7 +124,8 @@ export function Systems(world: World, viewport: Bitmap) {
       for (const e of entities) {
         const half = sprites[e].length / 2;
         const idx = flipped[e] ? spriteIdx[e] + half : spriteIdx[e];
-        viewport.draw(sprites[e][idx], x[e] | 0, y[e] | 0);
+        // viewport.draw(sprites[e][idx], x[e] | 0, y[e] | 0);
+        viewport.draw(sprites[e][idx], Math.round(x[e]), Math.round(y[e]));
       }
     }),
 
@@ -136,16 +151,14 @@ export function Systems(world: World, viewport: Bitmap) {
         const { vx, vy } = comp.cVelocity.storage;
         const { air, speed } = comp.cMeta.storage;
         for (const e of entities) {
-          // debug.set(air, vx[e].toFixed(), vy[e].toFixed());
-          if ((air[e] == true, vy[e] == 0)) air[e] = false;
           if (!keys[e].size) {
             current[e] = 0;
             continue;
           }
-          current[e] = 1;
+          current[e] = 1; // TODO: fix false firing on any key
           if (keys[e].has("KeyQ")) (vx[e] -= speed[e]), (flipped[e] = true);
           if (keys[e].has("KeyW")) (vx[e] += speed[e]), (flipped[e] = false);
-          if (keys[e].has("KeyP")) !air[e] && ((air[e] = true), (vy[e] = -12));
+          if (keys[e].has("KeyP")) !air[e] && ((air[e] = true), (vy[e] = -10));
         }
       },
     ),

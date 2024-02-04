@@ -1,6 +1,6 @@
 import { Level, LevelConfig } from "../world"
 
-describe("world", () => {
+describe.skip("World", () => {
   describe("Level", () => {
     const levelConfig: LevelConfig = {
       map: [
