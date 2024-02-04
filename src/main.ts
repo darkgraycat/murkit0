@@ -141,9 +141,9 @@ export const init = async (config: MainConfig): Promise<void> => {
   const update = (dt: number) => {
     // console.time("update")
     move(dt);
-    control(dt);
     collideBounds(dt);
     collideBlocks(dt);
+    control(dt);
     // console.timeEnd("update")
   };
 

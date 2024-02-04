@@ -50,6 +50,22 @@ export function Systems(world: World, viewport: Bitmap) {
       },
     ),
 
+    /* Collide entities with a world tiles */
+    sCollideLevel: new System(
+      { cPosition, cVelocity, cShape, cMeta },
+      (_, comp, entities) => {
+        throw new Error("Not implemented yet");
+        // get entity cell cx, cy - current row and column
+        // get index world.level.collisions[top * columns + left]
+        // and collide with top, left, bottom, right
+        // input: same as collide shapes + level collision map
+        // algo:
+        // for all entities:
+        //  get top, left, right, bottom cells (ghost, no actualy an object)
+        //  check if collide for each side
+      }
+    ),
+
     /* Collide entities from groupA with entities from groupB */
     sCollideShapes: new System(
       { cPosition, cVelocity, cShape, cMeta },
@@ -71,10 +87,11 @@ export function Systems(world: World, viewport: Bitmap) {
               x[b], y[b], bRight, bBottom,
             );
             debug.set(
-              collisionSide[0].toUpperCase(),
+              collisionSide.toUpperCase(),
               air[e],
               vy[e].toFixed(2),
-              height
+              height,
+              b
             );
             if (collisionSide === CollisionSide.None) continue;
             totalCollisions++;
@@ -85,7 +102,7 @@ export function Systems(world: World, viewport: Bitmap) {
             //   case CollisionSide.Left: vx[e] = 0; x[e] = bRight; break;
             //   case CollisionSide.Top: vy[e] = 1; y[e] = bBottom; break;
             // }
-            if (collisionSide !== CollisionSide.Bottom) {
+            if (collisionSide !== CollisionSide.Bottom && false) {
               const really = rectangle(
                 x[e], y[e], x[e] + w[e], y[e] + h[e], 
                 x[b], y[b], x[b] + w[b], y[b] + h[b], 
@@ -100,8 +117,7 @@ export function Systems(world: World, viewport: Bitmap) {
               )
             }
             if (collisionSide === CollisionSide.Bottom) {
-              // vy[e] = 0;
-              vy[e] *= 0.2;
+              vy[e] = 0;
               y[e] = y[b] - h[e];
               air[e] = false;
               continue;
@@ -114,9 +130,8 @@ export function Systems(world: World, viewport: Bitmap) {
                 [x[b], y[b], w[b], h[b]],
               )
               // console.log(collisionSide, vx[e].toFixed(3), x[e].toFixed(3), y[e].toFixed(3), lasty.toFixed(3), eRight.toFixed(3), x[b], bRight, b);
-              // vx[e] = 0;
-              vx[e] *= 0.1;
-              x[e] = x[b] - w[e];
+              vx[e] = 0;
+              x[e] = x[b] - w[e] - 0.01;
               continue;
             }
             if (collisionSide === CollisionSide.Left) {
@@ -127,13 +142,12 @@ export function Systems(world: World, viewport: Bitmap) {
                 [x[b], y[b], w[b], h[b]],
               )
               // console.log(collisionSide, vx[e].toFixed(3), x[e].toFixed(3), y[e].toFixed(3), lasty.toFixed(3), eRight.toFixed(3), x[b], bRight, b);
-              // vx[e] = 0;
-              vx[e] *= 0.1;
-              x[e] = bRight;
+              vx[e] = 0;
+              x[e] = bRight + 0.01;
               continue;
             }
             if (collisionSide === CollisionSide.Top) {
-              vy[e] = 1;
+              vy[e] = 0;
               y[e] = bBottom;
               continue;
             }
@@ -173,9 +187,7 @@ export function Systems(world: World, viewport: Bitmap) {
       for (const e of entities) {
         const half = sprites[e].length / 2;
         const idx = flipped[e] ? spriteIdx[e] + half : spriteIdx[e];
-        const px = Math.round(x[e]); // it remove shiverring
-        const py = Math.round(y[e]);
-        viewport.draw(sprites[e][idx], px, py);
+        viewport.draw(sprites[e][idx], Math.round(x[e]), Math.round(y[e]));
         //viewport.draw(sprites[e][idx], x[e] | 0, y[e] | 0);
       }
     }),

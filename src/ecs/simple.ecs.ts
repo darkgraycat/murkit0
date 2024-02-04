@@ -77,7 +77,7 @@ export type SystemHandler<T> = (
   ...entities: number[][]
 ) => void;
 
-export type SystemCallback = (delta: number) => void;
+export type SystemCallback = (dt?: number) => void;
 
 export class System<T extends Record<string, Component<any>>> {
   constructor(

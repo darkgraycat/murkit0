@@ -1,7 +1,12 @@
-#### World and levels
+## World and levels
+we need multiple maps: for display, for collision
+
+#### Broad phase
+1. get player current cx, cy
+2. collide with left, top, right, 
 
 
-#### Collisions detection
+## Collisions detection
 side  vx    x       y       r       bx  br
 left  1.034 191.700 160.462 207.700 144 192
 left  4.999 191.686 160.508 207.686 144 192
