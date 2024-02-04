@@ -19,6 +19,8 @@ import { debug } from ".";
 
 const { rectangle, bounds } = collision;
 
+let [lastx, lasty] = [0, 0];
+
 export function Systems(world: World, viewport: Bitmap) {
   const { width, height } = world;
   return {
@@ -61,7 +63,7 @@ export function Systems(world: World, viewport: Bitmap) {
           const eBottom = y[e] + h[e];
           let totalCollisions = 0;
           for (const b of blocks) {
-            if (totalCollisions > 4) break;
+            // if (totalCollisions > 2) break;
             const bRight = x[b] + w[b];
             const bBottom = y[b] + h[b];
             const collisionSide = rectangle(
@@ -83,28 +85,57 @@ export function Systems(world: World, viewport: Bitmap) {
             //   case CollisionSide.Left: vx[e] = 0; x[e] = bRight; break;
             //   case CollisionSide.Top: vy[e] = 1; y[e] = bBottom; break;
             // }
+            if (collisionSide !== CollisionSide.Bottom) {
+              const really = rectangle(
+                x[e], y[e], x[e] + w[e], y[e] + h[e], 
+                x[b], y[b], x[b] + w[b], y[b] + h[b], 
+              );
+              console.log(
+                "Fly",
+                x[e].toFixed(3), y[e].toFixed(3), vx[e].toFixed(2), vy[e].toFixed(2),
+                x[b], y[b], bRight,
+                collisionSide,
+                `Realy: ${really}`,
+                totalCollisions,
+              )
+            }
             if (collisionSide === CollisionSide.Bottom) {
-              vy[e] = 0;
+              // vy[e] = 0;
+              vy[e] *= 0.2;
               y[e] = y[b] - h[e];
               air[e] = false;
-              return;
+              continue;
             }
             if (collisionSide === CollisionSide.Right) {
-              console.log(collisionSide, vx[e], x[e], eRight, x[b], bRight);
-              vx[e] = 0;
+              console.log(
+                collisionSide,
+                lasty,
+                [x[e], y[e], w[e], h[e]],
+                [x[b], y[b], w[b], h[b]],
+              )
+              // console.log(collisionSide, vx[e].toFixed(3), x[e].toFixed(3), y[e].toFixed(3), lasty.toFixed(3), eRight.toFixed(3), x[b], bRight, b);
+              // vx[e] = 0;
+              vx[e] *= 0.1;
               x[e] = x[b] - w[e];
-              return;
+              continue;
             }
             if (collisionSide === CollisionSide.Left) {
-              console.log(collisionSide, vx[e], x[e], eRight, x[b], bRight);
-              vx[e] = 0;
+              console.log(
+                collisionSide,
+                lasty,
+                [x[e], y[e], w[e], h[e]],
+                [x[b], y[b], w[b], h[b]],
+              )
+              // console.log(collisionSide, vx[e].toFixed(3), x[e].toFixed(3), y[e].toFixed(3), lasty.toFixed(3), eRight.toFixed(3), x[b], bRight, b);
+              // vx[e] = 0;
+              vx[e] *= 0.1;
               x[e] = bRight;
-              return;
+              continue;
             }
             if (collisionSide === CollisionSide.Top) {
               vy[e] = 1;
               y[e] = bBottom;
-              return;
+              continue;
             }
           }
         }
@@ -122,6 +153,8 @@ export function Systems(world: World, viewport: Bitmap) {
         for (const e of entities) {
           x[e] += vx[e] * dt;
           y[e] += vy[e] * dt;
+          lastx = x[e];
+          lasty = y[e];
           // note: switching pos and vel makes player unable to jump
           // TODO: think to move it separately, to avoid dependency with cMeta.air
           vx[e] *= friction;
@@ -170,7 +203,7 @@ export function Systems(world: World, viewport: Bitmap) {
         const { air, speed } = comp.cMeta.storage;
         for (const e of entities) {
           // debug.set(air, vx[e].toFixed(), vy[e].toFixed());
-          if ((air[e] == true, vy[e] == 0)) air[e] = false;
+          // if ((air[e] == true, vy[e] == 0)) air[e] = false;
           if (!keys[e].size) {
             current[e] = 0;
             continue;
