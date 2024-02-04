@@ -95,7 +95,8 @@ export const init = async (config: MainConfig): Promise<void> => {
     createHouseBlock(2, 48 * 2, 11 * 16),
 
     createHouseBlock(0, 48 * 3, 13 * 16),
-    createHouseBlock(2, 48 * 3, 11 * 16),
+    createBoxBlock(0, 10 * 16, 192),
+    // createHouseBlock(2, 48 * 3, 11 * 16),
 
     createHouseBlock(3, 48 * 4, 13 * 16),
     createHouseBlock(2, 48 * 4, 11 * 16),
@@ -112,6 +113,14 @@ export const init = async (config: MainConfig): Promise<void> => {
     createBoxBlock(1, 3 * 16, 224),
     createBoxBlock(0, 3.5 * 16, 224 - 16),
 
+    createBoxBlock(2, 14 * 16, 9 * 16),
+    createBoxBlock(2, 16 * 16, 9 * 16),
+
+    createBoxBlock(2, 14 * 16, 5 * 16),
+    createBoxBlock(2, 16 * 16, 5 * 16),
+
+    createBoxBlock(3, 17 * 16, 7 * 16),
+    createBoxBlock(3, 18 * 16, 7 * 16),
   ];
 
   console.debug("MAIN: attach entities with systems");
