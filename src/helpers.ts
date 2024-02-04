@@ -63,10 +63,10 @@ export const collision = {
     x1: number, y1: number,
     r1: number, b1: number,
   ): CollisionSide {
-    // if (x0 >= r1 || x1 >= r0 || y0 >= b1 || y1 >= b0) return CollisionSide.None;
+    if (x0 >= r1 || x1 >= r0 || y0 >= b1 || y1 >= b0) return CollisionSide.None;
     // below is very dirty hack:
     // whick causes sprite shivering on left collistion, due to |0 rounding
-    if (x0 >= r1 -1 || x1 >= r0 -1 || y0 >= b1 || y1 >= b0) return CollisionSide.None;
+    //if (x0 >= r1 -1 || x1 >= r0 -1 || y0 >= b1 || y1 >= b0) return CollisionSide.None;
     const dx = Math.min(r0 - x1, r1 - x0);
     const dy = Math.min(b0 - y1, b1 - y0);
     return dx < dy

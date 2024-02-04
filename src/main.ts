@@ -46,7 +46,7 @@ export const init = async (config: MainConfig): Promise<void> => {
     width,
     height,
     gravity: 0.9,
-    friction: 0.9,
+    friction: 0.8,
     skyColor: 0xff708090,
   });
 
@@ -66,7 +66,7 @@ export const init = async (config: MainConfig): Promise<void> => {
     cPosition: { x: 32, y: 128 },
     cVelocity: { vx: 0, vy: 0 },
     cShape: { w: 16, h: 16 },
-    cMeta: { air: true, speed: 0.6 },
+    cMeta: { air: true, speed: 1 },
     cInput: { keys },
     cSprite: {
       spriteIdx: 0,
@@ -76,12 +76,12 @@ export const init = async (config: MainConfig): Promise<void> => {
     cAnimation: {
       animations: [
         [0, 0, 3, 3],
-        [1, 2, 1, 0],
+        [1, 2, 3, 0],
       ],
       current: 0,
       length: 4,
       time: 0,
-      coef: 0.3,
+      coef: 0.4,
     },
   });
 
@@ -106,7 +106,7 @@ export const init = async (config: MainConfig): Promise<void> => {
     createHouseBlock(1, 48 * 6, 13 * 16),
     createHouseBlock(2, 48 * 6, 11 * 16),
 
-    createHouseBlock(4, 48 * 4.5, 9 * 16),
+    // createHouseBlock(4, 48 * 4.5, 9 * 16),
 
     createBoxBlock(1, 4 * 16, 224),
     createBoxBlock(1, 3 * 16, 224),
@@ -151,5 +151,5 @@ export const init = async (config: MainConfig): Promise<void> => {
   const engine = new Engine(adapter, fps, update, render, 0.03);
   engine.start();
   // TODO: live limited time. for dev only
-  setTimeout(() => engine.stop(), 1000 * 120); // for development only, to stop after 30 sec
+  setTimeout(() => engine.stop(), 1000 * 30); // for development only, to stop after 30 sec
 };

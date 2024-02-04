@@ -36,7 +36,7 @@ export function Systems(world: World, viewport: Bitmap) {
           const collisionSide = bounds(
             x[e], y[e], eRight, eBottom,
             0, 0, width, height,
-          )
+          );
           if (collisionSide == CollisionSide.None) continue;
           switch (collisionSide) {
             case CollisionSide.Left: vx[e] = 0; x[e] = 0; break;
@@ -51,55 +51,61 @@ export function Systems(world: World, viewport: Bitmap) {
     /* Collide entities from groupA with entities from groupB */
     sCollideShapes: new System(
       { cPosition, cVelocity, cShape, cMeta },
-      (_, comp, units, blocks) => {
+      (_, comp, entities, blocks) => {
         const { x, y } = comp.cPosition.storage;
         const { vx, vy } = comp.cVelocity.storage;
         const { w, h } = comp.cShape.storage;
         const { air } = comp.cMeta.storage;
-        for (const e of units) {
-          const uRight = x[e] + w[e];
-          const uBottom = y[e] + h[e];
+        for (const e of entities) {
+          const eRight = x[e] + w[e];
+          const eBottom = y[e] + h[e];
           let totalCollisions = 0;
           for (const b of blocks) {
-            if (totalCollisions > 2) break;
+            if (totalCollisions > 4) break;
             const bRight = x[b] + w[b];
             const bBottom = y[b] + h[b];
             const collisionSide = rectangle(
-              x[e], y[e], uRight, uBottom,
+              x[e], y[e], eRight, eBottom,
               x[b], y[b], bRight, bBottom,
             );
-            debug.set(collisionSide, air[e], vy[e].toFixed(2), height)
-            if (collisionSide == CollisionSide.None) {
-              // if (y[e] + h[e] < height) air[e] = true;
-              // air[e] = true;
-              continue;
-            }
-            // console.log(collisionSide)
+            debug.set(
+              collisionSide[0].toUpperCase(),
+              air[e],
+              vy[e].toFixed(2),
+              height
+            );
+            if (collisionSide === CollisionSide.None) continue;
             totalCollisions++;
-            if (collisionSide === CollisionSide.Left) {
-              vx[e] = 0
-              x[e] = bRight;
+            // reorganized sides by rarity, added return. still got small left collision/but no right
+            // switch (collisionSide) {
+            //   case CollisionSide.Bottom: vy[e] = 0; y[e] = y[b] - h[e]; air[e] = false; break;
+            //   case CollisionSide.Right: vx[e] = 0; x[e] = x[b] - w[e]; break;
+            //   case CollisionSide.Left: vx[e] = 0; x[e] = bRight; break;
+            //   case CollisionSide.Top: vy[e] = 1; y[e] = bBottom; break;
+            // }
+            if (collisionSide === CollisionSide.Bottom) {
+              vy[e] = 0;
+              y[e] = y[b] - h[e];
+              air[e] = false;
+              return;
             }
             if (collisionSide === CollisionSide.Right) {
-              vx[e] = 0
+              console.log(collisionSide, vx[e], x[e], eRight, x[b], bRight);
+              vx[e] = 0;
               x[e] = x[b] - w[e];
+              return;
+            }
+            if (collisionSide === CollisionSide.Left) {
+              console.log(collisionSide, vx[e], x[e], eRight, x[b], bRight);
+              vx[e] = 0;
+              x[e] = bRight;
+              return;
             }
             if (collisionSide === CollisionSide.Top) {
-              vy[e] = 1
+              vy[e] = 1;
               y[e] = bBottom;
+              return;
             }
-            if (collisionSide === CollisionSide.Bottom) {
-              // vy[e] *= -0.001;
-              vy[e] = 0;
-              y [e] = y[b] - h[e]; 
-              air[e] = false;
-						}
-            // switch (collisionSide) {
-            //   case CollisionSide.Left: vx[e] = 0; x[e] = bRight; break;
-            //   case CollisionSide.Right: vx[e] = 0; x[e] = x[b] - w[e]; break;
-            //   case CollisionSide.Top: vy[e] = 1; y[e] = bBottom; break;
-            //   case CollisionSide.Bottom: vy[e] = 0; y[e] = y[b] - h[e]; air[e] = false; break;
-            // }
           }
         }
       },
@@ -119,6 +125,8 @@ export function Systems(world: World, viewport: Bitmap) {
           // note: switching pos and vel makes player unable to jump
           // TODO: think to move it separately, to avoid dependency with cMeta.air
           vx[e] *= friction;
+          //vy[e] *= friction; // experimental
+
           vy[e] += gravity;
           //if (air[e]) vy[e] += gravity;
         }
@@ -132,9 +140,9 @@ export function Systems(world: World, viewport: Bitmap) {
       for (const e of entities) {
         const half = sprites[e].length / 2;
         const idx = flipped[e] ? spriteIdx[e] + half : spriteIdx[e];
-        const px = Math.round(x[e])
-        const py = Math.round(y[e])
-        viewport.draw(sprites[e][idx], px,  py);
+        const px = Math.round(x[e]); // it remove shiverring
+        const py = Math.round(y[e]);
+        viewport.draw(sprites[e][idx], px, py);
         //viewport.draw(sprites[e][idx], x[e] | 0, y[e] | 0);
       }
     }),

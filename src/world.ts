@@ -84,4 +84,3 @@ export class Level {
     this.collisions = this.filterMap(LevelCellType.Block);
   }
 }
-
