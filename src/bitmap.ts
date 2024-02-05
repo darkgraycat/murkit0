@@ -27,8 +27,8 @@ export class Bitmap {
 
   /** Draw Bitmap on current one
   * @param bitmap source Bitmap to draw
-  * @param x offset x
-  * @param y offset y
+  * @param x destination offset x
+  * @param y destination offset y
   * @returns self
   * */
   public draw(bitmap: Bitmap, x: number, y: number): this {
@@ -47,13 +47,15 @@ export class Bitmap {
 
   /** Copy Bitmap area to current one
   * @param bitmap source Bitmap to draw
-  * @param x offset x
-  * @param y offset y
+  * @param x destination offset x
+  * @param y destination offset y
+  * @param sx source offset x
+  * @param sy source offset y
   * @param width area width of source Bitmap
   * @param height area height of source Bitmap
   * @returns self
   * */
-  public copy(bitmap: Bitmap, x: number, y: number, width: number, height: number): this {
+  public copy(bitmap: Bitmap, x: number, y: number, sx: number, sy: number, width: number, height: number): this {
     // TODO: define do we need to sx, sy?
     // as a help pls see old implementation
     const { data: dest, width: dw, height: dh } = this;
@@ -70,8 +72,8 @@ export class Bitmap {
   }
 
   /** Extract pixels to new Bitmap
-  * @param x offset x
-  * @param y offset y
+  * @param x source offset x
+  * @param y source offset y
   * @param width new Bitmap width
   * @param height new Bitam height
   * @returns new Bitmap
@@ -188,7 +190,7 @@ export class TileableBitmap extends Bitmap {
     return tbitmap;
   }
 
-  public splitToBitmaps(): Bitmap[] {
+  public split(): Bitmap[] {
     const bitmaps = [];
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {

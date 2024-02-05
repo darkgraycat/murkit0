@@ -36,10 +36,10 @@ export const init = async (config: MainConfig): Promise<void> => {
       ["./assets/backgrounds_houses.png", 48, 32, 5, 1],
     );
 
-  const playerSprites = playerTiles.splitToBitmaps();
-  playerSprites.push(...playerTiles.flipV().splitToBitmaps());
-  const bgHouseSprites = bgHouseTiles.splitToBitmaps();
-  const boxSprites = boxTiles.splitToBitmaps();
+  const playerSprites = playerTiles.split();
+  playerSprites.push(...playerTiles.flipV().split());
+  const bgHouseSprites = bgHouseTiles.split();
+  const boxSprites = boxTiles.split();
 
   console.debug("MAIN: init world");
   const world = new World({
@@ -65,7 +65,7 @@ export const init = async (config: MainConfig): Promise<void> => {
   const player = em.add({
     cPosition: { x: 32, y: 128 },
     cVelocity: { vx: 0, vy: 0 },
-    cShape: { w: 16, h: 16 },
+    cShape: { w: 10, h: 14 },
     cMeta: { air: true, speed: 1 },
     cInput: { keys },
     cSprite: {
@@ -145,8 +145,8 @@ export const init = async (config: MainConfig): Promise<void> => {
     draw(dt);
 
     screenBitmap.copy(
-      bgHouseTiles,
-      20, 20, 48, 32
+      bgHouseTiles, 20, 20,
+      0, 0, 48, 32,
     );
 
     screenCtx.putImageData(screenImageData, 0, 0);

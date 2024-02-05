@@ -104,7 +104,7 @@ describe("ecs/simple.ecs", () => {
         cState: { active: true },
       });
       expect(em.get(b)).toEqual({ cShape: { w: 30, h: 40 }, cState: {} });
-      em.set(b, {});
+      em.set(b, null);
       const c = em.add({ cState: { active: false } });
       expect([a, b, c]).toEqual([0, 1, 2]);
       expect(em.get(a)).toEqual({
@@ -112,8 +112,8 @@ describe("ecs/simple.ecs", () => {
         cState: { active: true },
       });
       expect(em.get(b)).toEqual({
-        cShape: {},
-        cState: {},
+        cShape: { w: 0, h: 0 },
+        cState: { active: false },
       });
       expect(em.get(c)).toEqual({ cShape: {}, cState: { active: false } });
     });
@@ -226,6 +226,16 @@ describe("ecs/simple.ecs", () => {
   });
 
   describe("ECS experimental features", () => {
+    it("Component with optional properties", () => {
+      const cComp = new Component<{ label: string, a?: number, desc?: string }>({ label: "", a: 10, desc: "no desc" });
+      cComp.set(0, { label: "First", a: 17, desc: "First comp" });
+      cComp.set(1, { label: "Second", a: 12 });
+      cComp.set(2, { label: "Third" });
+      const { storage } = cComp;
+      expect(storage.label).toEqual([ "First", "Second", "Third" ]);
+      expect(storage.a).toEqual([ 17, 12, 10 ]);
+      expect(storage.desc).toEqual([ "First comp", "no desc", "no desc" ]);
+    })
     it("Compoment with method", () => {
       const cCompWithMethod = new Component({
         a: 0,

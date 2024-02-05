@@ -18,7 +18,7 @@ export class EntityManager<T extends Record<string, Component<any>>> {
   set<K extends keyof T>(entity: number, components: Record<K, typeof this.components[K]["schema"]>): void {
     const entries = Object.entries(this.components);
     for (const [componentName, component] of entries) {
-      component.set(entity, components?.[componentName])
+      component.set(entity, components?.[componentName] || {})
     }
   }
 
@@ -40,7 +40,7 @@ export class EntityManager<T extends Record<string, Component<any>>> {
 
 /* Component */
 export type Storage<T> = { [K in keyof T]: T[K][] };
-export class Component<T> {
+export class Component<T extends Object> {
   readonly schema: Imutable<T>;
   readonly storage: Imutable<Storage<T>>;
   constructor(schema: T) {
@@ -60,7 +60,7 @@ export class Component<T> {
 
   set(idx: number, data: T): number {
     const { storage } = this;
-    for (const prop in storage) storage[prop][idx] = data?.[prop];
+    for (const prop in storage) storage[prop][idx] = data[prop] || this.schema[prop];
     return idx;
   }
 
