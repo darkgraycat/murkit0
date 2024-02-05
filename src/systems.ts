@@ -77,7 +77,7 @@ export function Systems(world: World, viewport: Bitmap) {
           const eBottom = y[e] + h[e];
           let totalCollisions = 0;
           for (const b of blocks) {
-            if (totalCollisions > 1) break;
+            if (totalCollisions > 2) break;
             const bRight = x[b] + w[b];
             const bBottom = y[b] + h[b];
             const collisionSide = rectangle(
@@ -85,8 +85,9 @@ export function Systems(world: World, viewport: Bitmap) {
               x[b], y[b], bRight, bBottom,
             );
             // TODO: remove debug
-            debug.set(collisionSide.toUpperCase(), air[e] ? "^" : "_", `${x[e].toFixed(2)}:${y[e].toFixed(2)}`, vy[e].toFixed(2));
+            debug.set(collisionSide.toUpperCase(), air[e] ? "^" : "_", `${x[e].toFixed(2).padStart(6, "0")}:${y[e].toFixed(2).padStart(6, "0")}`, vy[e].toFixed(2));
             if (collisionSide === CollisionSide.None) continue;
+            if (collisionSide !== CollisionSide.Bottom) console.log(collisionSide,b);
             totalCollisions++;
             switch (collisionSide) {
               case CollisionSide.Bottom: vy[e] = 0; y[e] = y[b] - h[e]; air[e] = false; break;

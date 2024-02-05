@@ -47,7 +47,8 @@ export const init = async (config: MainConfig): Promise<void> => {
     height,
     gravity: 0.9,
     friction: 0.8,
-    skyColor: 0xff708090,
+    skyColor: 0xffe09020,
+    // skyColor: 0xff708090,
   });
 
   console.debug("MAIN: init systems");
@@ -135,21 +136,13 @@ export const init = async (config: MainConfig): Promise<void> => {
   const control = sController.setup([player]);
   const animate = sAnimation.setup([player]);
 
-  // TODO: for debug only
-  const { x, y } = components.cPosition.storage;
-  const { vx, vy } = components.cVelocity.storage;
-
   const render = (dt: number) => {
     // console.time("render")
     screenBitmap.fill(world.skyColor);
+
     animate(dt);
     drawBg(dt);
     draw(dt);
-
-    screenBitmap.copy(
-      bgHouseTiles, 20, 20,
-      0, 0, 48, 32,
-    );
 
     screenCtx.putImageData(screenImageData, 0, 0);
     // console.timeEnd("render")

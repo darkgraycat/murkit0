@@ -3,7 +3,7 @@ export class Bitmap {
   readonly height: number;
   protected data: Uint32Array;
 
-  /** Create Bitmap with empty pixels
+  /** Create new Bitmap with empty pixels
   * @param width new Bitmap width
   * @param height new Bitmap height
   * */
@@ -36,37 +36,36 @@ export class Bitmap {
     const { data: src,  width: sw } = bitmap;
     let i = src.length;
     while (i--) {
+      if (src[i] === 0) continue;
       const px = x + (i % sw);
       const py = y + (i / sw | 0);
       if (px < 0 || px >= dw || py < 0 || py >= dh) continue;
-      if (src[i] === 0) continue;
       dest[px + py * dw] = src[i];
     }
     return this;
   }
 
-  /** Copy Bitmap area to current one
-  * @param bitmap source Bitmap to draw
+  /** Copy area to current one
+  * @param bitmap destination Bitmap
   * @param x destination offset x
   * @param y destination offset y
   * @param sx source offset x
   * @param sy source offset y
-  * @param width area width of source Bitmap
-  * @param height area height of source Bitmap
+  * @param width area width to copy
+  * @param height area height to copy
   * @returns self
   * */
   public copy(bitmap: Bitmap, x: number, y: number, sx: number, sy: number, width: number, height: number): this {
-    // TODO: define do we need to sx, sy?
-    // as a help pls see old implementation
-    const { data: dest, width: dw, height: dh } = this;
-    const { data: src,  width: sw } = bitmap;
+    const { data: dest, width: dw, height: dh } = bitmap;
+    const { data: src,  width: sw } = this;
     let i = width * height;
     while (i--) {
-      const px = x + (i % sw);
-      const py = y + (i / sw | 0);
+      const j = (sx + i % width) + (sy + (i / width | 0)) * sw;
+      if (src[j] == 0) continue;
+      const px = x + (i % width);
+      const py = y + (i / width | 0);
       if (px < 0 || px >= dw || py < 0 || py >= dh) continue;
-      if (src[i] === 0) continue;
-      dest[px + py * dw] = src[i];
+      dest[px + py * dw] = src[j];
     }
     return this;
   }
@@ -129,7 +128,7 @@ export class Bitmap {
   }
 
   /** Vertical flip
-   * @returns self
+  * @returns self
   * */
   public flipV(): this {
     const { data, width } = this;
@@ -165,38 +164,49 @@ export class Bitmap {
 }
 
 export class TileableBitmap extends Bitmap {
-  readonly tileWidth: number;
-  readonly tileHeight: number;
+  readonly twidth: number;
+  readonly theight: number;
   readonly cols: number;
   readonly rows: number;
 
-  constructor(tileWidth:number, tileHeight:number, cols:number, rows: number) {
-    super(tileWidth * cols, tileHeight * rows);
-    this.tileWidth = tileWidth;
-    this.tileHeight = tileHeight;
+  /** Create new TileableBitmap with empty pixels
+  * @param twidth width of the tile
+  * @param theight height of the tile
+  * @param cols total number of tiles in horizontal
+  * @param rows total number of tiles in vertical
+  * */
+  constructor(twidth: number, theight: number, cols: number, rows: number) {
+    super(twidth * cols, theight * rows);
+    this.twidth = twidth;
+    this.theight = theight;
     this.cols = cols;
     this.rows = rows;
   }
 
-  public static from(
-    buffer: ArrayBuffer,
-    tileWidth: number,
-    tileHeight: number,
-    cols: number = 1,
-    rows: number = 1,
-  ): TileableBitmap {
-    const tbitmap = new TileableBitmap(tileWidth, tileHeight, cols, rows);
+  /** Create TileableBitmap from buffer
+  * @param buffer buffer with color values
+  * @param twidth width of the tile
+  * @param theight height of the tile
+  * @param cols total number of tiles in horizontal
+  * @param rows total number of tiles in vertical
+  * @returns new TileableBitmap
+  * */
+  public static from(buffer: ArrayBuffer, twidth: number, theight: number, cols: number = 1, rows: number = 1): TileableBitmap {
+    const tbitmap = new TileableBitmap(twidth, theight, cols, rows);
     tbitmap.data = new Uint32Array(buffer);
     return tbitmap;
   }
 
+  /** Split TileableBitmap to array of Bitmaps
+  * @returns array of Bitmaps
+  * */
   public split(): Bitmap[] {
     const bitmaps = [];
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {
-        const x = col * this.tileWidth;
-        const y = row * this.tileHeight;
-        bitmaps.push(this.extract(x, y, this.tileWidth, this.tileWidth));
+        const x = col * this.twidth;
+        const y = row * this.theight;
+        bitmaps.push(this.extract(x, y, this.twidth, this.twidth));
       }
     }
     return bitmaps;
