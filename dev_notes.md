@@ -1,5 +1,10 @@
 ## World and levels
 we need multiple maps: for display, for collision
+having "mapping" in each level I will face a lot of duplicated lines
+lets have only level data in level object
+so split leveldata in 2:
+1. cellMap,
+2. cellData,
 
 #### Broad phase
 1. get player current cx, cy

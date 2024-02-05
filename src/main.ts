@@ -88,6 +88,9 @@ export const init = async (config: MainConfig): Promise<void> => {
     },
   });
 
+  const b = new Bitmap(0, 0);
+  
+
   const createHouseBlock = (idx: number, x: number, y: number) =>
     createStaticDrawableEntity(em, bgHouseSprites, idx, x, y, 48, 32);
   const createBoxBlock = (idx: number, x: number, y: number) =>

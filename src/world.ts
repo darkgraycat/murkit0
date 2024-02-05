@@ -84,3 +84,12 @@ export class Level {
     this.collisions = this.filterMap(LevelCellType.Block);
   }
 }
+
+// developing new interface for Level
+// TODO: remove "2" at the end
+export type LevelCellData2 = {
+
+}
+
+
+
