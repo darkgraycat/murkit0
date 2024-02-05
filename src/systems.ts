@@ -119,13 +119,17 @@ export function Systems(world: World, viewport: Bitmap) {
 
     /* Render frame of spritesheet by index */
     sDrawing: new System({ cSprite, cPosition }, (_, comp, entities) => {
-      const { sprites, spriteIdx, flipped } = comp.cSprite.storage;
+      const { sprites, spriteIdx, flipped, offsetX, offsetY } = comp.cSprite.storage;
       const { x, y } = comp.cPosition.storage;
       for (const e of entities) {
         const half = sprites[e].length / 2;
         const idx = flipped[e] ? spriteIdx[e] + half : spriteIdx[e];
         // viewport.draw(sprites[e][idx], x[e] | 0, y[e] | 0);
-        viewport.draw(sprites[e][idx], Math.round(x[e]), Math.round(y[e]));
+        viewport.draw(
+          sprites[e][idx],
+          offsetX[e] + Math.round(x[e]),
+          offsetY[e] + Math.round(y[e]),
+        );
       }
     }),
 

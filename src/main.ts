@@ -72,6 +72,8 @@ export const init = async (config: MainConfig): Promise<void> => {
       spriteIdx: 0,
       sprites: playerSprites,
       flipped: false,
+      offsetX: -3,
+      offsetY: -2,
     },
     cAnimation: {
       animations: [
