@@ -1,36 +1,50 @@
 import { Imutable } from "../common/types";
-
 /* EntityManager */
 export class EntityManager<T extends Record<string, Component<any>>> {
   private idx = 0;
-  constructor(
-    private components: T,
-  ) {}
+  /** Create new Entity Manager
+  * @param components components dictionary 
+  * */
+  constructor(private components: T) {}
 
+  /** Add new entity with properties for components
+  * @param components components entity have
+  * @returns entity index
+  * */
   add<K extends keyof T>(components: Record<K, typeof this.components[K]["schema"]>): number {
     const entries = Object.entries(components);
-    for (const [componentName, componentData] of entries){
-      this.components[componentName].set(this.idx, componentData);
+    for (const [componentName, component] of entries){
+      this.components[componentName].set(this.idx, component);
     }
     return this.idx++;
   }
 
-  set<K extends keyof T>(entity: number, components: Record<K, typeof this.components[K]["schema"]>): void {
+  /** Assign new properties for components for entity
+  * @param idx entity index
+  * @param components new components values
+  * */
+  set<K extends keyof T>(idx: number, components: { [P in K]: T[P]["schema"] }): void {
     const entries = Object.entries(this.components);
     for (const [componentName, component] of entries) {
-      component.set(entity, components?.[componentName])
+      component.set(idx, components?.[componentName] || {})
     }
   }
 
-  get(entity: number) {
+  /** Build readonly object of all entity components
+  * @param idx entity index
+  * @returns readonly entity object
+  * */
+  get<K extends keyof T>(idx: number): Imutable<{ [P in K]: T[P]["schema"] }> {
     const entries = Object.entries(this.components);
-    const result: any = {};
+    const result = {} as { [P in K]: T[P]["schema"] };
     for (const [componentName, component] of entries){
-      result[componentName] = component.get(entity);
+      result[componentName] = component.get(idx);
     }
     return result;
   }
 
+  /** Reset Entity Manager and remove all entities data
+  * */
   reset(): void {
     const components = Object.values(this.components);
     for (const component of components) component.reset();
@@ -40,9 +54,12 @@ export class EntityManager<T extends Record<string, Component<any>>> {
 
 /* Component */
 export type Storage<T> = { [K in keyof T]: T[K][] };
-export class Component<T> {
+export class Component<T extends Object> {
   readonly schema: Imutable<T>;
   readonly storage: Imutable<Storage<T>>;
+  /** Create new Component
+  * @param schema Plain object with properties 
+  * */
   constructor(schema: T) {
     this.schema = schema;
     this.storage = Object.keys(schema).reduce(
@@ -51,19 +68,30 @@ export class Component<T> {
     );
   }
 
-  get(idx: number): T {
+  /** Build readonly object of Component element
+  * @param idx entity index
+  * @returns readonly Component object
+  * */
+  get(idx: number): Imutable<T> {
     const { storage } = this;
-    const element: any = {};
+    const element = {} as T;
     for (const prop in storage) element[prop] = storage[prop][idx];
     return element;
   }
 
+  /** Assign new values for Component element
+  * @param idx entity index
+  * @param data new values
+  * @returns entity index
+  * */
   set(idx: number, data: T): number {
     const { storage } = this;
-    for (const prop in storage) storage[prop][idx] = data?.[prop];
+    for (const prop in storage) storage[prop][idx] = data[prop] || this.schema[prop];
     return idx;
   }
 
+  /** Reset Component storage
+  * */
   reset(): void {
     const { storage } = this;
     for (const prop in storage) storage[prop].length = 0;
@@ -76,15 +104,21 @@ export type SystemHandler<T> = (
   components: T,
   ...entities: number[][]
 ) => void;
-
 export type SystemCallback = (dt?: number) => void;
-
 export class System<T extends Record<string, Component<any>>> {
+  /** Create new System
+  * @param components components to use in the System
+  * @param handler callback with access to components
+  * */
   constructor(
     readonly components: T,
     private handler: SystemHandler<T>,
   ) {}
 
+  /** Create callback to execute the System
+  * @param entities array of entity groups assigned to the System
+  * @returns callback
+  * */
   setup(...entities: number[][]): SystemCallback {
     return (dt) => this.handler(dt, this.components, ...entities);
   }

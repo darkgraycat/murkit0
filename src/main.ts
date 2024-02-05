@@ -36,10 +36,10 @@ export const init = async (config: MainConfig): Promise<void> => {
       ["./assets/backgrounds_houses.png", 48, 32, 5, 1],
     );
 
-  const playerSprites = playerTiles.splitToBitmaps();
-  playerSprites.push(...playerTiles.flipV().splitToBitmaps());
-  const bgHouseSprites = bgHouseTiles.splitToBitmaps();
-  const boxSprites = boxTiles.splitToBitmaps();
+  const playerSprites = playerTiles.split();
+  playerSprites.push(...playerTiles.flipV().split());
+  const bgHouseSprites = bgHouseTiles.split();
+  const boxSprites = boxTiles.split();
 
   console.debug("MAIN: init world");
   const world = new World({
@@ -47,7 +47,8 @@ export const init = async (config: MainConfig): Promise<void> => {
     height,
     gravity: 0.9,
     friction: 0.8,
-    skyColor: 0xff708090,
+    skyColor: 0xffe09020,
+    // skyColor: 0xff708090,
   });
 
   console.debug("MAIN: init systems");
@@ -65,13 +66,15 @@ export const init = async (config: MainConfig): Promise<void> => {
   const player = em.add({
     cPosition: { x: 32, y: 128 },
     cVelocity: { vx: 0, vy: 0 },
-    cShape: { w: 16, h: 16 },
+    cShape: { w: 10, h: 14 },
     cMeta: { air: true, speed: 1 },
     cInput: { keys },
     cSprite: {
       spriteIdx: 0,
       sprites: playerSprites,
       flipped: false,
+      offsetX: -3,
+      offsetY: -2,
     },
     cAnimation: {
       animations: [
@@ -133,16 +136,14 @@ export const init = async (config: MainConfig): Promise<void> => {
   const control = sController.setup([player]);
   const animate = sAnimation.setup([player]);
 
-  // TODO: for debug only
-  const { x, y } = components.cPosition.storage;
-  const { vx, vy } = components.cVelocity.storage;
-
   const render = (dt: number) => {
     // console.time("render")
     screenBitmap.fill(world.skyColor);
+
     animate(dt);
     drawBg(dt);
     draw(dt);
+
     screenCtx.putImageData(screenImageData, 0, 0);
     // console.timeEnd("render")
   };

@@ -77,7 +77,7 @@ export function Systems(world: World, viewport: Bitmap) {
           const eBottom = y[e] + h[e];
           let totalCollisions = 0;
           for (const b of blocks) {
-            if (totalCollisions > 1) break;
+            if (totalCollisions > 2) break;
             const bRight = x[b] + w[b];
             const bBottom = y[b] + h[b];
             const collisionSide = rectangle(
@@ -85,8 +85,9 @@ export function Systems(world: World, viewport: Bitmap) {
               x[b], y[b], bRight, bBottom,
             );
             // TODO: remove debug
-            debug.set(collisionSide.toUpperCase(), air[e] ? "^" : "_", `${x[e].toFixed(2)}:${y[e].toFixed(2)}`, vy[e].toFixed(2));
+            debug.set(collisionSide.toUpperCase(), air[e] ? "^" : "_", `${x[e].toFixed(2).padStart(6, "0")}:${y[e].toFixed(2).padStart(6, "0")}`, vy[e].toFixed(2));
             if (collisionSide === CollisionSide.None) continue;
+            if (collisionSide !== CollisionSide.Bottom) console.log(collisionSide,b);
             totalCollisions++;
             switch (collisionSide) {
               case CollisionSide.Bottom: vy[e] = 0; y[e] = y[b] - h[e]; air[e] = false; break;
@@ -119,13 +120,17 @@ export function Systems(world: World, viewport: Bitmap) {
 
     /* Render frame of spritesheet by index */
     sDrawing: new System({ cSprite, cPosition }, (_, comp, entities) => {
-      const { sprites, spriteIdx, flipped } = comp.cSprite.storage;
+      const { sprites, spriteIdx, flipped, offsetX, offsetY } = comp.cSprite.storage;
       const { x, y } = comp.cPosition.storage;
       for (const e of entities) {
         const half = sprites[e].length / 2;
         const idx = flipped[e] ? spriteIdx[e] + half : spriteIdx[e];
         // viewport.draw(sprites[e][idx], x[e] | 0, y[e] | 0);
-        viewport.draw(sprites[e][idx], Math.round(x[e]), Math.round(y[e]));
+        viewport.draw(
+          sprites[e][idx],
+          offsetX[e] + Math.round(x[e]),
+          offsetY[e] + Math.round(y[e]),
+        );
       }
     }),
 

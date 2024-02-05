@@ -20,10 +20,14 @@ export const cSprite = new Component<{
   spriteIdx: number;
   sprites: Bitmap[];
   flipped: boolean;
+  offsetX?: number,
+  offsetY?: number,
 }>({
   spriteIdx: 0,
   sprites: [],
   flipped: false,
+  offsetX: 0,
+  offsetY: 0
 });
 
 export const cAnimation = new Component<{
