@@ -87,9 +87,11 @@ export class Level {
 
 // developing new interface for Level
 // TODO: remove "2" at the end
-export type LevelCellData2 = {
+export type LevelGridEntryParams = {
 
 }
+export type LevelLegend = { [key: number]: LevelGridEntryParams };
+
 
 
 
