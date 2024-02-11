@@ -30,7 +30,7 @@ export class Bitmap {
     return this.data;
   }
 
-  /** Draw Bitmap on current one
+  /** Draw Bitmap on self
   * @param bitmap source Bitmap to draw
   * @param x destination offset x
   * @param y destination offset y
@@ -49,7 +49,7 @@ export class Bitmap {
     return this;
   }
 
-  /** Copy area to current one
+  /** Copy to Bitmap area of self
   * @param bitmap destination Bitmap
   * @param x destination offset x
   * @param y destination offset y
@@ -93,7 +93,7 @@ export class Bitmap {
     return bitmap;
   }
 
-  /** Clone current Bitmap in new one
+  /** Clone self to new Bitmap
   * @returns new Bitmap */
   public clone(): Bitmap {
     const bitmap = new Bitmap(this.width, this.height);
@@ -104,7 +104,7 @@ export class Bitmap {
     return bitmap;
   }
 
-  /** Fill current Bitmap with color
+  /** Fill self with color
   * @param color color to fill
   * @returns self */
   public fill(color: number): this {
@@ -133,7 +133,7 @@ export class Bitmap {
   * @returns self */
   public flipH(): this {
     const { data, width, height } = this;
-    let i = data.length / 2; // skip iterating bottom half
+    let i = data.length / 2;
     while (i--) {
       const px = i % width;
       const py = height - (i / width | 0) - 1;
@@ -179,6 +179,36 @@ export class TileableBitmap extends Bitmap {
     return tbitmap;
   }
 
+  /** Extract tile to new Bitmap
+  * @param col tile location by x
+  * @param row tile location by y
+  * @returns new Bitmap */
+  public extractTile(col: number, row: number): Bitmap {
+    return this.extract(
+      col * this.twidth,
+      row * this.theight,
+      this.twidth,
+      this.theight,
+    );
+  }
+
+  /** Copy to Bitmap one tile of self
+  * @param bitmap destination Bitmap
+  * @param x destination offset x
+  * @param y destination offset y
+  * @param col tile location by x
+  * @param row tile location by y
+  * @returns self */
+  public copyTile(bitmap: Bitmap, x: number, y: number, col: number, row: number): this {
+    return this.copy(
+      bitmap, x, y,
+      col * this.twidth,
+      row * this.theight,
+      this.twidth,
+      this.theight,
+    );
+  }
+
   /** Split TileableBitmap to array of Bitmaps
   * @returns array of Bitmaps */
   public split(): Bitmap[] {
@@ -193,17 +223,22 @@ export class TileableBitmap extends Bitmap {
     return bitmaps;
   }
 
-  /** Create new Bitmap from TileableBitmap
-  * @param col frame location by x
-  * @param row frame location by y
-  * @returns new Bitmap */
-  public frame(col: number, row: number): Bitmap {
-    return this.extract(
-      col * this.twidth,
-      row * this.theight,
-      this.twidth,
-      this.theight,
-    );
+  /** Create new TileableBitmap by reordering tiles of self
+  * @param order indexes of source tiles by col * row
+  * @param cols total number of tiles in horizontal
+  * @param rows total number of tiles in vertical
+  * @returns new TileableBitmap */
+  public reorder(order: number[], cols: number, rows: number): TileableBitmap {
+    const { twidth, theight, cols: scols } = this;
+    const tbitmap = new TileableBitmap(twidth, theight, cols, rows);
+    let i = cols * rows;
+    while(i--) {
+      const j = order[i];
+      const [dc, dr] = [i % cols, i / cols | 0];
+      const [sc, sr] = [j % scols, j / scols | 0];
+      this.copyTile(tbitmap, dc * twidth, dr * theight, sc, sr);
+    }
+    return tbitmap;
   }
 }
 

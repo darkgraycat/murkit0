@@ -20,5 +20,7 @@ Smooth change in place
 #### End screen
 
 
+#### Paralax bg:
+its better and simpler not to create multiple bitmaps, but built
 
 

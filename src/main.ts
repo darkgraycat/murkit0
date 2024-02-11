@@ -9,6 +9,8 @@ import * as components from "./components";
 
 import { bulkTileableBitmapLoad, createStaticDrawableEntity } from "./helpers";
 
+import { benchmark } from "./utils";
+
 export type MainConfig = {
   width: number;
   height: number;
@@ -43,14 +45,14 @@ export const init = async (config: MainConfig): Promise<void> => {
   const boxSprites = boxTiles.split();
 
   const animatedBgSprites = [
-    bgTiles.frame(0, 0),         // 0 sky 1
-    bgTiles.frame(0, 0).flipV(), // 1 sky 2
-    bgTiles.frame(2, 0),         // 2 pines
-    bgTiles.frame(1, 0),         // 3 hills
-    bgTiles.frame(3, 0),         // 4 elec
-    bgTiles.frame(4, 0),         // 5 factory
-    bgTiles.frame(5, 0),         // 6 city 1
-    bgTiles.frame(5, 0).flipV(), // 7 city 2
+    bgTiles.extractTile(0, 0),         // 0 sky 1
+    bgTiles.extractTile(0, 0).flipV(), // 1 sky 2
+    bgTiles.extractTile(2, 0),         // 2 pines
+    bgTiles.extractTile(1, 0),         // 3 hills
+    bgTiles.extractTile(3, 0),         // 4 elec
+    bgTiles.extractTile(4, 0),         // 5 factory
+    bgTiles.extractTile(5, 0),         // 6 city 1
+    bgTiles.extractTile(5, 0).flipV(), // 7 city 2
   ];
   const animatedBgPalletes = animatedBgSprites.map((bitmap) => new BitmapPallete(bitmap));
   console.log(animatedBgSprites.length)
@@ -105,7 +107,7 @@ export const init = async (config: MainConfig): Promise<void> => {
     ...Array.from({ length: animatedBgCols + 1 }).map((_, i) => createAnimatedBgEntity(4, i * animatedBgWidth, 7 * 16, -2 )),
     ...Array.from({ length: animatedBgCols + 1 }).map((_, i) => createAnimatedBgEntity(5, i * animatedBgWidth, 8 * 16, -2.5 )),
     ...Array.from({ length: animatedBgCols + 1 }).map((_, i) => createAnimatedBgEntity(6, i * animatedBgWidth, 9.5 * 16, -3 )),
-    ...Array.from({ length: animatedBgCols + 1 }).map((_, i) => createAnimatedBgEntity(7, i * animatedBgWidth, 11 * 16, -3.5 )),
+    ...Array.from({ length: animatedBgCols + 1 }).map((_, i) => createAnimatedBgEntity(7, i * animatedBgWidth, 10.9 * 16, -3.5 )),
     ...Array.from({ length: animatedBgCols + 1 }).map((_, i) => createAnimatedBgEntity(1, i * animatedBgWidth, 1 * 16, -2 )),
     ...Array.from({ length: animatedBgCols + 1 }).map((_, i) => createAnimatedBgEntity(0, i * animatedBgWidth, 0 * 16, -1 )),
   ];
@@ -124,30 +126,49 @@ export const init = async (config: MainConfig): Promise<void> => {
   animatedBgPalletes[3].pallete = [0xff293929, 0];
   animatedBgPalletes[4].pallete = [0xff484848, 0];
   animatedBgPalletes[5].pallete = [0xff404040, 0xff206090];
-  animatedBgPalletes[6].pallete = [0xff303030, 0xff206090];
-  animatedBgPalletes[7].pallete = [0xff202020, 0xff206090];
+  animatedBgPalletes[6].pallete = [0xff303030, 0xff909090];
+  animatedBgPalletes[7].pallete = [0xff202020, 0xff909090];
   console.log(animatedBgPalletes.map(d => d.pallete))
+
+  const renderBench = benchmark("render bench", 2);
+  const updateBench = benchmark("update bench", 2);
+
+  const factoryAndCity = bgTiles.reorder([4, 4, 4, 4, 5, 5, 5, 5], 4, 2);
+  console.log(bgTiles.width);
+  console.log(bgTiles.height);
+  console.log(factoryAndCity.width);
+  console.log(factoryAndCity.height);
 
   // animated bg
   const render = (dt: number) => {
+    renderBench.A();
     screenBitmap.fill(world.skyColor);
 
-    animateBg(dt);
+    // animateBg(dt);
+    screenBitmap.draw(factoryAndCity, 100, 100);
     animate(dt);
     draw(dt);
 
     screenCtx.putImageData(screenImageData, 0, 0);
+    renderBench.B();
   };
 
   const update = (dt: number) => {
+    updateBench.A();
     move(dt);
     collideBounds(dt);
     control(dt);
+    updateBench.B();
   };
 
   console.debug("MAIN: run engine");
   const engine = new Engine(adapter, fps, update, render, 0.03);
   engine.start();
   // TODO: live limited time. for dev only
-  setTimeout(() => engine.stop(), 1000 * 30); // for development only, to stop after 30 sec
+  setTimeout(() => {
+    engine.stop();
+    console.debug("MAIN: engine stopped");
+    console.log(renderBench.resultsFps());
+    console.log(updateBench.resultsFps());
+  }, 1000 * 5); // for development only, to stop after 30 sec
 };

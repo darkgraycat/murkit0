@@ -64,6 +64,14 @@ what remap do:
 for all pixels in Bitmap set color of Data[Map[i]]
 
 
+TileableBitmap.reorder:
+
+A B C
+D E F
 
 
+[2 2 3 3] cols = 2
+
+C C
+D D
 
