@@ -125,11 +125,10 @@ export function Systems(world: World, viewport: Bitmap) {
       for (const e of entities) {
         const half = sprites[e].length / 2;
         const idx = flipped[e] ? spriteIdx[e] + half : spriteIdx[e];
-        // viewport.draw(sprites[e][idx], x[e] | 0, y[e] | 0);
         viewport.draw(
           sprites[e][idx],
-          offsetX[e] + Math.round(x[e]),
-          offsetY[e] + Math.round(y[e]),
+          Math.round(offsetX[e] + x[e]),
+          Math.round(offsetY[e] + y[e]),
         );
       }
     }),
@@ -167,5 +166,23 @@ export function Systems(world: World, viewport: Bitmap) {
         }
       },
     ),
+
+    /* Dynamic background */
+    sDrawAnimatedBg: new System(
+      { cSprite, cAnimation },
+      (dt, comp, entities) => {
+        const { offsetX, offsetY, sprites, spriteIdx } = comp.cSprite.storage;
+        const { time, coef } = comp.cAnimation.storage;
+        for (const e of entities) {
+          const frameTime = (time[e] + dt * coef[e]) % 32;
+          viewport.draw(
+            sprites[e][spriteIdx[e]],
+            Math.round(offsetX[e] + frameTime),
+            Math.round(offsetY[e]),
+          );
+          time[e] = frameTime;
+        }
+      }
+    )
   };
 }

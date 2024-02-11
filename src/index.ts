@@ -15,7 +15,7 @@ window.addEventListener("load", () => {
   window.addEventListener("keyup", ({ code }) => keys.delete(code));
 
   const width = 320;
-  const height = 240;
+  const height = 200;
 
   console.log(document);
   const screen = document.getElementById("screen") as HTMLCanvasElement;

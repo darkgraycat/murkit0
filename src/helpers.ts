@@ -32,8 +32,7 @@ export const createStaticDrawableEntity = (
   spriteIdx: number,
   x: number, y: number,
   w: number, h: number,
-) =>
-  em.add({
+) => em.add({
     cPosition: { x, y },
     cShape: { w, h },
     cSprite: { sprites, spriteIdx, flipped: false },

@@ -19,7 +19,7 @@ export const cShape = new Component<{ w: number; h: number }>({
 export const cSprite = new Component<{
   spriteIdx: number;
   sprites: Bitmap[];
-  flipped: boolean;
+  flipped?: boolean;
   offsetX?: number,
   offsetY?: number,
 }>({
@@ -53,17 +53,24 @@ export const cMeta = new Component<{ air: boolean; speed: number }>({
   speed: 0,
 });
 
-// TODO: investigate possibility of using world as a component
-export const cWorld = new Component<{
-  width: number,
-  height: number,
-  gravity: number,
-  friction: number,
-  viewport: Bitmap,
-}>({
-  width: 0,
-  height: 0,
-  gravity: 0,
-  friction: 0,
-  viewport: new Bitmap(0, 0),
-});
+// export const cAnimatedBg = new Component<{ x: number, w: number, vx: number, lastx?: number }>({
+//   x: 0,
+//   w: 0,
+//   vx: 0,
+//   lastx: 0,
+// });
+// 
+// // TODO: investigate possibility of using world as a component
+// export const cWorld = new Component<{
+//   width: number,
+//   height: number,
+//   gravity: number,
+//   friction: number,
+//   viewport: Bitmap,
+// }>({
+//   width: 0,
+//   height: 0,
+//   gravity: 0,
+//   friction: 0,
+//   viewport: new Bitmap(0, 0),
+// });

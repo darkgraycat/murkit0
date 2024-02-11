@@ -226,6 +226,41 @@ describe("ecs/simple.ecs", () => {
   });
 
   describe("ECS experimental features", () => {
+    it("System and dynamic entity groups", () => {
+      const cPos = new Component({ health: 0, dmg: 10 });
+      cPos.set(0, { health: 100, dmg: 10 });
+      cPos.set(1, { health: 100, dmg: 20 });
+      cPos.set(2, { health: 100, dmg: 30 });
+      cPos.set(3, { health: 100, dmg: 40 });
+      cPos.set(4, { health: 100, dmg: 50 });
+      const groupA = [0, 1, 2];
+      const groupB = [3, 4];
+      const logs: string[] = [];
+      const sExec = new System(
+        { cPos },
+        (dt, comps, ents1, ents2) => {
+          const { health, dmg } = comps.cPos.storage;
+          for (const e1 of ents1) {
+            for (const e2 of ents2) {
+              logs.push(`${e1} damages ${e2} at ${dt}`);
+              health[e2] -= dmg[e1]
+            }
+          }
+        }
+      )
+      const exec = sExec.setup(groupA, groupB);
+      const { storage: { health } } = cPos;
+      expect(health).toEqual([100, 100, 100, 100, 100]);
+      exec(1);
+      expect(health).toEqual([100, 100, 100, 40, 40]);
+      groupB.pop();
+      exec(2);
+      expect(health).toEqual([100, 100, 100, -20, 40]);
+      groupB.push(groupA.pop());
+      exec(3);
+      expect(health).toEqual([100, 100, 70, -50, 40]);
+      // console.log(logs)
+    });
     it("Component with optional properties", () => {
       const cComp = new Component<{ label: string, a?: number, desc?: string }>({ label: "", a: 10, desc: "no desc" });
       cComp.set(0, { label: "First", a: 17, desc: "First comp" });

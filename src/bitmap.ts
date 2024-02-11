@@ -1,3 +1,4 @@
+/* Bitmap */
 export class Bitmap {
   readonly width: number;
   readonly height: number;
@@ -5,8 +6,7 @@ export class Bitmap {
 
   /** Create new Bitmap with empty pixels
   * @param width new Bitmap width
-  * @param height new Bitmap height
-  * */
+  * @param height new Bitmap height */
   constructor(width: number, height: number) {
     this.width = width;
     this.height = height;
@@ -17,20 +17,24 @@ export class Bitmap {
   * @param buffer buffer with color values
   * @param width new Bitmap width
   * @param height new Bitmap height
-  * @returns new Bitmap
-  * */
+  * @returns new Bitmap */
   public static from(buffer: ArrayBuffer, width: number, height: number): Bitmap {
     const bitmap = new Bitmap(width, height);
     bitmap.data = new Uint32Array(buffer);
     return bitmap;
   }
 
+  /** Get pixels array
+  * @returns Uint32Array which represents pixels */
+  public get pixels(): Uint32Array {
+    return this.data;
+  }
+
   /** Draw Bitmap on current one
   * @param bitmap source Bitmap to draw
   * @param x destination offset x
   * @param y destination offset y
-  * @returns self
-  * */
+  * @returns self */
   public draw(bitmap: Bitmap, x: number, y: number): this {
     const { data: dest, width: dw, height: dh } = this;
     const { data: src,  width: sw } = bitmap;
@@ -53,8 +57,7 @@ export class Bitmap {
   * @param sy source offset y
   * @param width area width to copy
   * @param height area height to copy
-  * @returns self
-  * */
+  * @returns self */
   public copy(bitmap: Bitmap, x: number, y: number, sx: number, sy: number, width: number, height: number): this {
     const { data: dest, width: dw, height: dh } = bitmap;
     const { data: src,  width: sw } = this;
@@ -75,8 +78,7 @@ export class Bitmap {
   * @param y source offset y
   * @param width new Bitmap width
   * @param height new Bitam height
-  * @returns new Bitmap
-  * */
+  * @returns new Bitmap */
   public extract(x: number, y: number, width: number, height: number): Bitmap {
     const bitmap = new Bitmap(width, height);
     const { data: src,  width: sw, height: sh } = this;
@@ -92,8 +94,7 @@ export class Bitmap {
   }
 
   /** Clone current Bitmap in new one
-  * @returns new Bitmap
-  * */
+  * @returns new Bitmap */
   public clone(): Bitmap {
     const bitmap = new Bitmap(this.width, this.height);
     const { data: dest } = bitmap;
@@ -105,31 +106,14 @@ export class Bitmap {
 
   /** Fill current Bitmap with color
   * @param color color to fill
-  * @returns self
-  * */
+  * @returns self */
   public fill(color: number): this {
     this.data.fill(color);
     return this;
   }
 
-  /** Remap Bitmap colors by new palette
-  * @param mapping <prevColor, newColor>
-  * @returns self
-  * */
-  public remap(mapping: Map<number, number>): this {
-    const { data } = this;
-    let i = data.length;
-    while (i--) {
-      const prev = data[i];
-      if (!mapping.has(prev)) continue
-      data[i] = mapping.get(prev)
-    }
-    return this;
-  }
-
   /** Vertical flip
-  * @returns self
-  * */
+  * @returns self */
   public flipV(): this {
     const { data, width } = this;
     let i = data.length;
@@ -146,8 +130,7 @@ export class Bitmap {
   }
 
   /** Horizontal flip
-   * @returns self
-  * */
+  * @returns self */
   public flipH(): this {
     const { data, width, height } = this;
     let i = data.length / 2; // skip iterating bottom half
@@ -163,6 +146,7 @@ export class Bitmap {
   }
 }
 
+/* TileableBitmap */
 export class TileableBitmap extends Bitmap {
   readonly twidth: number;
   readonly theight: number;
@@ -173,8 +157,7 @@ export class TileableBitmap extends Bitmap {
   * @param twidth width of the tile
   * @param theight height of the tile
   * @param cols total number of tiles in horizontal
-  * @param rows total number of tiles in vertical
-  * */
+  * @param rows total number of tiles in vertical */
   constructor(twidth: number, theight: number, cols: number, rows: number) {
     super(twidth * cols, theight * rows);
     this.twidth = twidth;
@@ -189,8 +172,7 @@ export class TileableBitmap extends Bitmap {
   * @param theight height of the tile
   * @param cols total number of tiles in horizontal
   * @param rows total number of tiles in vertical
-  * @returns new TileableBitmap
-  * */
+  * @returns new TileableBitmap */
   public static from(buffer: ArrayBuffer, twidth: number, theight: number, cols: number = 1, rows: number = 1): TileableBitmap {
     const tbitmap = new TileableBitmap(twidth, theight, cols, rows);
     tbitmap.data = new Uint32Array(buffer);
@@ -198,8 +180,7 @@ export class TileableBitmap extends Bitmap {
   }
 
   /** Split TileableBitmap to array of Bitmaps
-  * @returns array of Bitmaps
-  * */
+  * @returns array of Bitmaps */
   public split(): Bitmap[] {
     const bitmaps = [];
     for (let row = 0; row < this.rows; row++) {
@@ -210,5 +191,69 @@ export class TileableBitmap extends Bitmap {
       }
     }
     return bitmaps;
+  }
+
+  /** Create new Bitmap from TileableBitmap
+  * @param col frame location by x
+  * @param row frame location by y
+  * @returns new Bitmap */
+  public frame(col: number, row: number): Bitmap {
+    return this.extract(
+      col * this.twidth,
+      row * this.theight,
+      this.twidth,
+      this.theight,
+    );
+  }
+}
+
+/* BitmapPallete */
+export class BitmapPallete {
+  private palleteData: Uint32Array;
+  readonly palleteMap: Uint8Array;
+  readonly bitmap: Bitmap;
+
+  /** Create new BitmapPallete attached to Bitmap
+  * @param bitmap source Bitmap */
+  constructor(bitmap: Bitmap) {
+    this.bitmap = bitmap;
+    const pixels = bitmap.pixels;
+    const map = [] as number[];
+    const colors = [] as number[];
+    let i = pixels.length;
+    while (i--) {
+      const pixel = pixels[i];
+      const idx = colors.indexOf(pixel);
+      if (idx < 0) {
+        map[i] = colors.length;
+        colors.push(pixel);
+      } else map[i] = idx;
+    }
+    this.palleteMap = new Uint8Array(map);
+    this.palleteData = new Uint32Array(colors);
+  }
+
+  /** Get pallete as array of numbers
+  * @returns colors */
+  public get pallete(): number[] {
+    return Array.from(this.palleteData);
+  }
+
+  /** Set new pallete and apply on source Bitmap
+  * @param pallete new pallete to apply */
+  public set pallete(pallete: number[]) {
+    this.palleteData.set(pallete);
+    this.remap();
+  }
+
+  /** Apply pallete on source Bitmap */
+  protected remap(): void {
+    const { 
+      bitmap: { pixels },
+      palleteData,
+      palleteMap,
+    } = this;
+    let i = pixels.length;
+    while (i--) pixels[i] = palleteData[palleteMap[i]];
   }
 }

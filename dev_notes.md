@@ -43,3 +43,27 @@ which causes collision
     1:2  3-2
     16, 17, 18
     23, 24, 25
+
+#### pallete and color manipulation
+Option A
+    All bitmaps stores indexes not actual pixels
+    Viewport bitmap applies pixels on indexes
+    + realtime manipulation
+    - additional lookup on each frame, but lookup is O(1)
+    - need to handle this
+    How it can be, example:
+        ( Need to have 2 bitmaps for static, and 1 for player )
+        have array of collors (pallete)
+        on image load(bitmap creation) store unique colors to pallete and create bitmap with indexes
+
+
+palleteData = actual colors: [0xfff, 0x452, 0xf24]
+palleteMap = readonly map of indexes [1, 0, 0, 2, 1]
+
+what remap do:
+for all pixels in Bitmap set color of Data[Map[i]]
+
+
+
+
+
