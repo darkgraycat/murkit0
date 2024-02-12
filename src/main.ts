@@ -56,8 +56,23 @@ export const init = async (config: MainConfig): Promise<void> => {
     bgTiles.reorder([5,5,5,5,5,5,5,5,5,5,5], 11, 1),          // 6 city
     bgTiles.reorder([5,5,5,5,5,5,5,5,5,5,5], 11, 1).flipV(),  // 7 city
   ]
-
   const animatedBgPalletes = animatedBgLayers.map((bitmap) => new BitmapPallete(bitmap));
+
+  const animatedFgOrder =  [9, 9, 2, 9, 9, 3, 9, 9];
+  const animatedFgOrder2 = [9, 9, 0, 9, 9, 0, 9, 9];
+  const animatedFgLayers = [
+    bgHouseTiles.reorder([
+      ...animatedFgOrder,
+      ...animatedFgOrder,
+      ...animatedFgOrder2,
+      ...animatedFgOrder2,
+      ...animatedFgOrder,
+      ...animatedFgOrder,
+      ...animatedFgOrder2,
+      ...animatedFgOrder2,
+    ], 16, 4),
+  ];
+  const animatedFgPalletes = animatedFgLayers.map((bitmap) => new BitmapPallete(bitmap));
   
   console.debug("MAIN: init world");
   const world = new World({
@@ -76,6 +91,7 @@ export const init = async (config: MainConfig): Promise<void> => {
     sDrawing,
     sController,
     sDrawAnimatedBg,
+    sDrawAnimatedFg,
   } = Systems(world, screenBitmap);
 
   console.debug("MAIN: init entities");
@@ -98,20 +114,27 @@ export const init = async (config: MainConfig): Promise<void> => {
 
   // TODO: #newECS: how we can make dynamic component arguments using TS types, to achive this API:
   // const entity = em.create(x, y, w, h) // where x & y and w & h is separate components
-  const createAnimatedBgEntity = (spriteIdx: number, x: number, y: number, speed: number) => em.add({
+  const createAnimatedBgEntity = (spriteIdx: number, alt: number, speed: number) => em.add({
     cAnimation: { animations: [[0]], current: 0, length: 0, time: 0, coef: speed },
-    cSprite:   { sprites: animatedBgLayers, spriteIdx, offsetX: x, offsetY: y },
+    cSprite:   { sprites: animatedBgLayers, spriteIdx, offsetX: 0, offsetY: alt * 16 },
   });
 
   const animatedBgLayersEntities = [
-    createAnimatedBgEntity(2, 0, 5 * 16, -1),
-    createAnimatedBgEntity(3, 0, 6 * 16, -1.5),
-    createAnimatedBgEntity(4, 0, 7 * 16, -2),
-    createAnimatedBgEntity(5, 0, 8 * 16, -2.5),
-    createAnimatedBgEntity(6, 0, 9.5 * 16, -3),
-    createAnimatedBgEntity(7, 0, 10.9 * 16, -3.5),
-    createAnimatedBgEntity(1, 0, 1 * 16, -2),
-    createAnimatedBgEntity(0, 0, 0 * 16, -1),
+    createAnimatedBgEntity(2, 5, -1),
+    createAnimatedBgEntity(3, 6, -1.5),
+    createAnimatedBgEntity(4, 7, -2),
+    createAnimatedBgEntity(5, 8, -2.5),
+    createAnimatedBgEntity(6, 9.5, -3),
+    createAnimatedBgEntity(7, 10.9, -3.5),
+    createAnimatedBgEntity(1, 1, -2),
+    createAnimatedBgEntity(0, 0, -1),
+  ]
+  const createAnimatedFgEntity = (spriteIdx: number, alt: number, speed: number) => em.add({
+    cAnimation: { animations: [[0]], current: 0, length: 0, time: 0, coef: speed },
+    cSprite:   { sprites: animatedFgLayers, spriteIdx, offsetX: 0, offsetY: alt * 16 },
+  });
+  const animatedFgLayersEntities = [
+    createAnimatedFgEntity(0, 5, -3)
   ]
 
   console.debug("MAIN: attach entities with systems");
@@ -121,7 +144,9 @@ export const init = async (config: MainConfig): Promise<void> => {
   const control = sController.setup([player]);
   const animate = sAnimation.setup([player]);
   const animateBg = sDrawAnimatedBg.setup(animatedBgLayersEntities);
+  const animateFg = sDrawAnimatedFg.setup(animatedFgLayersEntities);
 
+  console.log("FGpals", animatedBgPalletes.map(d => d.pallete))
   animatedBgPalletes[0].pallete = [0, 0xff807060, 0xff605040];
   animatedBgPalletes[1].pallete = [0, 0xff908070, 0xff706050];
   animatedBgPalletes[2].pallete = [0xff304030, 0];
@@ -130,7 +155,8 @@ export const init = async (config: MainConfig): Promise<void> => {
   animatedBgPalletes[5].pallete = [0xff404040, 0xff206090];
   animatedBgPalletes[6].pallete = [0xff303030, 0xff909090];
   animatedBgPalletes[7].pallete = [0xff202020, 0xff909090];
-  console.log(animatedBgPalletes.map(d => d.pallete))
+  console.log("BGpals", animatedFgPalletes.map(d => d.pallete))
+  animatedFgPalletes[0].pallete = [0, 0xff202020, 0xff505050];
 
   const renderBench = benchmark("render bench", 2);
   const updateBench = benchmark("update bench", 2);
@@ -140,13 +166,10 @@ export const init = async (config: MainConfig): Promise<void> => {
     renderBench.A();
     screenBitmap.fill(world.skyColor);
 
-    // animatedBgLayers.forEach((bl, i) => {
-    //   screenBitmap.draw(bl, 0, i * 32 + 32)
-    // })
-
     animateBg(dt);
     animate(dt);
     draw(dt);
+    animateFg(dt);
 
     screenCtx.putImageData(screenImageData, 0, 0);
     renderBench.B();
@@ -169,5 +192,5 @@ export const init = async (config: MainConfig): Promise<void> => {
     console.debug("MAIN: engine stopped");
     console.log(renderBench.resultsFps());
     console.log(updateBench.resultsFps());
-  }, 1000 * 5); // for development only, to stop after 30 sec
+  }, 1000 * 30); // for development only, to stop after 30 sec
 };

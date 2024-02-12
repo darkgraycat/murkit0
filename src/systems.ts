@@ -160,13 +160,17 @@ export function Systems(world: World, viewport: Bitmap) {
             continue;
           }
           current[e] = 1; // TODO: fix false firing on any key
-          if (keys[e].has("KeyQ")) (vx[e] -= speed[e]), (flipped[e] = true);
+          // if (keys[e].has("KeyQ")) (vx[e] -= speed[e]), (flipped[e] = true);
+          if (keys[e].has("KeyQ")) (vx[e] -= speed[e]), (flipped[e] = false);
           if (keys[e].has("KeyW")) (vx[e] += speed[e]), (flipped[e] = false);
           if (keys[e].has("KeyP")) !air[e] && ((air[e] = true), (vy[e] = -10));
         }
       },
     ),
 
+    // TODO: ability to add modifiers to the system
+    // Modifier can store 32 and 48
+    // Also it can store pointer to World
     /* Dynamic background */
     sDrawAnimatedBg: new System(
       { cSprite, cAnimation },
@@ -183,6 +187,22 @@ export function Systems(world: World, viewport: Bitmap) {
           time[e] = frameTime;
         }
       }
-    )
+    ),
+    sDrawAnimatedFg: new System(
+      { cSprite, cAnimation },
+      (dt, comp, entities) => {
+        const { offsetX, offsetY, sprites, spriteIdx } = comp.cSprite.storage;
+        const { time, coef } = comp.cAnimation.storage;
+        for (const e of entities) {
+          const frameTime = (time[e] + dt * coef[e]) % 384;
+          viewport.draw(
+            sprites[e][spriteIdx[e]],
+            Math.round(offsetX[e] + frameTime),
+            Math.round(offsetY[e]),
+          );
+          time[e] = frameTime;
+        }
+      }
+    ),
   };
 }
