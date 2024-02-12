@@ -1,3 +1,8 @@
+/* TODO and ideas
+  Bitmap with shared buffer (abiliy to draw part, but modify source)
+  Bitmap with indexes instead of pixels (partialy done)
+*/
+
 /* Bitmap */
 export class Bitmap {
   readonly width: number;

@@ -64,14 +64,19 @@ what remap do:
 for all pixels in Bitmap set color of Data[Map[i]]
 
 
+#### TileableBitmap
 TileableBitmap.reorder:
-
 A B C
 D E F
-
-
 [2 2 3 3] cols = 2
-
 C C
 D D
+TODO:
+ability to create TileableBitmap from Bitmaps array (join)
+
+#### Animated BG notes
+TODO:
+1. remake to include +1 color for shade (etc)
+2. make all tiles compatible (smooth at the ends)
+3. reorder allow us to make variations
 
