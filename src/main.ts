@@ -45,7 +45,6 @@ export const init = async (config: MainConfig): Promise<void> => {
   const boxSprites = boxTiles.split();
 
   // TODO: make dedicated EM and components and systems for decorations
-  // TODO: fix mixed animated bg strip. mb we need to double length (easy way)
   const animatedBgLayers = [
     // bgTiles.reorder([0,0,0,0,0,0,0,0,0,0,0], 11, 1),          // 0 sky
     // bgTiles.reorder([0,0,0,0,0,0,0,0,0,0,0], 11, 1).flipV(),  // 1 sky
