@@ -47,12 +47,21 @@ export const init = async (config: MainConfig): Promise<void> => {
   // TODO: make dedicated EM and components and systems for decorations
   // TODO: fix mixed animated bg strip. mb we need to double length (easy way)
   const animatedBgLayers = [
+    // bgTiles.reorder([0,0,0,0,0,0,0,0,0,0,0], 11, 1),          // 0 sky
+    // bgTiles.reorder([0,0,0,0,0,0,0,0,0,0,0], 11, 1).flipV(),  // 1 sky
+    // bgTiles.reorder([2,2,2,2,2,2,2,2,2,2,2], 11, 1),          // 2 pines
+    // bgTiles.reorder([1,1,1,1,1,1,1,1,1,1,1], 11, 1),          // 3 hills
+    // bgTiles.reorder([3,3,3,3,3,3,3,3,3,3,3], 11, 1),          // 4 elechils
+    // bgTiles.reorder([4,4,4,4,4,4,4,4,4,4,4], 11, 1),          // 5 factory
+    // bgTiles.reorder([5,5,5,5,5,5,5,5,5,5,5], 11, 1),          // 6 city
+    // bgTiles.reorder([5,5,5,5,5,5,5,5,5,5,5], 11, 1).flipV(),  // 7 city
+
     bgTiles.reorder([0,0,0,0,0,0,0,0,0,0,0], 11, 1),          // 0 sky
     bgTiles.reorder([0,0,0,0,0,0,0,0,0,0,0], 11, 1).flipV(),  // 1 sky
     bgTiles.reorder([2,2,2,2,2,2,2,2,2,2,2], 11, 1),          // 2 pines
     bgTiles.reorder([1,1,1,1,1,1,1,1,1,1,1], 11, 1),          // 3 hills
-    bgTiles.reorder([3,3,3,3,3,3,3,3,3,3,3], 11, 1),          // 4 elechils
-    bgTiles.reorder([4,4,4,4,4,4,4,4,4,4,4], 11, 1),          // 5 factory
+    bgTiles.reorder([5,5,5,5,5,5,5,5,5,5,5], 11, 1),          // 4 elechils
+    bgTiles.reorder([5,5,5,5,5,5,5,5,5,5,5], 11, 1),          // 5 factory
     bgTiles.reorder([5,5,5,5,5,5,5,5,5,5,5], 11, 1),          // 6 city
     bgTiles.reorder([5,5,5,5,5,5,5,5,5,5,5], 11, 1).flipV(),  // 7 city
   ]
@@ -104,7 +113,7 @@ export const init = async (config: MainConfig): Promise<void> => {
     cInput: { keys },
     cSprite: { spriteIdx: 0, sprites: playerSprites, offsetX: -3, offsetY: -2 },
     cAnimation: {
-      animations: [ [0, 0, 3, 3], [1, 2, 3, 0] ],
+      animations: [ [0, 0, 3, 3], [1, 2, 3, 0], [1, 1, 2, 2] ],
       current: 0,
       length: 4,
       time: 0,
@@ -120,14 +129,15 @@ export const init = async (config: MainConfig): Promise<void> => {
   });
 
   const animatedBgLayersEntities = [
-    createAnimatedBgEntity(2, 5, -1),
-    createAnimatedBgEntity(3, 6, -1.5),
-    createAnimatedBgEntity(4, 7, -2),
-    createAnimatedBgEntity(5, 8, -2.5),
-    createAnimatedBgEntity(6, 9.5, -3),
-    createAnimatedBgEntity(7, 10.9, -3.5),
-    createAnimatedBgEntity(1, 1, -2),
-    createAnimatedBgEntity(0, 0, -1),
+    createAnimatedBgEntity(2, 4, -1.0),
+    createAnimatedBgEntity(3, 5, -1.5),
+    createAnimatedBgEntity(4, 6, -2.0),
+    createAnimatedBgEntity(5, 7, -2.5),
+    createAnimatedBgEntity(6, 8, -3.0),
+    createAnimatedBgEntity(7, 9, -3.5),
+    createAnimatedBgEntity(0, 2, -1.0),
+    createAnimatedBgEntity(1, 1, -1.5),
+    createAnimatedBgEntity(0, 0, -2.0),
   ]
   const createAnimatedFgEntity = (spriteIdx: number, alt: number, speed: number) => em.add({
     cAnimation: { animations: [[0]], current: 0, length: 0, time: 0, coef: speed },
@@ -147,16 +157,28 @@ export const init = async (config: MainConfig): Promise<void> => {
   const animateFg = sDrawAnimatedFg.setup(animatedFgLayersEntities);
 
   console.log("FGpals", animatedBgPalletes.map(d => d.pallete))
-  animatedBgPalletes[0].pallete = [0, 0xff807060, 0xff605040];
-  animatedBgPalletes[1].pallete = [0, 0xff908070, 0xff706050];
-  animatedBgPalletes[2].pallete = [0xff304030, 0];
-  animatedBgPalletes[3].pallete = [0xff293929, 0];
-  animatedBgPalletes[4].pallete = [0xff484848, 0];
-  animatedBgPalletes[5].pallete = [0xff404040, 0xff206090];
-  animatedBgPalletes[6].pallete = [0xff303030, 0xff909090];
-  animatedBgPalletes[7].pallete = [0xff202020, 0xff909090];
+  // animatedBgPalletes[0].pallete = [0, 0xff807060, 0xff605040];
+  // animatedBgPalletes[1].pallete = [0, 0xff908070, 0xff706050];
+  // animatedBgPalletes[2].pallete = [0xff304030, 0];
+  // animatedBgPalletes[3].pallete = [0xff293929, 0];
+  // animatedBgPalletes[4].pallete = [0xff484848, 0];
+  // animatedBgPalletes[5].pallete = [0xff404040, 0xff206090];
+  // animatedBgPalletes[6].pallete = [0xff303030, 0xff909090];
+  // animatedBgPalletes[7].pallete = [0xff202020, 0xff909090];
+
+  world.skyColor = 0xff4499ff;
+  animatedBgPalletes[0].pallete = [0, 0xff3366ee, 0xff2244aa];
+  animatedBgPalletes[1].pallete = [0, 0xff113388, 0xff2255bb];
+  animatedBgPalletes[2].pallete = [0xff303030, 0];
+  animatedBgPalletes[3].pallete = [0xff292929, 0];
+  animatedBgPalletes[4].pallete = [0xff333333, 0xff206090];
+  animatedBgPalletes[5].pallete = [0xff303030, 0xff206090];
+  animatedBgPalletes[6].pallete = [0xff252525, 0xff206090];
+  animatedBgPalletes[7].pallete = [0xff202020, 0xff206090];
+
   console.log("BGpals", animatedFgPalletes.map(d => d.pallete))
-  animatedFgPalletes[0].pallete = [0, 0xff202020, 0xff505050];
+  // animatedFgPalletes[0].pallete = [0, 0xff202020, 0xff505050];
+  animatedFgPalletes[0].pallete = [0, 0xff101010, 0xff303030];
 
   const renderBench = benchmark("render bench", 2);
   const updateBench = benchmark("update bench", 2);

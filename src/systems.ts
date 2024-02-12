@@ -156,13 +156,14 @@ export function Systems(world: World, viewport: Bitmap) {
         const { air, speed } = comp.cMeta.storage;
         for (const e of entities) {
           if (!keys[e].size) {
-            current[e] = 0;
+            current[e] = air[e] ? 2 : 0;
             continue;
           }
-          current[e] = 1; // TODO: fix false firing on any key
-          // if (keys[e].has("KeyQ")) (vx[e] -= speed[e]), (flipped[e] = true);
-          if (keys[e].has("KeyQ")) (vx[e] -= speed[e]), (flipped[e] = false);
-          if (keys[e].has("KeyW")) (vx[e] += speed[e]), (flipped[e] = false);
+          // current is animation player
+          // TODO: investigate how we can add documentation to component fields
+          // current[e] = 1; // TODO: fix false firing on any key
+          if (keys[e].has("KeyQ")) (vx[e] -= speed[e]), (flipped[e] = true), current[e] = 1;
+          else if (keys[e].has("KeyW")) (vx[e] += speed[e]), (flipped[e] = false), current[e] = 1;
           if (keys[e].has("KeyP")) !air[e] && ((air[e] = true), (vy[e] = -10));
         }
       },
