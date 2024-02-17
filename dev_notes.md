@@ -29,7 +29,9 @@ y - 160.524
 which causes collision
 
 ## Bitmap
-
+#### Ideas
+- Bitmap with shared buffer (abiliy to draw part, but modify source)
+- Bitmap with indexes instead of pixels (partialy done)
 #### copy
    0  1  2  3  4  5  6
 0  01 02 03 04 05 06 07
