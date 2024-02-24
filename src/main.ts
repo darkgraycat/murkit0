@@ -3,11 +3,12 @@ import { Engine } from "./engine";
 import { Bitmap } from "./bitmap";
 
 import { EntityManager } from "./ecs/simple.ecs";
-import { World, Level } from "./world";
+import { World } from "./world";
 import { Systems } from "./systems";
+import { Entities } from "./entities";
 import * as components from "./components";
 
-import { bulkTileableBitmapLoad, createStaticDrawableEntity } from "./helpers";
+import { benchmark } from "./utils";
 
 export type MainConfig = {
   width: number;
@@ -26,29 +27,13 @@ export const init = async (config: MainConfig): Promise<void> => {
   const screenBitmap = Bitmap.from(screenImageData.data.buffer, width, height);
   const adapter = new Adapter();
 
-  console.debug("MAIN: load assets");
-  const [playerTiles, boxTiles, bgTiles, bgHouseTiles] =
-    await bulkTileableBitmapLoad(
-      adapter,
-      ["./assets/player.png", 16, 16, 4, 1],
-      ["./assets/platforms.png", 16, 16, 4, 1],
-      ["./assets/backgrounds.png", 32, 32, 6, 1],
-      ["./assets/backgrounds_houses.png", 48, 32, 5, 1],
-    );
-
-  const playerSprites = playerTiles.split();
-  playerSprites.push(...playerTiles.flipV().split());
-  const bgHouseSprites = bgHouseTiles.split();
-  const boxSprites = boxTiles.split();
-
   console.debug("MAIN: init world");
   const world = new World({
     width,
     height,
     gravity: 0.9,
-    friction: 0.8,
-    skyColor: 0xffe09020,
-    // skyColor: 0xff708090,
+    friction: 0.95,
+    skyColor: 0xffa09080,
   });
 
   console.debug("MAIN: init systems");
@@ -56,110 +41,81 @@ export const init = async (config: MainConfig): Promise<void> => {
     sMovement,
     sAnimation,
     sCollideBounds,
-    sCollideShapes,
     sDrawing,
-    sController,
+    sControllerRunner,
+    sDrawAnimatedBg,
+    sDrawAnimatedFg,
   } = Systems(world, screenBitmap);
 
   console.debug("MAIN: init entities");
   const em = new EntityManager(components);
-  const player = em.add({
-    cPosition: { x: 32, y: 128 },
-    cVelocity: { vx: 0, vy: 0 },
-    cShape: { w: 10, h: 14 },
-    cMeta: { air: true, speed: 1 },
-    cInput: { keys },
-    cSprite: {
-      spriteIdx: 0,
-      sprites: playerSprites,
-      flipped: false,
-      offsetX: -3,
-      offsetY: -2,
-    },
-    cAnimation: {
-      animations: [
-        [0, 0, 3, 3],
-        [1, 2, 3, 0],
-      ],
-      current: 0,
-      length: 4,
-      time: 0,
-      coef: 0.4,
-    },
-  });
-
-  const createHouseBlock = (idx: number, x: number, y: number) =>
-    createStaticDrawableEntity(em, bgHouseSprites, idx, x, y, 48, 32);
-  const createBoxBlock = (idx: number, x: number, y: number) =>
-    createStaticDrawableEntity(em, boxSprites, idx, x, y, 16, 16);
-
-  const houseBlocks = [
-    createHouseBlock(1, 48 * 2, 13 * 16),
-    createHouseBlock(2, 48 * 2, 11 * 16),
-
-    createHouseBlock(0, 48 * 3, 13 * 16),
-    createBoxBlock(0, 10 * 16, 192),
-    // createHouseBlock(2, 48 * 3, 11 * 16),
-
-    createHouseBlock(3, 48 * 4, 13 * 16),
-    createHouseBlock(2, 48 * 4, 11 * 16),
-
-    createHouseBlock(0, 48 * 5, 13 * 16),
-    createHouseBlock(1, 48 * 5, 11 * 16),
-
-    createHouseBlock(1, 48 * 6, 13 * 16),
-    createHouseBlock(2, 48 * 6, 11 * 16),
-
-    // createHouseBlock(4, 48 * 4.5, 9 * 16),
-
-    createBoxBlock(1, 4 * 16, 224),
-    createBoxBlock(1, 3 * 16, 224),
-    createBoxBlock(0, 3.5 * 16, 224 - 16),
-
-    createBoxBlock(2, 14 * 16, 9 * 16),
-    createBoxBlock(2, 16 * 16, 9 * 16),
-
-    createBoxBlock(2, 14 * 16, 5 * 16),
-    createBoxBlock(2, 16 * 16, 5 * 16),
-
-    createBoxBlock(3, 17 * 16, 7 * 16),
-    createBoxBlock(3, 18 * 16, 7 * 16),
-  ];
+  const {
+    playerEntity,
+    animatedBgLayersEntities,
+    animatedFgLayersEntities,
+    fgBgLayers: {
+      animatedBgPalletes,
+      animatedFgPalletes,
+    }
+  } = await Entities(em, adapter, keys);
 
   console.debug("MAIN: attach entities with systems");
-  const collideBounds = sCollideBounds.setup([player]);
-  const collideBlocks = sCollideShapes.setup([player], houseBlocks);
-  const move = sMovement.setup([player]);
-  // const draw = sDrawing.setup([player, ...houseBlocks]);
-  const draw = sDrawing.setup([player]);
-  const drawBg = sDrawing.setup(houseBlocks);
-  const control = sController.setup([player]);
-  const animate = sAnimation.setup([player]);
+  const collideBounds = sCollideBounds.setup([playerEntity]);
+  const move = sMovement.setup([playerEntity]);
+  const draw = sDrawing.setup([playerEntity]);
+  const control = sControllerRunner.setup([playerEntity]);
+  const animate = sAnimation.setup([playerEntity]);
+  const animateBg = sDrawAnimatedBg.setup(animatedBgLayersEntities);
+  const animateFg = sDrawAnimatedFg.setup(animatedFgLayersEntities);
 
+  // colors
+  world.skyColor = 0xff4499ff;
+
+  animatedBgPalletes[0].pallete = [0, 0xff3366ee, 0xff2244aa];
+  animatedBgPalletes[1].pallete = [0, 0xff113388, 0xff2255bb];
+  animatedBgPalletes[2].pallete = [0xff303030, 0];
+  animatedBgPalletes[3].pallete = [0xff292929, 0];
+  animatedBgPalletes[4].pallete = [0xff333333, 0xff206090];
+  animatedBgPalletes[5].pallete = [0xff303030, 0xff206090];
+  animatedBgPalletes[6].pallete = [0xff252525, 0xff206090];
+  animatedBgPalletes[7].pallete = [0xff202020, 0xff206090];
+
+  animatedFgPalletes[0].pallete = [0, 0xff101010, 0xff303030];
+
+  // debug tools
+  const renderBench = benchmark("render bench", 2);
+  const updateBench = benchmark("update bench", 2);
+
+  // animated bg
   const render = (dt: number) => {
-    // console.time("render")
+    renderBench.A();
     screenBitmap.fill(world.skyColor);
 
+    animateBg(dt);
     animate(dt);
-    drawBg(dt);
     draw(dt);
+    animateFg(dt);
 
     screenCtx.putImageData(screenImageData, 0, 0);
-    // console.timeEnd("render")
+    renderBench.B();
   };
 
   const update = (dt: number) => {
-    // console.time("update")
+    updateBench.A();
     move(dt);
     collideBounds(dt);
-    collideBlocks(dt);
     control(dt);
-    // console.timeEnd("update")
+    updateBench.B();
   };
 
   console.debug("MAIN: run engine");
   const engine = new Engine(adapter, fps, update, render, 0.03);
   engine.start();
   // TODO: live limited time. for dev only
-  setTimeout(() => engine.stop(), 1000 * 30); // for development only, to stop after 30 sec
+  setTimeout(() => {
+    engine.stop();
+    console.debug("MAIN: engine stopped");
+    console.log(renderBench.resultsFps());
+    console.log(updateBench.resultsFps());
+  }, 1000 * 30); // for development only, to stop after 30 sec
 };
