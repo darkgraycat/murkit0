@@ -1,5 +1,6 @@
 const fs = require('fs/promises');
 
+// TODO: fix
 (async (images) => {
   const imagesList = {};
   for await (const img of images) {
@@ -11,7 +12,16 @@ const fs = require('fs/promises');
     const pixelData = buffer.slice(pixelDataOffset);
 
     const pixels = [];
-    for (let i = 0; i < pixelData.length; i += 4) pixels.push(pixelData.readUInt32BE(i));
+    for (let i = 0; i < pixelData.length; i += 4) {
+      const [r, g, b, a] = [
+        pixelData[i + 0],
+        pixelData[i + 1],
+        pixelData[i + 2],
+        pixelData[i + 2],
+      ]
+      const pixel =  (a << 24) | (b << 16) | (g << 8) | r;
+      pixels.push(pixel);
+    }
 
     const image = {
       width: width,
