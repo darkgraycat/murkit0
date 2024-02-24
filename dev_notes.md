@@ -70,10 +70,6 @@ F5A623
 
 E0A030
 D04020
-=======
-    1:2  3-2
-    16, 17, 18
-    23, 24, 25
 
 #### pallete and color manipulation
 Option A

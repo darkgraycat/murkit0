@@ -46,6 +46,7 @@ export type LevelConfig = {
   mapping: { [key: number]: LevelCell };
 };
 
+// TODO: rewrite implementation and data structure
 export class Level {
   // TODO: use LevelCell type for map property
   public collisions: boolean[][];
@@ -84,13 +85,6 @@ export class Level {
     this.collisions = this.filterMap(LevelCellType.Block);
   }
 }
-
-// developing new interface for Level
-// TODO: remove "2" at the end
-export type LevelGridEntryParams = {
-
-}
-export type LevelLegend = { [key: number]: LevelGridEntryParams };
 
 
 

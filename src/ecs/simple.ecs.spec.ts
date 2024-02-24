@@ -314,6 +314,6 @@ describe("ecs/simple.ecs", () => {
       tick(); expect(storage.val).toEqual([6, 9, 12, 10]);
       tick(); expect(storage.val).toEqual([8, 12, 12, 10]);
       tick(); expect(storage.val).toEqual([10, 12, 12, 10]);
-    })
+    });
   });
 });

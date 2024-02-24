@@ -3,9 +3,10 @@ import { IAdapter } from "./common/types";
 import { EntityManager } from "./ecs/simple.ecs";
 import { bulkTileableBitmapLoad } from "./helpers";
 import { MainConfig } from "./main";
+import { World } from "./world";
 
 // TODO: I dont like this function at all, added temporary
-export async function Entities(em: EntityManager<any>, adapter: IAdapter, keys: MainConfig["keys"]) {
+export async function Entities(em: EntityManager<any>, world: World, adapter: IAdapter, keys: MainConfig["keys"]) {
   console.debug("ENTITIES: load assets");
   const [playerTiles, blockTiles, bgTiles, houseTiles] = await bulkTileableBitmapLoad(
     adapter,
@@ -23,15 +24,17 @@ export async function Entities(em: EntityManager<any>, adapter: IAdapter, keys: 
   // TODO: make dedicated EM and components and systems for decorations
   // TODO: use Level to build level assets
   //           or make Level to use ids of assets
+  const animatedBgLength= 20;
   const animatedBgLayers = [
-    bgTiles.reorder([0,0,0,0,0,0,0,0,0,0,0], 11, 1),          // 0 sky
-    bgTiles.reorder([0,0,0,0,0,0,0,0,0,0,0], 11, 1).flipV(),  // 1 sky
-    bgTiles.reorder([2,2,2,2,2,2,2,2,2,2,2], 11, 1),          // 2 pines
-    bgTiles.reorder([1,1,1,1,1,1,1,1,1,1,1], 11, 1),          // 3 hills
-    bgTiles.reorder([5,5,5,5,5,5,5,5,5,5,5], 11, 1),          // 4 elechils
-    bgTiles.reorder([5,5,5,5,5,5,5,5,5,5,5], 11, 1),          // 5 factory
-    bgTiles.reorder([5,5,5,5,5,5,5,5,5,5,5], 11, 1),          // 6 city
-    bgTiles.reorder([5,5,5,5,5,5,5,5,5,5,5], 11, 1).flipV(),  // 7 city
+    bgTiles.reorder(Array.from<number>({ length: animatedBgLength }).fill(0),animatedBgLength, 1),
+    bgTiles.reorder(Array.from<number>({ length: animatedBgLength }).fill(0),animatedBgLength, 1),
+
+    bgTiles.reorder(Array.from<number>({ length: animatedBgLength }).fill(2),animatedBgLength, 1),
+    bgTiles.reorder(Array.from<number>({ length: animatedBgLength }).fill(1),animatedBgLength, 1),
+    bgTiles.reorder(Array.from<number>({ length: animatedBgLength }).fill(4),animatedBgLength, 1),
+    bgTiles.reorder(Array.from<number>({ length: animatedBgLength }).fill(5),animatedBgLength, 1),
+    bgTiles.reorder(Array.from<number>({ length: animatedBgLength }).fill(5),animatedBgLength, 1),
+    bgTiles.reorder(Array.from<number>({ length: animatedBgLength }).fill(5),animatedBgLength, 1),
   ];
   const animatedBgPalletes = animatedBgLayers.map((bitmap) => new BitmapPallete(bitmap));
 
@@ -91,7 +94,7 @@ export async function Entities(em: EntityManager<any>, adapter: IAdapter, keys: 
 
   const createAnimatedFgEntity = (spriteIdx: number, alt: number, speed: number) => em.add({
     cAnimation: { animations: [[0]], current: 0, length: 0, time: 0, coef: speed },
-    cSprite:   { sprites: animatedFgLayers, spriteIdx, offsetX: 0, offsetY: alt * 16 },
+    cSprite: { sprites: animatedFgLayers, spriteIdx, offsetX: 0, offsetY: alt * 16 },
   });
   const animatedFgLayersEntities = [createAnimatedFgEntity(0, 5, -3)];
 
