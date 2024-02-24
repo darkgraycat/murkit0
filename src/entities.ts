@@ -4,6 +4,7 @@ import { EntityManager } from "./ecs/simple.ecs";
 import { bulkTileableBitmapLoad } from "./helpers";
 import { MainConfig } from "./main";
 
+// TODO: I dont like this function at all, added temporary
 export async function Entities(em: EntityManager<any>, adapter: IAdapter, keys: MainConfig["keys"]) {
   console.debug("ENTITIES: load assets");
   const [playerTiles, blockTiles, bgTiles, houseTiles] = await bulkTileableBitmapLoad(
