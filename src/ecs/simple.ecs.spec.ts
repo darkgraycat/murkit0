@@ -272,15 +272,23 @@ describe("ecs/simple.ecs", () => {
       expect(storage.desc).toEqual([ "First comp", "no desc", "no desc" ]);
     })
     it("Compoment with method", () => {
-      const cCompWithMethod = new Component({
-        a: 0,
-        b: 0,
-        op: () => 0,
-      });
+      type cCompMethod = () => Partial<cCompProps>;
+      type cCompProps = { a: number, b: number, op: cCompMethod };
+      const op: cCompMethod = () => ({ a: 10, b: 20 });
+      const cComp = new Component<cCompProps>({ a: 0, b: 0, op });
       const [a, b]  = [
-        cCompWithMethod.set(0, { a: 2, b: 3, op: () => 0 }),
-        cCompWithMethod.set(1, { a: 2, b: 3, op: () => 0 }),
+        cComp.set(0, { a: 2, b: 3, op }),
+        cComp.set(1, { a: 5, b: 7, op }),
       ];
+      const sSystem = new System(
+        { cComp },
+        (_, comps, ents) => {
+          const { op } = cComp.storage;
+          for (const e of ents) {
+            op[e]();
+          }
+        }
+      );
     });
     it("System controls System", () => {
       const cComp = new Component({ val: 0, acc: 0 });
@@ -314,6 +322,26 @@ describe("ecs/simple.ecs", () => {
       tick(); expect(storage.val).toEqual([6, 9, 12, 10]);
       tick(); expect(storage.val).toEqual([8, 12, 12, 10]);
       tick(); expect(storage.val).toEqual([10, 12, 12, 10]);
+    });
+    it("Multiple Entity Managers", () => {
+      const cPhys = new Component({ p: 0, v: 0 });
+      const cInfo = new Component({ name: "" });
+      // TODO: use globalComponent
+      const cWorld = new Component({ length: 0, time: 0 });
+      const cBackground = new Component({ image: "", idx: 0 });
+      const emObjects = new EntityManager({ cWorld, cPhys, cInfo });
+      const emGraphics = new EntityManager({ cWorld, cBackground });
+      const sMovement = new System(
+        { cPhys, cWorld },
+        (_, comps, ents) => {
+          const { p, v } = comps.cPhys.storage;
+          const { length } = comps.cWorld.storage;
+          for (const e of ents) {
+            if (0 >= p[e] || p[e] >= length[0]) v[e] = -v[e];
+            p[e] += v[e];
+          }
+        }
+      )
     });
   });
 });

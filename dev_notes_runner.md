@@ -60,3 +60,4 @@ we need to switch second 10 then after screen switch first 10
     2. for backgrounds
     Note: World appears in both
           Stage is a component as well
+Due to deadline: refactor later

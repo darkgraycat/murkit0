@@ -86,6 +86,27 @@ export class Level {
   }
 }
 
+export type StageConfig = {
+  name: string,
+  bgLayout: number[][],
+  bgPallete: number[][],
+  next: Stage,
+};
+export class Stage {
+  constructor(
+    readonly name: StageConfig["name"],
+    readonly bgLayout: StageConfig["bgLayout"],
+    readonly bgPallete: StageConfig["bgPallete"],
+  ) {}
 
+  static from(config: StageConfig): Stage {
+    const { name, bgLayout, bgPallete } = config;
+    return new Stage(
+      name || "<no name>",
+      bgLayout ? bgLayout.map(row => row.map(Number)) : [],
+      bgPallete ? bgPallete.map(row => row.map(Number)) : [],
+    );
+  }
+}
 
 

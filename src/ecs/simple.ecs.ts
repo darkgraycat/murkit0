@@ -1,16 +1,18 @@
 import { Imutable } from "../common/types";
 
+export type ComponentList<T> = Record<string, Component<T>>;
+
 /* EntityManager */
-export class EntityManager<T extends Record<string, Component<any>>> {
+export class EntityManager<C extends ComponentList<any>> {
   private idx = 0;
   /** Create new Entity Manager
   * @param components components dictionary */
-  constructor(private components: T) {}
+  constructor(private components: C) {}
 
   /** Add new entity with properties for components
   * @param components components entity have
   * @returns entity index */
-  add<K extends keyof T>(components: Record<K, typeof this.components[K]["schema"]>): number {
+  add<K extends keyof C>(components: Record<K, typeof this.components[K]["schema"]>): number {
     const entries = Object.entries(components);
     for (const [componentName, component] of entries){
       this.components[componentName].set(this.idx, component);
@@ -21,7 +23,7 @@ export class EntityManager<T extends Record<string, Component<any>>> {
   /** Assign new properties for components for entity
   * @param idx entity index
   * @param components new components values */
-  set<K extends keyof T>(idx: number, components: { [P in K]: T[P]["schema"] }): void {
+  set<K extends keyof C>(idx: number, components: { [P in K]: C[P]["schema"] }): void {
     const entries = Object.entries(this.components);
     for (const [componentName, component] of entries) {
       component.set(idx, components?.[componentName] || {})
@@ -31,9 +33,9 @@ export class EntityManager<T extends Record<string, Component<any>>> {
   /** Build readonly object of all entity components
   * @param idx entity index
   * @returns readonly entity object */
-  get<K extends keyof T>(idx: number): Imutable<{ [P in K]: T[P]["schema"] }> {
+  get<K extends keyof C>(idx: number): Imutable<{ [P in K]: C[P]["schema"] }> {
     const entries = Object.entries(this.components);
-    const result = {} as { [P in K]: T[P]["schema"] };
+    const result = {} as { [P in K]: C[P]["schema"] };
     for (const [componentName, component] of entries){
       result[componentName] = component.get(idx);
     }
