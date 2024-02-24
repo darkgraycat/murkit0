@@ -196,9 +196,10 @@ export function Systems(world: World, viewport: Bitmap) {
       { cSprite, cAnimation },
       (dt, comp, entities) => {
         const { offsetX, offsetY, sprites, spriteIdx } = comp.cSprite.storage;
-        const { time, coef } = comp.cAnimation.storage;
+        const { time, coef, animations } = comp.cAnimation.storage;
+        // use animations to build up new layouts
         for (const e of entities) {
-          const frameTime = (time[e] + dt * coef[e]) % 32;
+          const frameTime = (time[e] + dt * coef[e]) % width;
           viewport.draw(
             sprites[e][spriteIdx[e]],
             Math.round(offsetX[e] + frameTime),

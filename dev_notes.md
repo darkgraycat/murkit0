@@ -1,5 +1,11 @@
 ## World and levels
 we need multiple maps: for display, for collision
+having "mapping" in each level I will face a lot of duplicated lines
+lets have only level data in level object
+so split leveldata in 2:
+1. cellMap,
+2. cellData,
+Also I need to handle background and foreground layers with paralax effect (but do I need to put it in level data?)
 
 #### Broad phase
 1. get player current cx, cy
@@ -42,9 +48,28 @@ which causes collision
 5  36 37 38 39 40 41 42
 6  43 44 45 46 47 48 49
 
-    1:2  3-2
-    16, 17, 18
-    23, 24, 25
+  1:2  3-2
+  16, 17, 18
+  23, 24, 25
+
+D0C0B0
+907F70
+8A7A6B
+484038
+
+908070
+b09080
+d0a090
+
+908070
+707060
+506050
+305040
+
+F5A623
+
+E0A030
+D04020
 
 #### pallete and color manipulation
 Option A

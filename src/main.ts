@@ -57,7 +57,7 @@ export const init = async (config: MainConfig): Promise<void> => {
       animatedBgPalletes,
       animatedFgPalletes,
     }
-  } = await Entities(em, adapter, keys);
+  } = await Entities(em, world, adapter, keys);
 
   console.debug("MAIN: attach entities with systems");
   const collideBounds = sCollideBounds.setup([playerEntity]);
