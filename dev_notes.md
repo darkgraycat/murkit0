@@ -82,3 +82,14 @@ TODO:
 2. make all tiles compatible (smooth at the ends)
 3. reorder allow us to make variations
 
+
+
+
+
+
+
+
+#### TODOS
+// TODO: #newECS: how we can make dynamic component arguments using TS types, to achive this API:
+// const entity = em.create(x, y, w, h) // where x & y and w & h is separate components
+

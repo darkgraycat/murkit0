@@ -20,6 +20,8 @@ import { debug } from ".";
 const { rectangle, bounds } = collision;
 
 export function Systems(world: World, viewport: Bitmap) {
+  console.debug("SYSYEMS: initialization");
+
   const { width, height } = world;
   return {
     /* Collide entities with world bounds */
@@ -135,8 +137,7 @@ export function Systems(world: World, viewport: Bitmap) {
 
     /* Calculate next frame needed to draw */
     sAnimation: new System({ cAnimation, cSprite }, (dt, comp, entities) => {
-      const { animations, current, length, time, coef } =
-        comp.cAnimation.storage;
+      const { animations, current, length, time, coef } = comp.cAnimation.storage;
       const { spriteIdx } = comp.cSprite.storage;
       for (const e of entities) {
         const frameTime = (time[e] + dt * coef[e]) % length[e];
@@ -159,12 +160,30 @@ export function Systems(world: World, viewport: Bitmap) {
             current[e] = air[e] ? 2 : 0;
             continue;
           }
-          // current is animation player
-          // TODO: investigate how we can add documentation to component fields
-          // current[e] = 1; // TODO: fix false firing on any key
-          if (keys[e].has("KeyQ")) (vx[e] -= speed[e]), (flipped[e] = true), current[e] = 1;
-          else if (keys[e].has("KeyW")) (vx[e] += speed[e]), (flipped[e] = false), current[e] = 1;
-          if (keys[e].has("KeyP")) !air[e] && ((air[e] = true), (vy[e] = -10));
+          if (keys[e].has("KeyQ"))      vx[e] -= speed[e], current[e] = 1, flipped[e] = true;
+          else if (keys[e].has("KeyW")) vx[e] += speed[e], current[e] = 1, flipped[e] = false;
+          if (keys[e].has("KeyP"))      !air[e] && (air[e] = true, vy[e] = -10);
+        }
+      },
+    ),
+
+    /*Listen for user input for runner mode*/
+    sControllerRunner: new System(
+      { cVelocity, cInput, cMeta, cAnimation },
+      (_, comp, entities) => {
+        const { current, coef } = comp.cAnimation.storage;
+        const { keys } = comp.cInput.storage;
+        const { vx, vy } = comp.cVelocity.storage;
+        const { air, speed } = comp.cMeta.storage;
+        for (const e of entities) {
+          if (!keys[e].size) {
+            current[e] = air[e] ? 2 : 1;
+            coef[e] = 0.4
+            continue;
+          }
+          if (keys[e].has("KeyQ"))      vx[e] -= speed[e], coef[e] = 0.2, current[e] = 1;
+          else if (keys[e].has("KeyW")) vx[e] += speed[e], coef[e] = 0.8, current[e] = 1;
+          if (keys[e].has("KeyP"))      !air[e] && (air[e] = true, vy[e] = -10);
         }
       },
     ),

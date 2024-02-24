@@ -1,6 +1,8 @@
 import { Bitmap } from "./bitmap";
 import { Component } from "./ecs/simple.ecs";
 
+console.debug("COMPONENTS: definitions");
+
 export const cPosition = new Component<{ x: number; y: number }>({
   x: 0,
   y: 0,

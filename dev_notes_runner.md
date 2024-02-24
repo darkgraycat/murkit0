@@ -27,3 +27,6 @@ resolved
 // TODO: fix mixed animated bg strip. mb we need to double length (easy way)
 Benefits of using double length strip is that we can replace parts dynamicaly making level change very smooth
 
+#### Runner controlls:
+Left TAP - slow down a bit
+
