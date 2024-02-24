@@ -20,6 +20,8 @@ import { debug } from ".";
 const { rectangle, bounds } = collision;
 
 export function Systems(world: World, viewport: Bitmap) {
+  console.debug("SYSYEMS: initialization");
+
   const { width, height } = world;
   return {
     /* Collide entities with world bounds */
@@ -125,19 +127,17 @@ export function Systems(world: World, viewport: Bitmap) {
       for (const e of entities) {
         const half = sprites[e].length / 2;
         const idx = flipped[e] ? spriteIdx[e] + half : spriteIdx[e];
-        // viewport.draw(sprites[e][idx], x[e] | 0, y[e] | 0);
         viewport.draw(
           sprites[e][idx],
-          offsetX[e] + Math.round(x[e]),
-          offsetY[e] + Math.round(y[e]),
+          Math.round(offsetX[e] + x[e]),
+          Math.round(offsetY[e] + y[e]),
         );
       }
     }),
 
     /* Calculate next frame needed to draw */
     sAnimation: new System({ cAnimation, cSprite }, (dt, comp, entities) => {
-      const { animations, current, length, time, coef } =
-        comp.cAnimation.storage;
+      const { animations, current, length, time, coef } = comp.cAnimation.storage;
       const { spriteIdx } = comp.cSprite.storage;
       for (const e of entities) {
         const frameTime = (time[e] + dt * coef[e]) % length[e];
@@ -157,15 +157,72 @@ export function Systems(world: World, viewport: Bitmap) {
         const { air, speed } = comp.cMeta.storage;
         for (const e of entities) {
           if (!keys[e].size) {
-            current[e] = 0;
+            current[e] = air[e] ? 2 : 0;
             continue;
           }
-          current[e] = 1; // TODO: fix false firing on any key
-          if (keys[e].has("KeyQ")) (vx[e] -= speed[e]), (flipped[e] = true);
-          if (keys[e].has("KeyW")) (vx[e] += speed[e]), (flipped[e] = false);
-          if (keys[e].has("KeyP")) !air[e] && ((air[e] = true), (vy[e] = -10));
+          if (keys[e].has("KeyQ"))      vx[e] -= speed[e], current[e] = 1, flipped[e] = true;
+          else if (keys[e].has("KeyW")) vx[e] += speed[e], current[e] = 1, flipped[e] = false;
+          if (keys[e].has("KeyP"))      !air[e] && (air[e] = true, vy[e] = -10);
         }
       },
+    ),
+
+    /*Listen for user input for runner mode*/
+    sControllerRunner: new System(
+      { cVelocity, cInput, cMeta, cAnimation },
+      (_, comp, entities) => {
+        const { current, coef } = comp.cAnimation.storage;
+        const { keys } = comp.cInput.storage;
+        const { vx, vy } = comp.cVelocity.storage;
+        const { air, speed } = comp.cMeta.storage;
+        for (const e of entities) {
+          if (!keys[e].size) {
+            current[e] = air[e] ? 2 : 1;
+            coef[e] = 0.4
+            continue;
+          }
+          if (keys[e].has("KeyQ"))      vx[e] -= speed[e], coef[e] = 0.2, current[e] = 1;
+          else if (keys[e].has("KeyW")) vx[e] += speed[e], coef[e] = 0.8, current[e] = 1;
+          if (keys[e].has("KeyP"))      !air[e] && (air[e] = true, vy[e] = -10);
+        }
+      },
+    ),
+
+    // TODO: ability to add modifiers to the system
+    // Modifier can store 32 and 48
+    // Also it can store pointer to World
+    /* Dynamic background */
+    sDrawAnimatedBg: new System(
+      { cSprite, cAnimation },
+      (dt, comp, entities) => {
+        const { offsetX, offsetY, sprites, spriteIdx } = comp.cSprite.storage;
+        const { time, coef } = comp.cAnimation.storage;
+        for (const e of entities) {
+          const frameTime = (time[e] + dt * coef[e]) % 32;
+          viewport.draw(
+            sprites[e][spriteIdx[e]],
+            Math.round(offsetX[e] + frameTime),
+            Math.round(offsetY[e]),
+          );
+          time[e] = frameTime;
+        }
+      }
+    ),
+    sDrawAnimatedFg: new System(
+      { cSprite, cAnimation },
+      (dt, comp, entities) => {
+        const { offsetX, offsetY, sprites, spriteIdx } = comp.cSprite.storage;
+        const { time, coef } = comp.cAnimation.storage;
+        for (const e of entities) {
+          const frameTime = (time[e] + dt * coef[e]) % 384;
+          viewport.draw(
+            sprites[e][spriteIdx[e]],
+            Math.round(offsetX[e] + frameTime),
+            Math.round(offsetY[e]),
+          );
+          time[e] = frameTime;
+        }
+      }
     ),
   };
 }

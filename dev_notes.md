@@ -29,7 +29,9 @@ y - 160.524
 which causes collision
 
 ## Bitmap
-
+#### Ideas
+- Bitmap with shared buffer (abiliy to draw part, but modify source)
+- Bitmap with indexes instead of pixels (partialy done)
 #### copy
    0  1  2  3  4  5  6
 0  01 02 03 04 05 06 07
@@ -43,3 +45,51 @@ which causes collision
     1:2  3-2
     16, 17, 18
     23, 24, 25
+
+#### pallete and color manipulation
+Option A
+    All bitmaps stores indexes not actual pixels
+    Viewport bitmap applies pixels on indexes
+    + realtime manipulation
+    - additional lookup on each frame, but lookup is O(1)
+    - need to handle this
+    How it can be, example:
+        ( Need to have 2 bitmaps for static, and 1 for player )
+        have array of collors (pallete)
+        on image load(bitmap creation) store unique colors to pallete and create bitmap with indexes
+
+
+palleteData = actual colors: [0xfff, 0x452, 0xf24]
+palleteMap = readonly map of indexes [1, 0, 0, 2, 1]
+
+what remap do:
+for all pixels in Bitmap set color of Data[Map[i]]
+
+
+#### TileableBitmap
+TileableBitmap.reorder:
+A B C
+D E F
+[2 2 3 3] cols = 2
+C C
+D D
+TODO:
+ability to create TileableBitmap from Bitmaps array (join)
+
+#### Animated BG notes
+TODO:
+1. remake to include +1 color for shade (etc)
+2. make all tiles compatible (smooth at the ends)
+3. reorder allow us to make variations
+
+
+
+
+
+
+
+
+#### TODOS
+// TODO: #newECS: how we can make dynamic component arguments using TS types, to achive this API:
+// const entity = em.create(x, y, w, h) // where x & y and w & h is separate components
+
