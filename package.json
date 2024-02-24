@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "webpack --mode=production",
     "dev": "webpack --watch --mode=development",
-    "start": "npm run dev",
     "test": "jest"
   },
   "author": "",
