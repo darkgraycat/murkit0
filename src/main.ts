@@ -63,7 +63,7 @@ export const init = async (config: MainConfig): Promise<void> => {
     bgTiles.reorder([5,5,5,5,5,5,5,5,5,5,5], 11, 1),          // 5 factory
     bgTiles.reorder([5,5,5,5,5,5,5,5,5,5,5], 11, 1),          // 6 city
     bgTiles.reorder([5,5,5,5,5,5,5,5,5,5,5], 11, 1).flipV(),  // 7 city
-  ]
+  ];
   const animatedBgPalletes = animatedBgLayers.map((bitmap) => new BitmapPallete(bitmap));
 
   const animatedFgOrder =  [9, 9, 2, 9, 9, 3, 9, 9];
@@ -124,7 +124,7 @@ export const init = async (config: MainConfig): Promise<void> => {
   // const entity = em.create(x, y, w, h) // where x & y and w & h is separate components
   const createAnimatedBgEntity = (spriteIdx: number, alt: number, speed: number) => em.add({
     cAnimation: { animations: [[0]], current: 0, length: 0, time: 0, coef: speed },
-    cSprite:   { sprites: animatedBgLayers, spriteIdx, offsetX: 0, offsetY: alt * 16 },
+    cSprite: { sprites: animatedBgLayers, spriteIdx, offsetX: 0, offsetY: alt * 16 },
   });
 
   const animatedBgLayersEntities = [
