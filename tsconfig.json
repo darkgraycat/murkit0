@@ -13,6 +13,6 @@
     "sourceMap": true,
     "strict": false
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "index.d.ts"],
   "exclude": ["node_modules"]
 }

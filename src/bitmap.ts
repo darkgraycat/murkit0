@@ -212,7 +212,7 @@ export class TileableBitmap extends Bitmap {
   /** Split TileableBitmap to array of Bitmaps
   * @returns array of Bitmaps */
   public split(): Bitmap[] {
-    const bitmaps = [];
+    const bitmaps: Bitmap[] = [];
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {
         const x = col * this.twidth;

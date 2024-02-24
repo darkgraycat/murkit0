@@ -1,7 +1,5 @@
 import { init } from "./main";
 
-// require('file-loader?name=[name].[ext]!../index.html');
-
 export const debug: any = {};
 
 window.addEventListener("load", () => {

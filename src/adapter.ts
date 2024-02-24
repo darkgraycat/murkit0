@@ -10,7 +10,7 @@ export class Adapter implements IAdapter {
       const image = new Image();
       image.onload = () => {
         const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
+        const context = canvas.getContext("2d") as CanvasRenderingContext2D;
         const { width, height } = image;
         canvas.width = width;
         canvas.height = height;

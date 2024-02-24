@@ -5,15 +5,24 @@ import { bulkTileableBitmapLoad } from "./helpers";
 import { MainConfig } from "./main";
 import { World } from "./world";
 
+import playerAsset from "../assets/player.png";
+import blocksAsset from "../assets/platforms.png";
+import bgAsset from "../assets/backgrounds.png";
+import houseAsset from "../assets/backgrounds_houses.png";
+
 // TODO: I dont like this function at all, added temporary
 export async function Entities(em: EntityManager<any>, world: World, adapter: IAdapter, keys: MainConfig["keys"]) {
   console.debug("ENTITIES: load assets");
   const [playerTiles, blockTiles, bgTiles, houseTiles] = await bulkTileableBitmapLoad(
     adapter,
-    ["./assets/player.png", 16, 16, 4, 1],
-    ["./assets/platforms.png", 16, 16, 4, 1],
-    ["./assets/backgrounds.png", 32, 32, 6, 1],
-    ["./assets/backgrounds_houses.png", 48, 32, 5, 1],
+    // ["./assets/player.png", 16, 16, 4, 1],
+    // ["./assets/platforms.png", 16, 16, 4, 1],
+    // ["./assets/backgrounds.png", 32, 32, 6, 1],
+    // ["./assets/backgrounds_houses.png", 48, 32, 5, 1],
+    [playerAsset, 16, 16, 4, 1],
+    [blocksAsset, 16, 16, 4, 1],
+    [bgAsset, 32, 32, 6, 1],
+    [houseAsset, 48, 32, 5, 1],
   );
   console.debug("ENTITIES: build graphics");
   const playerSprites = playerTiles.split().concat(playerTiles.flipV().split());
