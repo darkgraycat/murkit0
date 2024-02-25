@@ -31,7 +31,6 @@ window.addEventListener("load", async () => {
   // });
 
   const game = await runnerGame({ screen, width, height, keys, fps: 1000/60 });
-
-  console.log("INITIALIZED");
   game.engine.start();
+  console.log("INITIALIZED");
 });

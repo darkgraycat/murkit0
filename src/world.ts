@@ -102,29 +102,29 @@ export type StageConfig = {
   bgFill: number,
   fgFill: number,
 };
-// export class Stage {
-//   constructor(
-//     readonly name: string,
-//     public bgLayout: TileableBitmap[],
-//     public bgColors: BitmapPallete[],
-//     public bgOffset: number[],
-//     public bgSpeed: number[],
-//     public bgFill: number,
-//     public fgFill: number,
-//   ) {}
-// 
-//   static from(config: StageConfig, tiles: TileableBitmap): Stage {
-//     const { name, bgOffset, bgSpeed, bgLayout, bgColors, bgFill, fgFill } = config;
-//     const lengths = [bgOffset.length, bgSpeed.length, bgLayout.length, bgColors.length];
-//     if (lengths.some(l => l !== lengths[0])) throw new Error(`Error during Stage parsing: ${lengths}`);
-// 
-//     const parsedBgLayout = bgLayout.map(row => tiles.reorder(row.concat(row), row.length * 2, 1));
-//     const parsedBgColors = parsedBgLayout.map((tbitmap) => new BitmapPallete(tbitmap));
-//     bgColors.forEach((color, i) => parsedBgColors[i].pallete = color);
-// 
-//     return new Stage(name, parsedBgLayout, parsedBgColors, bgOffset, bgSpeed, bgFill, fgFill);
-//   }
-// }
+ export class Stage {
+   constructor(
+     readonly name: string,
+     public bgLayout: TileableBitmap[],
+     public bgColors: BitmapPallete[],
+     public bgOffset: number[],
+     public bgSpeed: number[],
+     public bgFill: number,
+     public fgFill: number,
+   ) {}
+ 
+   static from(config: StageConfig, tiles: TileableBitmap): Stage {
+     const { name, bgOffset, bgSpeed, bgLayout, bgColors, bgFill, fgFill } = config;
+     const lengths = [bgOffset.length, bgSpeed.length, bgLayout.length, bgColors.length];
+     if (lengths.some(l => l !== lengths[0])) throw new Error(`Error during Stage parsing: ${lengths}`);
+ 
+     const parsedBgLayout = bgLayout.map(row => tiles.reorder(row.concat(row), row.length * 2, 1));
+     const parsedBgColors = parsedBgLayout.map((tbitmap) => new BitmapPallete(tbitmap));
+     bgColors.forEach((color, i) => parsedBgColors[i].pallete = color);
+ 
+     return new Stage(name, parsedBgLayout, parsedBgColors, bgOffset, bgSpeed, bgFill, fgFill);
+   }
+ }
 // export class Stage {
 //   public progress = 0.0;
 //   private next: Stage;

@@ -15,13 +15,13 @@ export type BgRow = {
 export default [
   {
     name: "TestConfig", bgWidth: 10,
-    bgFill: 0xff220022, fgFill: 0xff22ff00,
+    bgFill: 0xff002200, fgFill: 0xff002200,
     bgRows: [
       { layout: [0,0,0,0,0,0,0,0,0,0], offset: 0.5, speed: 1.0, colors: [0x00000000, 0xff3366ee, 0xff2244aa] },
       { layout: [0,0,0,0,0,0,0,0,0,0], offset: 0.0, speed: 2.0, colors: [0x00000000, 0xff113388, 0xff2255bb] },
-      { layout: [2,2,2,2,2,2,2,2,2,2], offset: 3.5, speed: 2.0, colors: [0xffee6633, 0x00000000, 0x00000000] },
-      { layout: [3,3,3,3,3,3,3,3,3,3], offset: 4.0, speed: 4.0, colors: [0xff883311, 0x00000000, 0x00000000] },
-      { layout: [3,3,3,3,3,3,3,3,3,3], offset: 4.0, speed: 4.0, colors: [0xff883311, 0x00000000, 0x00000000] },
+      { layout: [2,2,2,2,2,2,2,2,2,2], offset: 2.5, speed: 2.0, colors: [0xffee6633, 0x00000000, 0x00000000] },
+      { layout: [3,3,3,3,3,3,3,3,3,3], offset: 3.0, speed: 4.0, colors: [0xff883311, 0x00000000, 0x00000000] },
+      { layout: [3,3,3,3,3,3,3,3,3,3], offset: 3.5, speed: 4.0, colors: [0xffee6633, 0x00000000, 0x00000000] },
       { layout: [3,3,3,3,3,3,3,3,3,3], offset: 4.0, speed: 4.0, colors: [0xff883311, 0x00000000, 0x00000000] },
     ],
   },
