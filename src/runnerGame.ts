@@ -3,14 +3,14 @@ import { Engine } from "./engine";
 import { Bitmap, TileableBitmap } from "./bitmap";
 
 import { EntityManager } from "./ecs/simple.ecs";
-import { World, StageBg, StageConfig } from "./world";
+import { World } from "./world";
 import { Systems } from "./systems";
 import * as components from "./components";
 
 import playerAsset from "../assets/player.png";
 import bgAsset from "../assets/backgrounds.png";
 import houseAsset from "../assets/backgrounds_houses.png";
-import { stages as runnerStages } from "./data/runner_levels";
+import stageConfigs, { StageConfig, BgRow } from "./data/runner_stages";
 
 export type GameConfig = {
   width: number;
@@ -20,13 +20,13 @@ export type GameConfig = {
   fps: number;
 };
 
+// why do I need this?
 export type GameState = {
   speed: number;
   distance: number;
   current: number;
   engine?: Engine;
   world?: World;
-  stage?: StageBg;
 }
 
 export type GameStateSwitcher = [
@@ -43,14 +43,7 @@ export default async (config: GameConfig): Promise<GameState> => {
   const viewport = Bitmap.from(screenImageData.data.buffer, width, height);
   // --------------------------------------------------------------------------
   const { playerSprites, bgTiles, houseTiles } = await assets(adapter);
-  const stageConfigs: StageConfig[] = runnerStages;
-  const stage = StageBg.from(stageConfigs[gs.current], bgTiles);
-  gs.stage = stage;
 
-  // @ts-ignore
-  window.trans = (n: number) => {
-    transitionStageBg(gs.stage, stageConfigs[n], bgTiles);
-  }
 
   // --------------------------------------------------------------------------
   const world = new World({ width, height, gravity: 0.9, friction: 0.95, skyColor: 0xffa09080 });
@@ -67,13 +60,7 @@ export default async (config: GameConfig): Promise<GameState> => {
     cMeta: { air: true, speed: 0.4 },
     cInput: { keys },
     cSprite: { spriteIdx: 0, sprites: playerSprites, offsetX: -3, offsetY: -2 },
-    cAnimation: {
-      animations: [ [0, 0, 3, 3], [1, 2, 3, 0], [1, 1, 2, 2] ],
-      current: 0,
-      length: 4,
-      time: 0,
-      coef: 0.4,
-    },
+    cAnimation: { animations: [ [0, 0, 3, 3], [1, 2, 3, 0], [1, 1, 2, 2] ], current: 0, length: 4, time: 0, coef: 0.4 },
   });
 
   // --------------------------------------------------------------------------
@@ -85,7 +72,6 @@ export default async (config: GameConfig): Promise<GameState> => {
 
   // --------------------------------------------------------------------------
   const render = (dt: number, time: number) => {
-    renderStageBg(dt, gs.stage, viewport);
     animate(dt);
     draw(dt);
     screenCtx.putImageData(screenImageData, 0, 0);
@@ -112,20 +98,6 @@ async function assets(adapter: Adapter) {
   const playerSprites = playerTiles.split().concat(playerTiles.flipV().split());
 
   return { playerSprites, bgTiles, houseTiles };
-}
-
-function renderStageBg(dt: number, bg: StageBg, viewport: Bitmap) {
-  bg.render(dt, viewport);
-}
-
-function transitionStageBg(bg: StageBg, config: StageConfig, tiles: TileableBitmap) {
-  bg.transition(
-    config.bgLayout,
-    config.bgColors,
-    config.bgFill,
-    config.fgFill,
-    tiles,
-  );
 }
 
 /*
