@@ -277,7 +277,8 @@ export class BitmapPallete {
   /** Set new pallete and apply on source Bitmap
   * @param pallete new pallete to apply */
   public set pallete(pallete: number[]) {
-    this.palleteData.set(pallete);
+    const length = this.palleteData.length;
+    this.palleteData.set(pallete.slice(0, length));
     this.remap();
   }
 

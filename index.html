@@ -26,5 +26,22 @@
   <body>
     <canvas id="screen" class="pixel"></canvas>
     <div id="debug"></div>
+    <div>
+      <input id="colorinput", type="color" name="colorhelper" />
+      <label id="colorlabel", for="colorhelper"></label>
+    </div>
+    <script>
+      const colors = []; 
+      const input = document.getElementById("colorinput");
+      const label = document.getElementById("colorlabel");
+      label.style.color = "#fff";
+      input.onchange = (e) => {
+        const parts = e.target.value.slice(1).match(/.{1,2}/g);
+        const converted = "0xff" + parts.reverse().join("");
+        colors.push(converted);
+        console.log(converted);
+        label.innerHTML = colors;
+      }
+    </script>
   </body>
 </html>

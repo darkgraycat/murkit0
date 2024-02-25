@@ -1,6 +1,6 @@
 import { IAdapter } from "./common/types";
 
-export type EngineHandler = (dt: number) => void;
+export type EngineHandler = (dt: number, time: number) => void;
 
 export class Engine {
   private timestamp: number = 0;
@@ -16,13 +16,14 @@ export class Engine {
 
   async tick() {
     while (this.running) {
-      const time = this.adapter.now();
-      const dt = (time - this.timestamp) * this.deltaCoef;
-      this.timestamp = this.adapter.now();
+      const now = this.adapter.now();
+      const dt = (now - this.timestamp) * this.deltaCoef;
+      const time = now * this.deltaCoef;
+      this.timestamp = now;
       // calc next interval
       await this.adapter.sleep(this.rate);
-      this.update(dt)
-      this.render(dt)
+      this.update(dt, time)
+      this.render(dt, time)
     }
   }
 
@@ -31,11 +32,11 @@ export class Engine {
 
     const time = this.adapter.now();
     const dt = (time - this.timestamp) * this.deltaCoef;
-    this.timestamp = this.adapter.now();
+    this.timestamp = time;
 
-    this.update(dt)
-    this.render(dt)
-    
+    this.update(dt, time);
+    this.render(dt, time);
+   
     setTimeout(() => this.tick(), this.rate)
   }
 

@@ -178,11 +178,11 @@ export function Systems(world: World, viewport: Bitmap) {
         for (const e of entities) {
           if (!keys[e].size) {
             current[e] = air[e] ? 2 : 1;
-            coef[e] = 0.4
+            coef[e] = 0.24
             continue;
           }
-          if (keys[e].has("KeyQ"))      vx[e] -= speed[e], coef[e] = 0.2, current[e] = 1;
-          else if (keys[e].has("KeyW")) vx[e] += speed[e], coef[e] = 0.8, current[e] = 1;
+          if (keys[e].has("KeyQ"))      vx[e] -= speed[e], coef[e] = 0.12, current[e] = 1;
+          else if (keys[e].has("KeyW")) vx[e] += speed[e], coef[e] = 0.48, current[e] = 1;
           if (keys[e].has("KeyP"))      !air[e] && (air[e] = true, vy[e] = -10);
         }
       },
@@ -209,21 +209,21 @@ export function Systems(world: World, viewport: Bitmap) {
         }
       }
     ),
-    sDrawAnimatedFg: new System(
-      { cSprite, cAnimation },
-      (dt, comp, entities) => {
-        const { offsetX, offsetY, sprites, spriteIdx } = comp.cSprite.storage;
-        const { time, coef } = comp.cAnimation.storage;
-        for (const e of entities) {
-          const frameTime = (time[e] + dt * coef[e]) % 384;
-          viewport.draw(
-            sprites[e][spriteIdx[e]],
-            Math.round(offsetX[e] + frameTime),
-            Math.round(offsetY[e]),
-          );
-          time[e] = frameTime;
-        }
-      }
-    ),
+    // sDrawAnimatedFg: new System(
+    //   { cSprite, cAnimation },
+    //   (dt, comp, entities) => {
+    //     const { offsetX, offsetY, sprites, spriteIdx } = comp.cSprite.storage;
+    //     const { time, coef } = comp.cAnimation.storage;
+    //     for (const e of entities) {
+    //       const frameTime = (time[e] + dt * coef[e]) % 384;
+    //       viewport.draw(
+    //         sprites[e][spriteIdx[e]],
+    //         Math.round(offsetX[e] + frameTime),
+    //         Math.round(offsetY[e]),
+    //       );
+    //       time[e] = frameTime;
+    //     }
+    //   }
+    // ),
   };
 }

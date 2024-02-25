@@ -22,12 +22,14 @@ export class EntityManager<C extends ComponentList<any>> {
 
   /** Assign new properties for components for entity
   * @param idx entity index
-  * @param components new components values */
-  set<K extends keyof C>(idx: number, components: { [P in K]: C[P]["schema"] }): void {
+  * @param components new components values
+  * @returns entity index */
+  set<K extends keyof C>(idx: number, components: { [P in K]: C[P]["schema"] }): number {
     const entries = Object.entries(this.components);
     for (const [componentName, component] of entries) {
-      component.set(idx, components?.[componentName] || {})
+      component.set(idx, components?.[componentName] || {});
     }
+    return idx;
   }
 
   /** Build readonly object of all entity components

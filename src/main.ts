@@ -3,13 +3,14 @@ import { Engine } from "./engine";
 import { Bitmap } from "./bitmap";
 
 import { EntityManager } from "./ecs/simple.ecs";
-import { World } from "./world";
+import { World, Stage } from "./world";
 import { Systems } from "./systems";
 import { Entities } from "./entities";
 import * as components from "./components";
 
+import { stages as runnerLevels } from "./data/runner_levels";
+
 import { benchmark } from "./utils";
-import { IImage } from "./common/types";
 
 export type MainConfig = {
   width: number;
@@ -45,20 +46,23 @@ export const init = async (config: MainConfig): Promise<void> => {
     sDrawing,
     sControllerRunner,
     sDrawAnimatedBg,
-    sDrawAnimatedFg,
   } = Systems(world, screenBitmap);
 
   console.debug("MAIN: init entities");
   const em = new EntityManager(components);
   const {
     playerEntity,
+    // TODO: NOTE! HERE LEVEL
     animatedBgLayersEntities,
-    animatedFgLayersEntities,
+    // animatedFgLayersEntities,
     fgBgLayers: {
       animatedBgPalletes,
-      animatedFgPalletes,
+      // animatedFgPalletes,
     }
   } = await Entities(em, world, adapter, keys);
+
+  console.debug("MAIN: init stages");
+  //const stages = Object.fromEntries(runnerLevels.map(level => [level.name, Stage.from(level)]));
 
   console.debug("MAIN: attach entities with systems");
   const collideBounds = sCollideBounds.setup([playerEntity]);
@@ -66,12 +70,14 @@ export const init = async (config: MainConfig): Promise<void> => {
   const draw = sDrawing.setup([playerEntity]);
   const control = sControllerRunner.setup([playerEntity]);
   const animate = sAnimation.setup([playerEntity]);
+  // TODO: NOTE! HERE LEVEL
   const animateBg = sDrawAnimatedBg.setup(animatedBgLayersEntities);
-  const animateFg = sDrawAnimatedFg.setup(animatedFgLayersEntities);
+  // const animateFg = sDrawAnimatedFg.setup(animatedFgLayersEntities);
 
   // colors
   world.skyColor = 0xff4499ff;
 
+  // TODO: NOTE! HERE LEVEL
   animatedBgPalletes[0].pallete = [0, 0xff3366ee, 0xff2244aa];
   animatedBgPalletes[1].pallete = [0, 0xff113388, 0xff2255bb];
   animatedBgPalletes[2].pallete = [0xff303030, 0];
@@ -81,7 +87,7 @@ export const init = async (config: MainConfig): Promise<void> => {
   animatedBgPalletes[6].pallete = [0xff252525, 0xff206090];
   animatedBgPalletes[7].pallete = [0xff202020, 0xff206090];
 
-  animatedFgPalletes[0].pallete = [0, 0xff101010, 0xff303030];
+  // animatedFgPalletes[0].pallete = [0, 0xff101010, 0xff303030];
 
   // debug tools
   const renderBench = benchmark("render bench", 2);
@@ -95,7 +101,7 @@ export const init = async (config: MainConfig): Promise<void> => {
     animateBg(dt);
     animate(dt);
     draw(dt);
-    animateFg(dt);
+    // animateFg(dt);
 
     screenCtx.putImageData(screenImageData, 0, 0);
     renderBench.B();

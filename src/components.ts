@@ -55,6 +55,11 @@ export const cMeta = new Component<{ air: boolean; speed: number }>({
   speed: 0,
 });
 
+export const c2AnimatedBg = new Component<{
+}>({
+
+});
+
 // export const cWorld = new Component<{
 //   time?: number,
 //   width: number,

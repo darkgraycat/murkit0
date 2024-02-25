@@ -1,8 +1,9 @@
-import { init } from "./main";
+// import { init } from "./main";
+import runnerGame from "./runnerGame";
 
 export const debug: any = {};
 
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
   const debugEl = document.getElementById("debug") as HTMLDivElement;
   debug.set = (...msg: string[]) => (debugEl.innerHTML = msg.join(", "));
   debug.add = (...msg: string[]) =>
@@ -21,11 +22,16 @@ window.addEventListener("load", () => {
   screen.width = width;
   screen.height = height;
 
-  init({
-    screen,
-    width,
-    height,
-    keys,
-    fps: 1000 / 60,
-  });
+  // init({
+  //   screen,
+  //   width,
+  //   height,
+  //   keys,
+  //   fps: 1000 / 60,
+  // });
+
+  const game = await runnerGame({ screen, width, height, keys, fps: 1000/60 });
+
+  console.log("INITIALIZED");
+  game.engine.start();
 });
