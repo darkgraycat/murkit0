@@ -36,8 +36,8 @@ export default async (config: GameConfig) => {
 
   const stageBgSprites = [] as TileableBitmap[][];
   const stageBgPalletes = [] as BitmapPallete[][];
-  const stageBgSpritesTurn = [] as TileableBitmap[][];
-  const stageBgPalletesTurn = [] as BitmapPallete[][];
+  // const stageBgSpritesTurn = [] as TileableBitmap[][];
+  // const stageBgPalletesTurn = [] as BitmapPallete[][];
   for (let i = 1; i <= stageConfigs.length; i++) {
     const { bgRows: curr, bgWidth: currlength } = stageConfigs[i - 1];
     const { bgRows: next, bgWidth: nextlength } = stageConfigs[i % stageConfigs.length];
@@ -56,38 +56,66 @@ export default async (config: GameConfig) => {
       currColors[rowIdx].pallete = currcolors;
       turnColors[rowIdx].pallete = nextcolors;
     }
-    stageBgSprites.push(currRows);
-    stageBgPalletes.push(currColors);
-    stageBgSpritesTurn.push(turnRows);
-    stageBgPalletesTurn.push(currColors);
+    stageBgSprites.push(currRows, turnRows);
+    stageBgPalletes.push(currColors, turnColors);
+    //stageBgSpritesTurn.push(turnRows);
+    //stageBgPalletesTurn.push(turnColors);
   }
 
-  const stage = {
-    currentIdx: 0,
-    spritesIdx: 0,
-    progress: 0,
-    current: stageConfigs[0],
-    sprites: stageBgSprites[0],
-    shifts: [0, 0, 0, 0, 0, 0],
+  console.log(stageBgSprites);
+
+  // HERE COMES COMPLETE MESS!
+  // just to make all quick as I can
+  // everything will be rewrited from scratch
+  const totalRows = 6;
+  const offset = [0.5, 0.0, 2.5, 3.0, 3.5, 4.0];
+  const speed = [1.0, 2.0, 2.0, 3.0, 3.5, 4.0]
+  const shifts = [0, 0, 0, 0, 0, 0]; // x offset for each row
+  const sprites = [0, 0, 0, 0, 0, 0]; // rows can be from different levels
+  const fill = 0; // bg fill from stage 0
+  let transition = 0; // transition step
+  let transition_target = 0; // transition target
+
+  const colorsTransition = (rowIdx: number) => {
+    if (transition <= 0) return;
+    const curr = stageBgPalletes[sprites[rowIdx]][rowIdx];
+    const prevPal = curr.pallete;
+    const nextPal = stageBgPalletes[sprites[rowIdx]+1][rowIdx].pallete;
+    const newPal = prevPal.map((p, i) => linear(p, nextPal[i], transition / 12));
+    curr.pallete = newPal; 
+    console.log("c transition", transition, rowIdx);
+  };
+  const layoutTransition = (rowIdx: number) => {
+    if (transition <= 0) return;
+    if (sprites[rowIdx] === transition_target) return;
+    sprites[rowIdx]++;
+    transition--;
+    if (transition <= totalRows) transition_target++;
+    console.log("l transition", transition, rowIdx);
   }
 
-  console.log(stage.current.name)
+  const nextStage = () => {
+    transition_target++;
+    transition = totalRows * 2 - 1;
+  }
+
+  const linear = (lo: number, hi: number, step: number): number => lo + (hi - lo) * step;
 
   const renderStageBg = (dt: number) => {
-    const { bgRows, bgFill } = stage.current;
-    viewport.fill(bgFill);
-    for (let i = 0; i < stage.sprites.length; i++) {
-      const rowSprite = stage.sprites[i];
-      const { shifts } = stage;
-      const { offset, speed } = bgRows[i];
-      const distance = speed * dt;
+    const bgfill = stageConfigs[fill].bgFill;
+    viewport.fill(bgfill);
+    for (let i = 0; i < totalRows; i++) {
+      const sprite = stageBgSprites[sprites[i]][i];
+      const distance = speed[i] * dt;
       shifts[i] -= distance;
-      if (-320 > shifts[i]) {
-        shifts[i] = 0;
-      }
-      viewport.draw(rowSprite, Math.round(shifts[i]), offset * 32);
+      const outOfBounds = -320 > shifts[i];
+      if (transition) colorsTransition(i);
+      if (transition && outOfBounds) layoutTransition(i);
+      if (outOfBounds) shifts[i] = 0;
+      viewport.draw(sprite, Math.round(shifts[i]), offset[i] * 32);
     }
-  }
+  };
+
 
   // --------------------------------------------------------------------------
   // 0 1 2 3 4
@@ -95,16 +123,9 @@ export default async (config: GameConfig) => {
   // 1 and 3 - transitions
 
   // @ts-ignore
-  window.transition = (n: number, mod = false) => {
-    stage.currentIdx = n;
-    stage.spritesIdx = n;
-    stage.current = stageConfigs[n];
-    if (mod) stage.sprites = stageBgSpritesTurn[n]
-    else stage.sprites = stageBgSprites[n];
-    console.log(stage.sprites);
+  window.transition = () => {
+    nextStage();
   };
-
-  // gameStage.bgRows[1].sprite = bgTiles.reorder([0,0,0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,1,1], 20, 1);
 
   // --------------------------------------------------------------------------
   const world = new World({ width, height, gravity: 0.9, friction: 0.95, skyColor: 0xffa09080 });
