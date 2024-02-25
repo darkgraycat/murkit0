@@ -10,7 +10,7 @@ import * as components from "./components";
 import playerAsset from "../assets/player.png";
 import bgAsset from "../assets/backgrounds.png";
 import houseAsset from "../assets/backgrounds_houses.png";
-import stageConfigs from "./data/runner_stages";
+import stageConfigs, { StageConfig } from "./data/runner_stages";
 
 export type GameConfig = {
   width: number;
@@ -34,98 +34,14 @@ export default async (config: GameConfig) => {
   const bgTiles = await adapter.loadImage(bgAsset).then(img => TileableBitmap.from(img.data, 32, 32, 6, 1));
   const houseTiles = await adapter.loadImage(houseAsset).then(img => TileableBitmap.from(img.data, 48, 32, 5, 1));
 
-  const stageBgSprites = [] as TileableBitmap[][];
-  const stageBgPalletes = [] as BitmapPallete[][];
-  // const stageBgSpritesTurn = [] as TileableBitmap[][];
-  // const stageBgPalletesTurn = [] as BitmapPallete[][];
-  for (let i = 1; i <= stageConfigs.length; i++) {
-    const { bgRows: curr, bgWidth: currlength } = stageConfigs[i - 1];
-    const { bgRows: next, bgWidth: nextlength } = stageConfigs[i % stageConfigs.length];
-    let rowIdx = curr.length;
-    const currRows = Array.from<TileableBitmap>({ length: rowIdx });
-    const turnRows = Array.from<TileableBitmap>({ length: rowIdx });
-    const currColors = Array.from<BitmapPallete>({ length: rowIdx });
-    const turnColors = Array.from<BitmapPallete>({ length: rowIdx });
-    while(rowIdx--) {
-      const { layout: currlayout, colors: currcolors } = curr[rowIdx];
-      const { layout: nextlayout, colors: nextcolors } = next[rowIdx];
-      currRows[rowIdx] = bgTiles.reorder(currlayout.concat(currlayout), currlength * 2, 1);
-      turnRows[rowIdx] = bgTiles.reorder(currlayout.concat(nextlayout), currlength + nextlength, 1);
-      currColors[rowIdx] = new BitmapPallete(currRows[rowIdx]);
-      turnColors[rowIdx] = new BitmapPallete(turnRows[rowIdx]);
-      currColors[rowIdx].pallete = currcolors;
-      turnColors[rowIdx].pallete = nextcolors;
-    }
-    stageBgSprites.push(currRows, turnRows);
-    stageBgPalletes.push(currColors, turnColors);
-    //stageBgSpritesTurn.push(turnRows);
-    //stageBgPalletesTurn.push(turnColors);
-  }
-
-  console.log(stageBgSprites);
-
-  // HERE COMES COMPLETE MESS!
-  // just to make all quick as I can
-  // everything will be rewrited from scratch
-  const totalRows = 6;
-  const offset = [0.5, 0.0, 2.5, 3.0, 3.5, 4.0];
-  const speed = [1.0, 2.0, 2.0, 3.0, 3.5, 4.0]
-  const shifts = [0, 0, 0, 0, 0, 0]; // x offset for each row
-  const sprites = [0, 0, 0, 0, 0, 0]; // rows can be from different levels
-  const fill = 0; // bg fill from stage 0
-  let transition = 0; // transition step
-  let transition_target = 0; // transition target
-
-  const colorsTransition = (rowIdx: number) => {
-    if (transition <= 0) return;
-    const curr = stageBgPalletes[sprites[rowIdx]][rowIdx];
-    const prevPal = curr.pallete;
-    const nextPal = stageBgPalletes[sprites[rowIdx]+1][rowIdx].pallete;
-    const newPal = prevPal.map((p, i) => linear(p, nextPal[i], transition / 12));
-    curr.pallete = newPal; 
-    console.log("c transition", transition, rowIdx);
-  };
-  const layoutTransition = (rowIdx: number) => {
-    if (transition <= 0) return;
-    if (sprites[rowIdx] === transition_target) return;
-    sprites[rowIdx]++;
-    transition--;
-    if (transition <= totalRows) transition_target++;
-    console.log("l transition", transition, rowIdx);
-  }
-
-  const nextStage = () => {
-    transition_target++;
-    transition = totalRows * 2 - 1;
-  }
-
-  const linear = (lo: number, hi: number, step: number): number => lo + (hi - lo) * step;
-
-  const renderStageBg = (dt: number) => {
-    const bgfill = stageConfigs[fill].bgFill;
-    viewport.fill(bgfill);
-    for (let i = 0; i < totalRows; i++) {
-      const sprite = stageBgSprites[sprites[i]][i];
-      const distance = speed[i] * dt;
-      shifts[i] -= distance;
-      const outOfBounds = -320 > shifts[i];
-      if (transition) colorsTransition(i);
-      if (transition && outOfBounds) layoutTransition(i);
-      if (outOfBounds) shifts[i] = 0;
-      viewport.draw(sprite, Math.round(shifts[i]), offset[i] * 32);
-    }
-  };
-
-
-  // --------------------------------------------------------------------------
-  // 0 1 2 3 4
-  // 0   1   2
-  // 1 and 3 - transitions
+  const stages = stageConfigs.map(config => new Stage(config, bgTiles, houseTiles));
+  let currentStage = 1;
 
   // @ts-ignore
-  window.transition = () => {
-    nextStage();
-  };
+  window.applyPal = (r: number, b: number, g: number) => {
+    stages[currentStage].adjustPallete(r, b, g);
+  }
+  // TODO: make 0 - entry, 3 - morning, 4 - ending
 
   // --------------------------------------------------------------------------
   const world = new World({ width, height, gravity: 0.9, friction: 0.95, skyColor: 0xffa09080 });
@@ -154,7 +70,7 @@ export default async (config: GameConfig) => {
 
   // --------------------------------------------------------------------------
   const render = (dt: number, time: number) => {
-    renderStageBg(dt);
+    stages[currentStage].renderBg(dt, viewport);
     animate(dt);
     draw(dt);
     screenCtx.putImageData(screenImageData, 0, 0);
@@ -169,6 +85,64 @@ export default async (config: GameConfig) => {
 
   return { engine }
 }
+
+type StageBgRow = {
+  sprite: Bitmap,
+  pallete: BitmapPallete,
+  shift: number,
+  offset: number,
+  speed: number,
+}
+class Stage {
+  config: StageConfig;
+  bgRows: StageBgRow[];
+  bgFill: number;
+  fgFill: number;
+  width: number;
+  constructor(config: StageConfig, bgTiles: TileableBitmap, fgTiles: TileableBitmap) {
+    const { bgfill, fgfill, bgwidth, bgrows } = config;
+    this.config = config;
+    this.bgFill = bgfill;
+    this.fgFill = fgfill;
+    this.width = bgwidth * bgTiles.twidth;
+    this.bgRows = [] as StageBgRow[];
+    for (let i = 0; i < bgrows.length; i++) {
+      const { layout, colors, offset, speed } = bgrows[i];
+      const sprite = bgTiles.reorder(layout.concat(layout), bgwidth * 2, 1);
+      const pallete = new BitmapPallete(sprite);
+      pallete.pallete = colors; 
+      this.bgRows[i] = { sprite, pallete, speed, shift: 0, offset: offset * sprite.theight };
+    }
+  }
+  renderBg(dt: number, viewport: Bitmap) {
+    const { width, bgRows, bgFill } = this;
+    viewport.fill(bgFill);
+    for (const row of bgRows) {
+      row.shift -= row.speed * dt;
+      if (-width >= row.shift) row.shift = 0;
+      viewport.draw(row.sprite, Math.round(row.shift), row.offset);
+    }
+  }
+  adjustPallete(redCoef: number, greenCoef: number, blueCoef: number) {
+    this.bgFill = helpers.hexadjust(this.bgFill, 1, blueCoef, greenCoef, redCoef);
+    for (const row of this.bgRows) {
+      row.pallete.pallete = row.pallete.pallete.map(color => helpers.hexadjust(color, 1, blueCoef, greenCoef, redCoef));
+    }
+  }
+
+}
+
+const helpers = {
+  hex2abgr: (hex: number) => ([hex >>> 24 & 0xff, hex >>> 16 & 0xff, hex >>> 8 & 0xff, hex & 0xff]),
+  abgr2hex: (a: number, b: number, g: number, r: number) => ((a << 24) | (b << 16) | (g << 8) | r) >>> 0,
+  hexadjust: (hex: number, A: number, B: number, G: number, R: number) => {
+    const [a, b, g, r] = helpers.hex2abgr(hex);
+    return helpers.abgr2hex(Math.min(a * A, 0xff), Math.min(b * B, 0xff), Math.min(g * G, 0xff), Math.min(r * R, 0xff));
+  }
+};
+
+// @ts-ignore
+window.h = helpers;
 
 /*
 QUICK NOTE:
