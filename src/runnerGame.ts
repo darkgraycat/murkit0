@@ -35,11 +35,12 @@ export default async (config: GameConfig) => {
   const houseTiles = await adapter.loadImage(houseAsset).then(img => TileableBitmap.from(img.data, 48, 32, 5, 1));
 
   const stages = stageConfigs.map(config => new Stage(config, bgTiles, houseTiles));
-  let currentStage = 1;
+  let stageIndex = 1;
+  let currentStage = stages[stageIndex];
 
   // @ts-ignore
   window.applyPal = (r: number, b: number, g: number) => {
-    stages[currentStage].adjustPallete(r, b, g);
+    currentStage.adjustPallete(r, b, g);
   }
   // TODO: make 0 - entry, 3 - morning, 4 - ending
 
@@ -70,7 +71,7 @@ export default async (config: GameConfig) => {
 
   // --------------------------------------------------------------------------
   const render = (dt: number, time: number) => {
-    stages[currentStage].renderBg(dt, viewport);
+    currentStage.renderBg(dt, viewport);
     animate(dt);
     draw(dt);
     screenCtx.putImageData(screenImageData, 0, 0);
