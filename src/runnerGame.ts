@@ -1,5 +1,5 @@
 import { Adapter } from "./adapter";
-import { Engine } from "./engine";
+import { Engine, TimeoutEngine } from "./engine";
 import { Bitmap, BitmapPallete, TileableBitmap } from "./bitmap";
 
 import { EntityManager } from "./ecs/simple.ecs";
@@ -34,16 +34,23 @@ export default async (config: GameConfig) => {
   const bgTiles = await adapter.loadImage(bgAsset).then(img => TileableBitmap.from(img.data, 32, 32, 6, 1));
   const houseTiles = await adapter.loadImage(houseAsset).then(img => TileableBitmap.from(img.data, 48, 32, 5, 1));
 
+  // TODO: the current pallete depends on progress
+  // i suggest to have some adjuster (1.2, 0.9. 0.8) for ex and apply it every N
+  let currentStage: Stage;
   const stages = stageConfigs.map(config => new Stage(config, bgTiles, houseTiles));
-  let stageIndex = 1;
-  let currentStage = stages[stageIndex];
 
-  // @ts-ignore
-  window.applyPal = (r: number, b: number, g: number) => {
-    currentStage.adjustPallete(r, b, g);
-  }
+  stages.forEach((stage, i) => i > 0 && stages[i - 1].setNext(stage));
+  stages.forEach((stage, i) => stage.onfinish((curr, next) => {
+    currentStage = next;
+    console.debug(`Swithing ${i}`);
+  }));
+  currentStage = stages[1];
+  stages[stages.length - 1].onfinish(() => {
+    // window.alert("You win!");
+    console.log("You win!");
+  });
   // TODO: make 0 - entry, 3 - morning, 4 - ending
-
+  //
   // --------------------------------------------------------------------------
   const world = new World({ width, height, gravity: 0.9, friction: 0.95, skyColor: 0xffa09080 });
   const {
@@ -77,15 +84,21 @@ export default async (config: GameConfig) => {
     screenCtx.putImageData(screenImageData, 0, 0);
   };
   const update = (dt: number, time: number) => {
+    currentStage.update(dt);
     move(dt);
     collideBounds(dt);
     control(dt);
   };
   // --------------------------------------------------------------------------
-  const engine = new Engine(adapter, fps, update, render, 0.03);
+  // const engine = new Engine(adapter, fps, update, render, 0.03);
+  const engine = new TimeoutEngine(adapter, fps, update, render, 0.03);
 
   return { engine }
 }
+
+// --------------------------------------------------------------------------
+// --------------------------------------------------------------------------
+// --------------------------------------------------------------------------
 
 type StageBgRow = {
   sprite: Bitmap,
@@ -94,18 +107,33 @@ type StageBgRow = {
   offset: number,
   speed: number,
 }
+type StageCallback = (self: Stage, next: Stage) => void;
 class Stage {
-  config: StageConfig;
-  bgRows: StageBgRow[];
-  bgFill: number;
-  fgFill: number;
-  width: number;
+  private static current: Stage;
+  private next: Stage;
+  private config: StageConfig;
+  private bgRows: StageBgRow[];
+  private bgFadeoutCoefs: [number, number, number];
+  private bgFadeoutTimer: NodeJS.Timeout;
+  private bgFill: number;
+  private fgFill: number;
+  private width: number;
+  private progress: number;
+  private handlers: {
+    onstart: StageCallback;
+    onfinish: StageCallback;
+  }
   constructor(config: StageConfig, bgTiles: TileableBitmap, fgTiles: TileableBitmap) {
-    const { bgfill, fgfill, bgwidth, bgrows } = config;
+    const { bgfill, fgfill, bgwidth, bgrows, length } = config;
     this.config = config;
     this.bgFill = bgfill;
     this.fgFill = fgfill;
     this.width = bgwidth * bgTiles.twidth;
+    this.progress = length;
+    this.handlers = {
+      onstart: () => {},
+      onfinish: () => {},
+    };
     this.bgRows = [] as StageBgRow[];
     for (let i = 0; i < bgrows.length; i++) {
       const { layout, colors, offset, speed } = bgrows[i];
@@ -113,6 +141,17 @@ class Stage {
       const pallete = new BitmapPallete(sprite);
       pallete.pallete = colors; 
       this.bgRows[i] = { sprite, pallete, speed, shift: 0, offset: offset * sprite.theight };
+    }
+  }
+  update(dt: number) {
+    this.progress -= dt; 
+    if (this.progress <= 100 && !this.bgFadeoutTimer) {
+      this.bgFadeoutTimer = setInterval(() => this.interpolateBgPallete((100 - this.progress) / 100), 100);
+    }
+    if (this.progress <= 0) {
+      this.finish();
+      this.next.start();
+      return;
     }
   }
   renderBg(dt: number, viewport: Bitmap) {
@@ -124,28 +163,84 @@ class Stage {
       viewport.draw(row.sprite, Math.round(row.shift), row.offset);
     }
   }
-  adjustPallete(redCoef: number, greenCoef: number, blueCoef: number) {
-    this.bgFill = helpers.hexadjust(this.bgFill, 1, blueCoef, greenCoef, redCoef);
+  renderFg(dt: number, viewport: Bitmap) {
+
+  }
+  adjustBgPallete(redCoef: number, greenCoef: number, blueCoef: number) {
+    this.bgFill = helpers.hexadjust(this.bgFill, [1, blueCoef, greenCoef, redCoef]);
     for (const row of this.bgRows) {
-      row.pallete.pallete = row.pallete.pallete.map(color => helpers.hexadjust(color, 1, blueCoef, greenCoef, redCoef));
+      row.pallete.pallete = row.pallete.pallete.map(color => helpers.hexadjust(color, [1, blueCoef, greenCoef, redCoef]));
     }
   }
-
+  adjustBgPallete2(redCoef: number, greenCoef: number, blueCoef: number) {
+    const { config: { bgrows, bgfill } } = this;
+    this.bgFill = helpers.hexadjust(bgfill, [1, blueCoef, greenCoef, redCoef]);
+    for (let i = 0; i < this.bgRows.length; i++) {
+      const pallete = this.bgRows[i].pallete;
+      const colors = bgrows[i].colors
+      pallete.pallete = colors.map(color => helpers.hexadjust(color, [1, blueCoef, greenCoef, redCoef]))
+    }
+  }
+  interpolateBgPallete(step: number) {
+    const { bgrows: sbgrows, bgfill: sbgfill } = this.config;
+    const { bgrows: dbgrows, bgfill: dbgfill } = this.next.config;
+    this.bgFill = helpers.interpolate(sbgfill, dbgfill, step);
+    this.bgRows.forEach((row, i) => {
+      const spal = sbgrows[i].colors;
+      const dpal = dbgrows[i].colors;
+      const colors = spal.map((_, j) => helpers.interpolate(spal[j], dpal[j], step));
+      row.pallete.pallete = colors;
+    });
+  }
+  setNext(stage: Stage) {
+    this.next = stage;
+    const [_, B, G, R] = helpers.calccoefs(
+      helpers.hex2abgr(this.config.bgfill),
+      helpers.hex2abgr(stage.config.bgfill),
+    );
+    // TODO: no need for now. interpolation is used for all rows
+    this.bgFadeoutCoefs = [B, G, R];
+  }
+  start() {
+    this.handlers.onstart(this, this.next);
+    clearInterval(this.bgFadeoutTimer);
+    console.debug(`Start: ${this.config.name}`)
+  }
+  finish() {
+    this.handlers.onfinish(this, this.next);
+    clearInterval(this.bgFadeoutTimer);
+    console.debug(`Finish: ${this.config.name}`)
+  }
+  onstart(cb: StageCallback) { this.handlers.onstart = cb; }
+  onfinish(cb: StageCallback) { this.handlers.onfinish = cb; }
 }
 
+// --------------------------------------------------------------------------
+
+type hex = number;
+type abgr = [number, number, number, number];
 const helpers = {
-  hex2abgr: (hex: number) => ([hex >>> 24 & 0xff, hex >>> 16 & 0xff, hex >>> 8 & 0xff, hex & 0xff]),
-  abgr2hex: (a: number, b: number, g: number, r: number) => ((a << 24) | (b << 16) | (g << 8) | r) >>> 0,
-  hexadjust: (hex: number, A: number, B: number, G: number, R: number) => {
+  hex2abgr: (hex: hex): abgr => ([hex >>> 24 & 0xff, hex >>> 16 & 0xff, hex >>> 8 & 0xff, hex & 0xff]),
+  abgr2hex: ([a, b, g, r]: abgr) => ((a << 24) | (b << 16) | (g << 8) | r) >>> 0,
+  hexadjust: (hex: hex, [A, B, G, R]: abgr) => {
     const [a, b, g, r] = helpers.hex2abgr(hex);
-    return helpers.abgr2hex(Math.min(a * A, 0xff), Math.min(b * B, 0xff), Math.min(g * G, 0xff), Math.min(r * R, 0xff));
+    return helpers.abgr2hex([Math.min(a * A, 255), Math.min(b * B, 255), Math.min(g * G, 255), Math.min(r * R, 255)]);
+  },
+  calccoefs: (colora: abgr, colorb: abgr, K = 1) => {
+    const A = colora[0] == 0 ? 255 : colorb[0] / colora[0] * K;
+    const B = colora[1] == 0 ? 255 : colorb[1] / colora[1] * K;
+    const G = colora[2] == 0 ? 255 : colorb[2] / colora[2] * K;
+    const R = colora[3] == 0 ? 255 : colorb[3] / colora[3] * K;
+    return [A, B, G, R];
+  },
+  interpolate: (hexa: hex, hexb: hex, step: number) => {
+    const colora = helpers.hex2abgr(hexa);
+    const colorb = helpers.hex2abgr(hexb);
+    const a = colora[0] + (colorb[0] - colora[0]) * step | 0;
+    const b = colora[1] + (colorb[1] - colora[1]) * step | 0;
+    const g = colora[2] + (colorb[2] - colora[2]) * step | 0;
+    const r = colora[3] + (colorb[3] - colora[3]) * step | 0;
+    // TODO: Point to improve: by avoiding conversion;
+    return helpers.abgr2hex([a, b, g, r]);
   }
 };
-
-// @ts-ignore
-window.h = helpers;
-
-/*
-QUICK NOTE:
-to make switch - create a timer which will wake up every 2 seconds and check distance
-*/

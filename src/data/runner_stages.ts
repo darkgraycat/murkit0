@@ -1,5 +1,6 @@
 export type StageConfig = {
   name: string,
+  length: number,
   bgrows: BgRow[],
   bgwidth: number,
   bgfill: number,
@@ -14,7 +15,7 @@ export type BgRow = {
 
 export default [
   {
-    name: "TestConfig", bgwidth: 10,
+    name: "TestConfig", bgwidth: 10, length: 200,
     bgfill: 0xff002200, fgfill: 0xff002200,
     bgrows: [
       { layout: [0,0,0,0,0,0,0,0,0,0], offset: 0.5, speed: 1.0, colors: [0x00000000, 0xff3366ee, 0xff2d1f1e] },
@@ -26,7 +27,7 @@ export default [
     ],
   },
   {
-    name: "SunsetCity", bgwidth: 10,
+    name: "SunsetCity", bgwidth: 10, length: 300,
     bgfill: 0xff4499fd, fgfill: 0xff202122,
     bgrows: [
       { layout: [0,0,0,0,0,0,0,0,0,0], offset: 0.5, speed: 1.0, colors: [0x00000000, 0xff3366ee, 0xff2244aa] },
@@ -38,7 +39,7 @@ export default [
     ],
   },
   {
-    name: "NightCity", bgwidth: 10,
+    name: "NightCity", bgwidth: 10, length: 300,
     bgfill: 0xff361d20, fgfill: 0xff2b1b1b,
     bgrows: [
       { layout: [0,0,0,0,0,0,0,0,0,0], offset: 0.5, speed: 1.0, colors: [0x00000000, 0xff402026, 0xff6a3e4f] },

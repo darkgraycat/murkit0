@@ -3,14 +3,14 @@ import { IAdapter } from "./common/types";
 export type EngineHandler = (dt: number, time: number) => void;
 
 export class Engine {
-  private timestamp: number = 0;
-  private running: boolean = false;
+  protected timestamp: number = 0;
+  protected running: boolean = false;
 
   constructor(
-    private adapter: IAdapter,
-    private rate: number,
-    private update: EngineHandler,
-    private render: EngineHandler,
+    protected adapter: IAdapter,
+    protected rate: number,
+    protected update: EngineHandler,
+    protected render: EngineHandler,
     readonly deltaCoef: number = 0.05,
   ) {}
 
@@ -27,27 +27,28 @@ export class Engine {
     }
   }
 
-  async tickTimeout() {
-    if (!this.running) return;
-
-    const time = this.adapter.now();
-    const dt = (time - this.timestamp) * this.deltaCoef;
-    this.timestamp = time;
-
-    this.update(dt, time);
-    this.render(dt, time);
-   
-    setTimeout(() => this.tick(), this.rate)
-  }
-
   start() {
     if (this.running) return;
     this.running = true;
     this.tick();
-    //this.tickTimeout();
   }
 
   stop() {
     this.running = false;
+  }
+}
+
+export class TimeoutEngine extends Engine {
+  async tick() {
+    if (!this.running) return;
+    const now = this.adapter.now();
+    const dt = (now - this.timestamp) * this.deltaCoef;
+    const time = now * this.deltaCoef;
+    this.timestamp = now;
+
+    // calc next interval
+    setTimeout(() => this.tick(), this.rate)
+    this.update(dt, time);
+    this.render(dt, time);
   }
 }
