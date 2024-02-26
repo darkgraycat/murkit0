@@ -82,3 +82,21 @@ export const collision = {
     return CollisionSide.None;
   }
 };
+
+const optimalDist = 8;
+const optimalDiffX = 4;
+const optimalDiffY = 2;
+
+export const platformPlacer = ((last) => (
+  px: number, py: number,
+  pw: number, ph: number,
+): [number, number] => {
+  const { x, y } = last;
+  console.log({ x, y, px, py, pw, ph })
+  // calc
+  const nx = 0;
+  const ny = 0;
+  last = { x: nx, y: ny };
+  return [320, 132]; // xy coordinates
+})({ x: 0, y: 0});
+

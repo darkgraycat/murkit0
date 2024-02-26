@@ -39,7 +39,7 @@ export default [
     ],
   },
   {
-    name: "NightCity", bgwidth: 10, length: 300,
+    name: "NightCity", bgwidth: 10, length: 3000,
     bgfill: 0xff361d20, fgfill: 0xff2b1b1b,
     bgrows: [
       { layout: [0,0,0,0,0,0,0,0,0,0], offset: 0.5, speed: 1.0, colors: [0x00000000, 0xff402026, 0xff6a3e4f] },

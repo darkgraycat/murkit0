@@ -31,9 +31,24 @@ export default async (config: GameConfig) => {
   // --------------------------------------------------------------------------
   // TODO: add collectables
   const playerTiles = await adapter.loadImage(playerAsset).then(img => TileableBitmap.from(img.data, 16, 16, 4, 1));
-  const playerSprites = playerTiles.split().concat(playerTiles.flipV().split());
   const bgTiles = await adapter.loadImage(bgAsset).then(img => TileableBitmap.from(img.data, 32, 32, 6, 1));
   const houseTiles = await adapter.loadImage(houseAsset).then(img => TileableBitmap.from(img.data, 48, 32, 5, 1));
+
+  const playerSprites = playerTiles.split().concat(playerTiles.flipV().split());
+  const houseSprites = [ // TODO: move to data, later ofc
+    houseTiles.reorder([1,0, 2,2, 0,1], 2, 3),
+    houseTiles.reorder([2,2, 1,1, 1,1], 2, 3),
+    houseTiles.reorder([3,4, 3,1, 2,2], 2, 3),
+    houseTiles.reorder([2,2,2,2, 0,0,0,0], 4, 2),
+    houseTiles.reorder([1,2,3,1, 0,2,2,0], 4, 2),
+    houseTiles.reorder([3,4,1,4, 1,3,2,4], 4, 2),
+    houseTiles.reorder([1,1, 1,1], 2, 2),
+    houseTiles.reorder([3,2, 1,1], 2, 2),
+    houseTiles.reorder([1,2,2,1, 1,2,2,1, 0,2,2,0], 4, 3),
+    houseTiles.reorder([2,0,1,4, 2,0,1,1, 0,0,0,0], 4, 3),
+    houseTiles.reorder([1,1, 1,1, 2,2, 3,3], 2, 4),
+    houseTiles.reorder([2,4,3,1,2, 2,1,3,0,2, 0,0,3,0,0], 5, 3),
+  ];
 
   // TODO: the current pallete depends on progress
   // i suggest to have some adjuster (1.2, 0.9. 0.8) for ex and apply it every N
@@ -43,12 +58,13 @@ export default async (config: GameConfig) => {
   stages.forEach((stage, i) => i > 0 && stages[i - 1].setNext(stage));
   stages.forEach((stage, i) => stage.onfinish((curr, next) => {
     currentStage = next;
-    console.debug(`Swithing ${i}`);
+    console.debug(`Switching ${i}`);
   }));
   currentStage = stages[1];
   stages[stages.length - 1].onfinish(() => {
     // window.alert("You win!");
     console.log("You win!");
+
   });
   // TODO: make 0 - entry, 3 - morning, 4 - ending
   //
@@ -56,8 +72,8 @@ export default async (config: GameConfig) => {
   // --------------------------------------------------------------------------
   const world = new World({ width, height, gravity: 0.7, friction: 0.95, skyColor: 0xffa09080 });
   const {
-    sMovement, sAnimation, sCollideBounds,
-    sDrawing, sControllerRunner,
+    sMovement, sAnimation, sCollideBounds, sCollideShapes,
+    sDrawing, sControllerRunner, sBuildingsRunner,
   } = Systems(world, viewport);
 
   const eManager = new EntityManager(components);
@@ -70,13 +86,27 @@ export default async (config: GameConfig) => {
     cSprite: { spriteIdx: 0, sprites: playerSprites, offsetX: -3, offsetY: -2 },
     cAnimation: { animations: [ [0, 0, 3, 3], [1, 2, 3, 0], [1, 1, 2, 2] ], current: 0, length: 4, time: 0, coef: 0.4 },
   });
-  // const createPlatform = ()
-  //const eHouses = eManager.a
+  const createBuilding = (spriteIdx: number, col: number, row: number) => eManager.add({
+    cPosition: { x: col * 16, y: row * 20, },
+    cSprite: { spriteIdx, sprites: houseSprites },
+    cShape: { w: houseSprites[spriteIdx].width, h: houseSprites[spriteIdx].height },
+  });
+  const eBuildings = [
+    // createBuilding(11, 0, 4),
+    createBuilding(0,  0, 4),
+    createBuilding(1,  20, 4),
+    // createBuilding(2,  0, 4),
+    // createBuilding(3,  0, 4),
+  ];
+
+
 
   // --------------------------------------------------------------------------
   const collideBounds = sCollideBounds.setup([ePlayer]);
+  const collideShapes = sCollideShapes.setup([ePlayer], eBuildings);
+  const platforms = sBuildingsRunner.setup(eBuildings);
   const move = sMovement.setup([ePlayer]);
-  const draw = sDrawing.setup([ePlayer]);
+  const draw = sDrawing.setup([ePlayer, ...eBuildings]);
   const control = sControllerRunner.setup([ePlayer]);
   const animate = sAnimation.setup([ePlayer]);
 
@@ -89,8 +119,10 @@ export default async (config: GameConfig) => {
   };
   const update = (dt: number, time: number) => {
     currentStage.update(dt);
+    platforms(dt),
     move(dt);
     collideBounds(dt);
+    collideShapes(dt);
     control(dt);
   };
   // --------------------------------------------------------------------------

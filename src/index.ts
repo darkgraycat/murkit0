@@ -26,29 +26,20 @@ window.addEventListener("load", async () => {
   screen.height = height;
 
   const actions: Set<string> = new Set();
-  const kbMapping = {
+  const actionsMapping = {
     KeyQ: "Left", KeyW: "Right", KeyP: "Jump",
     KeyA: "Left", KeyD: "Right", Space: "Jump",
     ArrowLeft: "Left", ArrowRight: "Right", ArrowUp: "Jump",
+    "btn-left": "Left", "btn-right": "Right", "btn-jump": "Jump",
   };
-  window.addEventListener("keydown", ({ code }) => actions.add(kbMapping[code] || code));
-  window.addEventListener("keyup", ({ code }) => actions.delete(kbMapping[code] || code));
+  window.addEventListener("keydown", ({ code }) => actionsMapping[code] && actions.add(actionsMapping[code]));
+  window.addEventListener("keyup", ({ code }) => actionsMapping[code] && actions.delete(actionsMapping[code]));
   for (const btn of buttons) {
-    btn.addEventListener("mousedown", (e) => {
-      // @ts-ignore
-      const id = e.target.id;
-      if (id === "btn-left") actions.add("Left");
-      if (id === "btn-jump") actions.add("Jump");
-      if (id === "btn-right") actions.add("Right");
-    });
-    btn.addEventListener("mouseup", (e) => {
-      // @ts-ignore
-      const id = e.target.id;
-      if (id === "btn-left") actions.delete("Left");
-      if (id === "btn-jump") actions.delete("Jump");
-      if (id === "btn-right") actions.delete("Right");
-    });
-  }
+    btn.addEventListener("touchstart", ({ target: { id } }: any) => actionsMapping[id] && actions.add(actionsMapping[id]))
+    btn.addEventListener("touchend", ({ target: { id } }: any) => actionsMapping[id] && actions.delete(actionsMapping[id]))
+    btn.addEventListener("mousedown", ({ target: { id } }: any) => actionsMapping[id] && actions.add(actionsMapping[id]))
+    btn.addEventListener("mouseup", ({ target: { id } }: any) => actionsMapping[id] && actions.delete(actionsMapping[id]))
+  };
 
   const game = await runnerGame({ screen, overlay, width, height, actions, fps: 1000/60 });
   game.engine.start();

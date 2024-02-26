@@ -14,6 +14,7 @@ import {
 import {
   CollisionSide,
   collision,
+  platformPlacer,
 } from "./helpers";
 
 import { debug } from ".";
@@ -88,9 +89,9 @@ export function Systems(world: World, viewport: Bitmap) {
               x[b], y[b], bRight, bBottom,
             );
             // TODO: remove debug
-            debug.set(collisionSide.toUpperCase(), air[e] ? "^" : "_", `${x[e].toFixed(2).padStart(6, "0")}:${y[e].toFixed(2).padStart(6, "0")}`, vy[e].toFixed(2));
+            // debug.set(collisionSide.toUpperCase(), air[e] ? "^" : "_", `${x[e].toFixed(2).padStart(6, "0")}:${y[e].toFixed(2).padStart(6, "0")}`, vy[e].toFixed(2));
             if (collisionSide === CollisionSide.None) continue;
-            if (collisionSide !== CollisionSide.Bottom) console.log(collisionSide,b);
+            // if (collisionSide !== CollisionSide.Bottom) console.log(collisionSide,b);
             totalCollisions++;
             switch (collisionSide) {
               case CollisionSide.Bottom: vy[e] = 0; y[e] = y[b] - h[e]; air[e] = false; break;
@@ -168,7 +169,7 @@ export function Systems(world: World, viewport: Bitmap) {
       },
     ),
 
-    /*Listen for user input for runner mode*/
+    /* Listen for user input for runner mode */
     sControllerRunner: new System(
       { cVelocity, cInputRunner, cMeta, cAnimation },
       (_, comp, entities) => {
@@ -187,6 +188,25 @@ export function Systems(world: World, viewport: Bitmap) {
           if (actions[e].has("Jump"))      !air[e] && (air[e] = true, vy[e] = -10);
         }
       },
+    ),
+
+    /* Generate platforms */
+    sBuildingsRunner: new System(
+      { cPosition, cShape },
+      (dt, comp, entities) => {
+        const speed = 3;
+        const { x, y } = comp.cPosition.storage;
+        const { w, h } = comp.cShape.storage;
+        for (const e of entities) {
+          x[e] -= speed * dt;
+          const rx = x[e] + w[e];
+          // no replace if still visible
+          if (x[e] >= -w[e]) continue;
+          const [dx, dy] = platformPlacer(x[e], y[e], w[e], h[e]);
+          x[e] = width + dx;
+          y[e] = dy;
+        }
+      }
     ),
 
     // TODO: ability to add modifiers to the system
