@@ -5,15 +5,25 @@ import { bulkTileableBitmapLoad } from "./helpers";
 import { MainConfig } from "./main";
 import { World } from "./world";
 
+// TODO: investigate how to do it in a proper way
+import playerAsset from "../assets/player.png";
+import blocksAsset from "../assets/platforms.png";
+import bgAsset from "../assets/backgrounds.png";
+import houseAsset from "../assets/backgrounds_houses.png";
+
 // TODO: I dont like this function at all, added temporary
 export async function Entities(em: EntityManager<any>, world: World, adapter: IAdapter, keys: MainConfig["keys"]) {
   console.debug("ENTITIES: load assets");
   const [playerTiles, blockTiles, bgTiles, houseTiles] = await bulkTileableBitmapLoad(
     adapter,
-    ["./assets/player.png", 16, 16, 4, 1],
-    ["./assets/platforms.png", 16, 16, 4, 1],
-    ["./assets/backgrounds.png", 32, 32, 6, 1],
-    ["./assets/backgrounds_houses.png", 48, 32, 5, 1],
+    // ["./assets/player.png", 16, 16, 4, 1],
+    // ["./assets/platforms.png", 16, 16, 4, 1],
+    // ["./assets/backgrounds.png", 32, 32, 6, 1],
+    // ["./assets/backgrounds_houses.png", 48, 32, 5, 1],
+    [playerAsset, 16, 16, 4, 1],
+    [blocksAsset, 16, 16, 4, 1],
+    [bgAsset, 32, 32, 6, 1],
+    [houseAsset, 48, 32, 5, 1],
   );
   console.debug("ENTITIES: build graphics");
   const playerSprites = playerTiles.split().concat(playerTiles.flipV().split());
@@ -26,6 +36,7 @@ export async function Entities(em: EntityManager<any>, world: World, adapter: IA
   //           or make Level to use ids of assets
   const animatedBgLength= 20;
   const animatedBgLayers = [
+    // LAYOUT
     bgTiles.reorder(Array.from<number>({ length: animatedBgLength }).fill(0),animatedBgLength, 1),
     bgTiles.reorder(Array.from<number>({ length: animatedBgLength }).fill(0),animatedBgLength, 1),
 
@@ -38,21 +49,22 @@ export async function Entities(em: EntityManager<any>, world: World, adapter: IA
   ];
   const animatedBgPalletes = animatedBgLayers.map((bitmap) => new BitmapPallete(bitmap));
 
-  const animatedFgOrder =  [9, 9, 2, 9, 9, 3, 9, 9];
-  const animatedFgOrder2 = [9, 9, 0, 9, 9, 0, 9, 9];
-  const animatedFgLayers = [
-    houseTiles.reorder([
-      ...animatedFgOrder,
-      ...animatedFgOrder,
-      ...animatedFgOrder2,
-      ...animatedFgOrder2,
-      ...animatedFgOrder,
-      ...animatedFgOrder,
-      ...animatedFgOrder2,
-      ...animatedFgOrder2,
-    ], 16, 4),
-  ];
-  const animatedFgPalletes = animatedFgLayers.map((bitmap) => new BitmapPallete(bitmap));
+  // TODO: handle FG layers later
+  // const animatedFgOrder =  [9, 9, 2, 9, 9, 3, 9, 9];
+  // const animatedFgOrder2 = [9, 9, 0, 9, 9, 0, 9, 9];
+  // const animatedFgLayers = [
+  //   houseTiles.reorder([
+  //     ...animatedFgOrder,
+  //     ...animatedFgOrder,
+  //     ...animatedFgOrder2,
+  //     ...animatedFgOrder2,
+  //     ...animatedFgOrder,
+  //     ...animatedFgOrder,
+  //     ...animatedFgOrder2,
+  //     ...animatedFgOrder2,
+  //   ], 16, 4),
+  // ];
+  // const animatedFgPalletes = animatedFgLayers.map((bitmap) => new BitmapPallete(bitmap));
 
   console.debug("ENTITIES: define entities");
   // player
@@ -92,20 +104,25 @@ export async function Entities(em: EntityManager<any>, world: World, adapter: IA
     createAnimatedBgEntity(0, 0, -2.0),
   ]
 
-  const createAnimatedFgEntity = (spriteIdx: number, alt: number, speed: number) => em.add({
-    cAnimation: { animations: [[0]], current: 0, length: 0, time: 0, coef: speed },
-    cSprite: { sprites: animatedFgLayers, spriteIdx, offsetX: 0, offsetY: alt * 16 },
-  });
-  const animatedFgLayersEntities = [createAnimatedFgEntity(0, 5, -3)];
+  // const createAnimatedFgEntity = (spriteIdx: number, alt: number, speed: number) => em.add({
+  //   cAnimation: { animations: [[0]], current: 0, length: 0, time: 0, coef: speed },
+  //   cSprite: { sprites: animatedFgLayers, spriteIdx, offsetX: 0, offsetY: alt * 16 },
+  // });
+  // const animatedFgLayersEntities = [createAnimatedFgEntity(0, 5, -3)];
 
   return {
     // return graphics, just in case
     tiles: { playerTiles, blockTiles, bgTiles, houseTiles },
     sprites: { playerSprites, blockSprites, bgSprites, houseSprites },
-    fgBgLayers: { animatedFgLayers, animatedFgPalletes, animatedBgLayers, animatedBgPalletes },
+    fgBgLayers: {
+      // animatedFgLayers,
+      // animatedFgPalletes,
+      animatedBgLayers,
+      animatedBgPalletes,
+    },
     // entities
     playerEntity,
-    animatedFgLayersEntities,
+    // animatedFgLayersEntities,
     animatedBgLayersEntities,
   };
 }

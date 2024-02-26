@@ -50,26 +50,35 @@ export const cInput = new Component<{ keys: Set<string> }>({
   keys: new Set(),
 });
 
+export const cInputRunner = new Component<{
+  actions: Set<String>,
+  jumping: boolean,
+  acceleration: number,
+}>({
+  actions: new Set(),
+  jumping: false,
+  acceleration: 0,
+});
+
 export const cMeta = new Component<{ air: boolean; speed: number }>({
   air: false,
   speed: 0,
 });
 
-// export const cAnimatedBg = new Component<{ x: number, w: number, vx: number, lastx?: number }>({
-//   x: 0,
-//   w: 0,
-//   vx: 0,
-//   lastx: 0,
-// });
-// 
-// // TODO: investigate possibility of using world as a component
+export const c2AnimatedBg = new Component<{
+}>({
+
+});
+
 // export const cWorld = new Component<{
+//   time?: number,
 //   width: number,
 //   height: number,
 //   gravity: number,
 //   friction: number,
 //   viewport: Bitmap,
 // }>({
+//   time: 0,
 //   width: 0,
 //   height: 0,
 //   gravity: 0,

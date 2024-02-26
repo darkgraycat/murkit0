@@ -2,21 +2,54 @@
   <head>
     <script src="dist/main.js"></script>
     <style>
-      body {
-        background-color: #191919;
+      :root {
+        --main-bg-color: #191919;
+        --buttons-inactive: #FFFFFF;
+        --buttons-size: 60px;
+      }
+      body { background-color: var(--main-bg-color); }
+
+      #container { position: relative; margin: auto; }
+      #screen, #overlay, #buttons { position: absolute; }
+
+      #screen { width: 100%; border: 4px solid var(--main-bg-color); border-radius: 32px }
+      #overlay { width: 100%; font-size: 20px; }
+      #buttons { width: 100%; bottom: -36vw; position: absolute }
+      #debug { width: 98%; height: 100px; display: none; }
+
+      .button {
+        background-color: var(--buttons-inactive);
+        opacity: .4;
       }
 
-      #screen {
-        width: 100%;
+      .triangle {
+        border-top: var(--buttons-size) solid transparent;
+        border-bottom: var(--buttons-size) solid transparent;
+        position: absolute;
       }
 
-      #debug {
-        color: green;
-        width: 100%;
-        height: 100px;
-        font-family: monospace;
+      .triangle-left {
+        background-color: transparent;
+        border-right: var(--buttons-size) solid var(--buttons-inactive);
+        top: 0px; left: 0px;
       }
 
+      .triangle-right {
+        background-color: transparent;
+        border-left: var(--buttons-size) solid var(--buttons-inactive);
+        top: 0px; left: 20vw;
+      }
+
+      .circle-jump {
+        position: absolute;
+        top: 0px; 
+        right: 20px; 
+        width: 120px;
+        height: 120px;
+        border-radius: 120px;
+      }
+
+      .text { color: #ddf; font-family: monospace;}
       .pixel { image-rendering: pixelated; }
       .smooth { image-rendering: crisp-edges; }
       .auto { image-rendering: auto; }
@@ -24,7 +57,36 @@
   </head>
 
   <body>
-    <canvas id="screen" class="pixel"></canvas>
-    <div id="debug"></div>
+    <div id="root">
+      <div id="container">
+        <canvas id="screen" class="pixel"></canvas>
+        <div id="buttons">
+          <div class="button triangle triangle-left"></div>
+          <div class="button triangle triangle-right"></div>
+          <div class="button circle-jump"></div>
+        </div>
+        <div id="overlay" class="text">This is demo</div>
+      </div>
+      <div id="debug" class="text"></div>
+    </div>
+    <!--
+    <div>
+      <input id="colorinput", type="color" name="colorhelper" />
+      <label id="colorlabel", for="colorhelper"></label>
+    </div>
+    <script>
+      const colors = []; 
+      const input = document.getElementById("colorinput");
+      const label = document.getElementById("colorlabel");
+      label.style.color = "#fff";
+      input.onchange = (e) => {
+        const parts = e.target.value.slice(1).match(/.{1,2}/g);
+        const converted = "0xff" + parts.reverse().join("");
+        colors.push(converted);
+        console.log(converted);
+        label.innerHTML = colors;
+      }
+    </script>
+    -->
   </body>
 </html>

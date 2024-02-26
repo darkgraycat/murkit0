@@ -272,15 +272,23 @@ describe("ecs/simple.ecs", () => {
       expect(storage.desc).toEqual([ "First comp", "no desc", "no desc" ]);
     })
     it("Compoment with method", () => {
-      const cCompWithMethod = new Component({
-        a: 0,
-        b: 0,
-        op: () => 0,
-      });
+      type cCompMethod = () => Partial<cCompProps>;
+      type cCompProps = { a: number, b: number, op: cCompMethod };
+      const op: cCompMethod = () => ({ a: 10, b: 20 });
+      const cComp = new Component<cCompProps>({ a: 0, b: 0, op });
       const [a, b]  = [
-        cCompWithMethod.set(0, { a: 2, b: 3, op: () => 0 }),
-        cCompWithMethod.set(1, { a: 2, b: 3, op: () => 0 }),
+        cComp.set(0, { a: 2, b: 3, op }),
+        cComp.set(1, { a: 5, b: 7, op }),
       ];
+      const sSystem = new System(
+        { cComp },
+        (_, comps, ents) => {
+          const { op } = cComp.storage;
+          for (const e of ents) {
+            op[e]();
+          }
+        }
+      );
     });
     it("System controls System", () => {
       const cComp = new Component({ val: 0, acc: 0 });
@@ -314,6 +322,64 @@ describe("ecs/simple.ecs", () => {
       tick(); expect(storage.val).toEqual([6, 9, 12, 10]);
       tick(); expect(storage.val).toEqual([8, 12, 12, 10]);
       tick(); expect(storage.val).toEqual([10, 12, 12, 10]);
+    });
+    it("Multiple Entity Managers with Intersections", () => {
+      // NOTE: intersections doesnt works, because components has own storage
+      const cData = new Component<{ name: string, value?: number}>({ value: 0, name: "" });
+      const cAlpha = new Component<{ a?: number }>({ a: 2 });
+      const cBeta = new Component<{ a?: number }>({ a: 3 });
+      const sShareA = new System(
+        { cData, cAlpha },
+        (_, c, es) => {
+          const { a } = c.cAlpha.storage;
+          const { name, value } = c.cData.storage;
+          for (const e of es) {
+            value[e] += a[e];
+            if (value[e] > 10) {
+              console.log(`Alpha Overflow ${name[e]}: ${value[e]}`);
+              value[e] = -a[e];
+            }
+          }
+        }
+      );
+      const sShareB = new System(
+        { cData, cBeta },
+        (_, c, es) => {
+          const { a } = c.cBeta.storage;
+          const { name, value } = c.cData.storage;
+          for (const e of es) {
+            value[e] += a[e];
+            if (value[e] > 10) {
+              console.log(`Beta Overflow ${name[e]}: ${value[e]}`);
+              value[e] = -a[e];
+            }
+          }
+        }
+      );
+      const alphaEm = new EntityManager({ cData, cAlpha });
+      const betaEm = new EntityManager({ cData, cBeta });
+      
+      console.log({ cData: cData.storage, cAlpha: cAlpha.storage, cBeta: cBeta.storage });
+      expect(cData.storage).toEqual({
+        name: [],
+        value: [],
+      });
+
+      let idx = 0;
+      const cra = (name: string, value: number, mod: number) => alphaEm.set(idx++, { cData: { name, value }, cAlpha: { a: mod } });
+      const crb = (name: string, value: number, mod: number) => betaEm.set(idx++, { cData: { name, value }, cBeta: { a: mod } });
+      const [a0, b0, a1, b1] = [
+        cra("AL_0", 0, 2),
+        crb("BT_0", 0, 3),
+        cra("AL_1", 5, 2),
+        crb("BT_1", 5, 3),
+      ]
+      const shareA = sShareA.setup([a0, a1]);
+      const shareB = sShareB.setup([b0, b1]);
+      shareA(0); shareB(0);
+      shareA(0); shareB(0);
+      shareA(0); shareB(0);
+      console.log({ cData: cData.storage, cAlpha: cAlpha.storage, cBeta: cBeta.storage });
     });
   });
 });

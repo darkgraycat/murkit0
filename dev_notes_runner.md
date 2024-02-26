@@ -41,18 +41,52 @@ bg_tile_w: 32
 means 10 tiles to cover
 means +10 exact copies at end
 
+DATA needed:
+entity + pallete = layout + pallete
 
 ###### Levels switch sprites
 we need to switch second 10 then after screen switch first 10
 
+#### QUICK PLAN:
+I need the way to switch layers and pallete on demand
+On demand means - some conditions
+Instead of using time, we should use DISTANCE and SPEED
+I need the way to adjust player speed, BUT:
+player speed is a speed of level
+
+OR. maybe just use ECS TO MAKE calcs with dynamic phys objects
+but. use plain procedural (for now) for everything else
+and name that module runnerGame:
+3 states:
+    start screen
+    actual gameplay
+    end screen
+ACTUALLY:
+i dont need 3 screens.
+I can just disable player controlls for title and end
+    and make big long house
+    then just render nice Title, or etc
 
 
+on transition i just reorder to next level
+                     recolor to next level
 
 
+SO i need 3 helpers:
+    reorder bg layout
+    recolor bg pallete
+    regenerate blocks
+and 2 more:
+    transition for layout
+    interpolate pallete
 
-
-
-
+## Another idea for BG
+I make prev idea work.. partialy. The problem that .reorder makes completely new bitmap
+and its hard to apply colors. I did a lot of shitcode, but now I know what to do:
+Double sized row as always, but if transition is in progress:
+having new order - use .copyTile to update tiles on shift < 0 - twidth
+in addition we will apply pallete on the whole row by steps.
+So lets to this.
 
 ## Refactoring notes
 #### 2 EntityManagers:
@@ -60,3 +94,24 @@ we need to switch second 10 then after screen switch first 10
     2. for backgrounds
     Note: World appears in both
           Stage is a component as well
+Due to deadline: refactor later
+
+#### Idea for name: MurkitRunner
+## MVP plans:
+такий план:
+[+] плавний перехід палітри (середня тяжкість)
+[ ] генерація домів по яким треба буде стрибати (легко)
+[ ] намалювати печиво та кофійок (легко та приємно)
+[ ] управління з миші/тачпаду (легко, накостиляю швидко)
+[ ] ще 2 рівні: початковий - де просто котик біжить(некерований) і видно тайтл гри + підказки для КЕРУВАННЯ
+[ ] і кінцевий де теж котик просто біжить(некерований) і якась статистика + час
+
+
+
+House/platform generation:
+to make it easy, lets just generate some pattern and do a favorite algorithm - random;
+BUT: random placement should possible to reach via jump
+So, this means we need to calculate max jump, which means fix controls
+
+
+#### Idea for future: endless runner with stages generation
