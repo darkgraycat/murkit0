@@ -51,6 +51,7 @@ export default async (config: GameConfig) => {
   });
   // TODO: make 0 - entry, 3 - morning, 4 - ending
   //
+
   // --------------------------------------------------------------------------
   const world = new World({ width, height, gravity: 0.9, friction: 0.95, skyColor: 0xffa09080 });
   const {
