@@ -96,10 +96,22 @@ So lets to this.
           Stage is a component as well
 Due to deadline: refactor later
 
+#### Idea for name: MurkitRunner
+## MVP plans:
+такий план:
+[+] плавний перехід палітри (середня тяжкість)
+[ ] генерація домів по яким треба буде стрибати (легко)
+[ ] намалювати печиво та кофійок (легко та приємно)
+[ ] управління з миші/тачпаду (легко, накостиляю швидко)
+[ ] ще 2 рівні: початковий - де просто котик біжить(некерований) і видно тайтл гри + підказки для КЕРУВАННЯ
+[ ] і кінцевий де теж котик просто біжить(некерований) і якась статистика + час
 
 
 
+House/platform generation:
+to make it easy, lets just generate some pattern and do a favorite algorithm - random;
+BUT: random placement should possible to reach via jump
+So, this means we need to calculate max jump, which means fix controls
 
 
-
-
+#### Idea for future: endless runner with stages generation

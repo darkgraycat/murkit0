@@ -50,6 +50,16 @@ export const cInput = new Component<{ keys: Set<string> }>({
   keys: new Set(),
 });
 
+export const cInputRunner = new Component<{
+  actions: Set<String>,
+  jumping: boolean,
+  acceleration: number,
+}>({
+  actions: new Set(),
+  jumping: false,
+  acceleration: 0,
+});
+
 export const cMeta = new Component<{ air: boolean; speed: number }>({
   air: false,
   speed: 0,

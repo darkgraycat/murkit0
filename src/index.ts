@@ -9,18 +9,19 @@ window.addEventListener("load", async () => {
   debug.add = (...msg: string[]) =>
     (debugEl.innerHTML += "<br>" + msg.join(", "));
 
-  const keys: Set<string> = new Set();
-  window.addEventListener("keydown", ({ code }) => keys.add(code));
-  window.addEventListener("keyup", ({ code }) => keys.delete(code));
-
   const width = 320;
   const height = 160;
 
   console.log(document);
   const screen = document.getElementById("screen") as HTMLCanvasElement;
+  const overlay = document.getElementById("overlay") as HTMLDivElement;
 
   screen.width = width;
   screen.height = height;
+
+  const keys: Set<string> = new Set();
+  window.addEventListener("keydown", ({ code }) => keys.add(code));
+  window.addEventListener("keyup", ({ code }) => keys.delete(code));
 
   // init({
   //   screen,
@@ -30,7 +31,7 @@ window.addEventListener("load", async () => {
   //   fps: 1000 / 60,
   // });
 
-  const game = await runnerGame({ screen, width, height, keys, fps: 1000/60 });
+  const game = await runnerGame({ screen, overlay, width, height, keys, fps: 1000/60 });
   game.engine.start();
   console.log("INITIALIZED");
 });

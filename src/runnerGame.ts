@@ -17,6 +17,7 @@ export type GameConfig = {
   height: number;
   keys: Set<string>;
   screen: HTMLCanvasElement;
+  overlay: HTMLDivElement;
   fps: number;
 };
 
@@ -69,6 +70,8 @@ export default async (config: GameConfig) => {
     cSprite: { spriteIdx: 0, sprites: playerSprites, offsetX: -3, offsetY: -2 },
     cAnimation: { animations: [ [0, 0, 3, 3], [1, 2, 3, 0], [1, 1, 2, 2] ], current: 0, length: 4, time: 0, coef: 0.4 },
   });
+  // const createPlatform = ()
+  //const eHouses = eManager.a
 
   // --------------------------------------------------------------------------
   const collideBounds = sCollideBounds.setup([ePlayer]);
@@ -166,21 +169,6 @@ class Stage {
   }
   renderFg(dt: number, viewport: Bitmap) {
 
-  }
-  adjustBgPallete(redCoef: number, greenCoef: number, blueCoef: number) {
-    this.bgFill = helpers.hexadjust(this.bgFill, [1, blueCoef, greenCoef, redCoef]);
-    for (const row of this.bgRows) {
-      row.pallete.pallete = row.pallete.pallete.map(color => helpers.hexadjust(color, [1, blueCoef, greenCoef, redCoef]));
-    }
-  }
-  adjustBgPallete2(redCoef: number, greenCoef: number, blueCoef: number) {
-    const { config: { bgrows, bgfill } } = this;
-    this.bgFill = helpers.hexadjust(bgfill, [1, blueCoef, greenCoef, redCoef]);
-    for (let i = 0; i < this.bgRows.length; i++) {
-      const pallete = this.bgRows[i].pallete;
-      const colors = bgrows[i].colors
-      pallete.pallete = colors.map(color => helpers.hexadjust(color, [1, blueCoef, greenCoef, redCoef]))
-    }
   }
   interpolateBgPallete(step: number) {
     const { bgrows: sbgrows, bgfill: sbgfill } = this.config;

@@ -8,8 +8,6 @@ import { Systems } from "./systems";
 import { Entities } from "./entities";
 import * as components from "./components";
 
-import { stages as runnerLevels } from "./data/runner_levels";
-
 import { benchmark } from "./utils";
 
 export type MainConfig = {

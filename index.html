@@ -2,21 +2,16 @@
   <head>
     <script src="dist/main.js"></script>
     <style>
-      body {
-        background-color: #191919;
-      }
+      body { background-color: #191919; }
 
-      #screen {
-        width: 100%;
-      }
+      #container { position: relative; margin: auto; }
+      #container #screen, #overlay { position: absolute; }
 
-      #debug {
-        color: green;
-        width: 100%;
-        height: 100px;
-        font-family: monospace;
-      }
+      #screen { width: 100%; border: 4px solid #191919; border-radius: 32px }
+      #overlay { width: 100%; font-size: 30px; }
+      #debug { width: 98%; height: 100px; display: none; }
 
+      .text { color: #ddf; font-family: monospace;}
       .pixel { image-rendering: pixelated; }
       .smooth { image-rendering: crisp-edges; }
       .auto { image-rendering: auto; }
@@ -24,8 +19,14 @@
   </head>
 
   <body>
-    <canvas id="screen" class="pixel"></canvas>
-    <div id="debug"></div>
+    <div id="root">
+      <div id="container">
+        <canvas id="screen" class="pixel"></canvas>
+        <div id="overlay" class="text">This is demo</div>
+      </div>
+      <div id="debug" class="text"></div>
+    </div>
+    <!--
     <div>
       <input id="colorinput", type="color" name="colorhelper" />
       <label id="colorlabel", for="colorhelper"></label>
@@ -43,5 +44,6 @@
         label.innerHTML = colors;
       }
     </script>
+    -->
   </body>
 </html>
