@@ -465,6 +465,7 @@ var cInputRunner = new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.Component({
 var cMeta = new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.Component({
     air: false,
     speed: 0,
+    power: 0,
 });
 var c2AnimatedBg = new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.Component({});
 // export const cWorld = new Component<{
@@ -902,18 +903,42 @@ var collision = {
         return CollisionSide.None;
     }
 };
-var optimalDist = 8;
-var optimalDiffX = 4;
-var optimalDiffY = 2;
-var platformPlacer = (function (last) { return function (px, py, pw, ph) {
+// export const platformPlacer = ((last, maxw, maxh) => (
+//   px: number, py: number,
+//   pw: number, ph: number,
+// ): [number, number] => {
+//   const cell = 16;
+//   let { x, y } = last;
+//   let nx = Math.random() * 2 * (px - x);
+//   let ny = Math.random() * 2 * (py - y);
+//   if (nx > maxw) nx /= 2;
+//   if (ny > maxh) ny /= 2;
+//   if (ny + ph < 160) ny /= 2;
+//   
+//   nx = Math.round(nx / cell) * cell;
+//   ny = Math.round(ny / cell) * cell;
+//   x = Math.round(x / cell) * cell;
+//   y = Math.round(y / cell) * cell;
+// 
+//   last = { x, y };
+//   return [nx, ny];
+// })({ x: 0, y: 0 }, 96, 48);
+var platformPlacer = (function (last, maxw, maxh) { return function (px, py, pw, ph) {
+    var grid = 16;
     var x = last.x, y = last.y;
-    console.log({ x: x, y: y, px: px, py: py, pw: pw, ph: ph });
-    // calc
-    var nx = 0;
-    var ny = 0;
-    last = { x: nx, y: ny };
-    return [320, 132]; // xy coordinates
-}; })({ x: 0, y: 0 });
+    var dx = x + 16;
+    var dy = y;
+    last = { x: dx, y: dy };
+    return [dx | 0, dy | 0];
+}; })({ x: 0, y: 0 }, 96, 48);
+/*
+grid: 16
+c17 r8 - right bottom
+c0 r8 - left bottom
+c0 r0 - left top (0, 0 x,y coords)
+c20 - next screen
+r10 - bottom
+*/
 
 
 /***/ }),
@@ -1028,6 +1053,7 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                     houseTiles.reorder([2, 0, 1, 4, 2, 0, 1, 1, 0, 0, 0, 0], 4, 3),
                     houseTiles.reorder([1, 1, 1, 1, 2, 2, 3, 3], 2, 4),
                     houseTiles.reorder([2, 4, 3, 1, 2, 2, 1, 3, 0, 2, 0, 0, 3, 0, 0], 5, 3),
+                    houseTiles.reorder([0], 1, 1),
                 ];
                 stages = _data_runner_stages__WEBPACK_IMPORTED_MODULE_10__["default"].map(function (config) { return new Stage(config, bgTiles, houseTiles); });
                 stages.forEach(function (stage, i) { return i > 0 && stages[i - 1].setNext(stage); });
@@ -1040,14 +1066,14 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                     // window.alert("You win!");
                     console.log("You win!");
                 });
-                world = new _world__WEBPACK_IMPORTED_MODULE_4__.World({ width: width, height: height, gravity: 0.7, friction: 0.95, skyColor: 0xffa09080 });
+                world = new _world__WEBPACK_IMPORTED_MODULE_4__.World({ width: width, height: height, gravity: 0.5, friction: 0.75, skyColor: 0xffa09080 });
                 _a = (0,_systems__WEBPACK_IMPORTED_MODULE_5__.Systems)(world, viewport), sMovement = _a.sMovement, sAnimation = _a.sAnimation, sCollideBounds = _a.sCollideBounds, sCollideShapes = _a.sCollideShapes, sDrawing = _a.sDrawing, sControllerRunner = _a.sControllerRunner, sBuildingsRunner = _a.sBuildingsRunner;
                 eManager = new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_3__.EntityManager(_components__WEBPACK_IMPORTED_MODULE_6__);
                 ePlayer = eManager.add({
-                    cPosition: { x: 32, y: 128 },
+                    cPosition: { x: 32, y: 64 },
                     cVelocity: { vx: 0, vy: 0 },
                     cShape: { w: 10, h: 14 },
-                    cMeta: { air: true, speed: 0.4 },
+                    cMeta: { air: true, speed: 0.6, power: 6 },
                     cInputRunner: { actions: actions, jumping: false, acceleration: 0 },
                     cSprite: { spriteIdx: 0, sprites: playerSprites, offsetX: -3, offsetY: -2 },
                     cAnimation: { animations: [[0, 0, 3, 3], [1, 2, 3, 0], [1, 1, 2, 2]], current: 0, length: 4, time: 0, coef: 0.4 },
@@ -1058,11 +1084,11 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                     cShape: { w: houseSprites[spriteIdx].width, h: houseSprites[spriteIdx].height },
                 }); };
                 eBuildings = [
-                    // createBuilding(11, 0, 4),
-                    createBuilding(0, 0, 4),
-                    createBuilding(1, 20, 4),
-                    // createBuilding(2,  0, 4),
-                    // createBuilding(3,  0, 4),
+                    // createBuilding(11, 0, 6),
+                    // createBuilding(0,  6, 7),
+                    createBuilding(1, 12, 6),
+                    // createBuilding(2,  18, 7),
+                    createBuilding(3, 24, 6),
                 ];
                 collideBounds = sCollideBounds.setup([ePlayer]);
                 collideShapes = sCollideShapes.setup([ePlayer], eBuildings);
@@ -1085,7 +1111,8 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                     collideShapes(dt);
                     control(dt);
                 };
-                engine = new _engine__WEBPACK_IMPORTED_MODULE_1__.TimeoutEngine(adapter, fps, update, render, 0.03);
+                engine = new _engine__WEBPACK_IMPORTED_MODULE_1__.Engine(adapter, fps, update, render, 60 / 1000);
+                // const engine = new TimeoutEngine(adapter, fps, update, render, 60 / 1000);
                 return [2 /*return*/, { engine: engine }];
         }
     });
@@ -1103,12 +1130,13 @@ var Stage = /** @class */ (function () {
             onfinish: function () { },
         };
         this.bgRows = [];
+        var speedQuickFix = 0.5; // TODO: remove, handle properly, later ofc
         for (var i = 0; i < bgrows.length; i++) {
             var _a = bgrows[i], layout = _a.layout, colors = _a.colors, offset = _a.offset, speed = _a.speed;
             var sprite = bgTiles.reorder(layout.concat(layout), bgwidth * 2, 1);
             var pallete = new _bitmap__WEBPACK_IMPORTED_MODULE_2__.BitmapPallete(sprite);
             pallete.pallete = colors;
-            this.bgRows[i] = { sprite: sprite, pallete: pallete, speed: speed, shift: 0, offset: offset * sprite.theight };
+            this.bgRows[i] = { sprite: sprite, pallete: pallete, speed: speed * speedQuickFix, shift: 0, offset: offset * sprite.theight };
         }
     }
     Stage.prototype.update = function (dt) {
@@ -1377,37 +1405,45 @@ function Systems(world, viewport) {
             var _a = comp.cAnimation.storage, current = _a.current, coef = _a.coef;
             var _b = comp.cInputRunner.storage, actions = _b.actions, jumping = _b.jumping;
             var _c = comp.cVelocity.storage, vx = _c.vx, vy = _c.vy;
-            var _d = comp.cMeta.storage, air = _d.air, speed = _d.speed;
+            var _d = comp.cMeta.storage, air = _d.air, speed = _d.speed, power = _d.power;
             for (var _i = 0, entities_7 = entities; _i < entities_7.length; _i++) {
                 var e = entities_7[_i];
                 if (!actions[e].size) {
                     current[e] = air[e] ? 2 : 1;
                     coef[e] = 0.24;
+                    if (air[e] == false)
+                        jumping[e] = false;
                     continue;
                 }
+                if (actions[e].has("Jump")) {
+                    if (!jumping[e] && !air[e]) {
+                        jumping[e] = true;
+                        air[e] = true;
+                        vy[e] = -power[e];
+                    }
+                }
+                else if (air[e] == false)
+                    jumping[e] = false;
                 if (actions[e].has("Left"))
                     vx[e] -= speed[e], coef[e] = 0.12, current[e] = 1;
                 else if (actions[e].has("Right"))
                     vx[e] += speed[e], coef[e] = 0.48, current[e] = 1;
-                if (actions[e].has("Jump"))
-                    !air[e] && (air[e] = true, vy[e] = -10);
             }
         }),
         /* Generate platforms */
         sBuildingsRunner: new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.System({ cPosition: _components__WEBPACK_IMPORTED_MODULE_1__.cPosition, cShape: _components__WEBPACK_IMPORTED_MODULE_1__.cShape }, function (dt, comp, entities) {
-            var speed = 3;
+            var speed = 1.5;
             var _a = comp.cPosition.storage, x = _a.x, y = _a.y;
             var _b = comp.cShape.storage, w = _b.w, h = _b.h;
             for (var _i = 0, entities_8 = entities; _i < entities_8.length; _i++) {
                 var e = entities_8[_i];
                 x[e] -= speed * dt;
-                var rx = x[e] + w[e];
                 // no replace if still visible
                 if (x[e] >= -w[e])
                     continue;
                 var _c = (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.platformPlacer)(x[e], y[e], w[e], h[e]), dx = _c[0], dy = _c[1];
-                x[e] = width + dx;
-                y[e] = dy;
+                x[e] += width + w[e] + dx;
+                y[e] += dy;
             }
         }),
         // TODO: ability to add modifiers to the system

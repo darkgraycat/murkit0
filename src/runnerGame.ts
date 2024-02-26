@@ -48,6 +48,7 @@ export default async (config: GameConfig) => {
     houseTiles.reorder([2,0,1,4, 2,0,1,1, 0,0,0,0], 4, 3),
     houseTiles.reorder([1,1, 1,1, 2,2, 3,3], 2, 4),
     houseTiles.reorder([2,4,3,1,2, 2,1,3,0,2, 0,0,3,0,0], 5, 3),
+    houseTiles.reorder([0], 1, 1),
   ];
 
   // TODO: the current pallete depends on progress
@@ -70,7 +71,7 @@ export default async (config: GameConfig) => {
   //
 
   // --------------------------------------------------------------------------
-  const world = new World({ width, height, gravity: 0.7, friction: 0.95, skyColor: 0xffa09080 });
+  const world = new World({ width, height, gravity: 0.5, friction: 0.75, skyColor: 0xffa09080 });
   const {
     sMovement, sAnimation, sCollideBounds, sCollideShapes,
     sDrawing, sControllerRunner, sBuildingsRunner,
@@ -78,10 +79,10 @@ export default async (config: GameConfig) => {
 
   const eManager = new EntityManager(components);
   const ePlayer = eManager.add({
-    cPosition: { x: 32, y: 128 },
+    cPosition: { x: 32, y: 64 },
     cVelocity: { vx: 0, vy: 0 },
     cShape: { w: 10, h: 14 },
-    cMeta: { air: true, speed: 0.4 },
+    cMeta: { air: true, speed: 0.6, power: 6 },
     cInputRunner: { actions, jumping: false, acceleration: 0 },
     cSprite: { spriteIdx: 0, sprites: playerSprites, offsetX: -3, offsetY: -2 },
     cAnimation: { animations: [ [0, 0, 3, 3], [1, 2, 3, 0], [1, 1, 2, 2] ], current: 0, length: 4, time: 0, coef: 0.4 },
@@ -92,11 +93,11 @@ export default async (config: GameConfig) => {
     cShape: { w: houseSprites[spriteIdx].width, h: houseSprites[spriteIdx].height },
   });
   const eBuildings = [
-    // createBuilding(11, 0, 4),
-    createBuilding(0,  0, 4),
-    createBuilding(1,  20, 4),
-    // createBuilding(2,  0, 4),
-    // createBuilding(3,  0, 4),
+    // createBuilding(11, 0, 6),
+    // createBuilding(0,  6, 7),
+    createBuilding(1,  12, 6),
+    // createBuilding(2,  18, 7),
+    createBuilding(3,  24, 6),
   ];
 
 
@@ -126,8 +127,8 @@ export default async (config: GameConfig) => {
     control(dt);
   };
   // --------------------------------------------------------------------------
-  // const engine = new Engine(adapter, fps, update, render, 0.03);
-  const engine = new TimeoutEngine(adapter, fps, update, render, 0.03);
+  const engine = new Engine(adapter, fps, update, render, 60 / 1000);
+  // const engine = new TimeoutEngine(adapter, fps, update, render, 60 / 1000);
 
   return { engine }
 }
@@ -171,12 +172,13 @@ class Stage {
       onfinish: () => {},
     };
     this.bgRows = [] as StageBgRow[];
+    const speedQuickFix = 0.5; // TODO: remove, handle properly, later ofc
     for (let i = 0; i < bgrows.length; i++) {
       const { layout, colors, offset, speed } = bgrows[i];
       const sprite = bgTiles.reorder(layout.concat(layout), bgwidth * 2, 1);
       const pallete = new BitmapPallete(sprite);
       pallete.pallete = colors; 
-      this.bgRows[i] = { sprite, pallete, speed, shift: 0, offset: offset * sprite.theight };
+      this.bgRows[i] = { sprite, pallete, speed: speed * speedQuickFix, shift: 0, offset: offset * sprite.theight };
     }
   }
   update(dt: number) {

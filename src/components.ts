@@ -60,9 +60,10 @@ export const cInputRunner = new Component<{
   acceleration: 0,
 });
 
-export const cMeta = new Component<{ air: boolean; speed: number }>({
+export const cMeta = new Component<{ air: boolean; speed: number; power: number }>({
   air: false,
   speed: 0,
+  power: 0,
 });
 
 export const c2AnimatedBg = new Component<{

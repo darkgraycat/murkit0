@@ -176,16 +176,24 @@ export function Systems(world: World, viewport: Bitmap) {
         const { current, coef } = comp.cAnimation.storage;
         const { actions, jumping } = comp.cInputRunner.storage;
         const { vx, vy } = comp.cVelocity.storage;
-        const { air, speed } = comp.cMeta.storage;
+        const { air, speed, power } = comp.cMeta.storage;
         for (const e of entities) {
           if (!actions[e].size) {
             current[e] = air[e] ? 2 : 1;
             coef[e] = 0.24
+            if (air[e] == false) jumping[e] = false;
             continue;
           }
+          if (actions[e].has("Jump")) {
+            if (!jumping[e] && !air[e]) {
+              jumping[e] = true;
+              air[e] = true;
+              vy[e] = -power[e];
+            }
+          } else if (air[e] == false) jumping[e] = false;
+
           if (actions[e].has("Left"))      vx[e] -= speed[e], coef[e] = 0.12, current[e] = 1;
           else if (actions[e].has("Right")) vx[e] += speed[e], coef[e] = 0.48, current[e] = 1;
-          if (actions[e].has("Jump"))      !air[e] && (air[e] = true, vy[e] = -10);
         }
       },
     ),
@@ -194,17 +202,16 @@ export function Systems(world: World, viewport: Bitmap) {
     sBuildingsRunner: new System(
       { cPosition, cShape },
       (dt, comp, entities) => {
-        const speed = 3;
+        const speed = 1.5;
         const { x, y } = comp.cPosition.storage;
         const { w, h } = comp.cShape.storage;
         for (const e of entities) {
           x[e] -= speed * dt;
-          const rx = x[e] + w[e];
           // no replace if still visible
           if (x[e] >= -w[e]) continue;
           const [dx, dy] = platformPlacer(x[e], y[e], w[e], h[e]);
-          x[e] = width + dx;
-          y[e] = dy;
+          x[e] += width + w[e] + dx;
+          y[e] += dy;
         }
       }
     ),

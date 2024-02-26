@@ -83,20 +83,45 @@ export const collision = {
   }
 };
 
-const optimalDist = 8;
-const optimalDiffX = 4;
-const optimalDiffY = 2;
-
-export const platformPlacer = ((last) => (
+// export const platformPlacer = ((last, maxw, maxh) => (
+//   px: number, py: number,
+//   pw: number, ph: number,
+// ): [number, number] => {
+//   const cell = 16;
+//   let { x, y } = last;
+//   let nx = Math.random() * 2 * (px - x);
+//   let ny = Math.random() * 2 * (py - y);
+//   if (nx > maxw) nx /= 2;
+//   if (ny > maxh) ny /= 2;
+//   if (ny + ph < 160) ny /= 2;
+//   
+//   nx = Math.round(nx / cell) * cell;
+//   ny = Math.round(ny / cell) * cell;
+//   x = Math.round(x / cell) * cell;
+//   y = Math.round(y / cell) * cell;
+// 
+//   last = { x, y };
+//   return [nx, ny];
+// })({ x: 0, y: 0 }, 96, 48);
+export const platformPlacer = ((last, maxw, maxh) => (
   px: number, py: number,
   pw: number, ph: number,
 ): [number, number] => {
-  const { x, y } = last;
-  console.log({ x, y, px, py, pw, ph })
-  // calc
-  const nx = 0;
-  const ny = 0;
-  last = { x: nx, y: ny };
-  return [320, 132]; // xy coordinates
-})({ x: 0, y: 0});
+  const grid = 16;
+  let { x, y } = last;
+  let dx = x + 16;
+  let dy = y;
 
+  last = { x: dx, y: dy };
+  return [dx | 0, dy | 0];
+})({ x: 0, y: 0 }, 96, 48);
+
+
+/*
+grid: 16
+c17 r8 - right bottom
+c0 r8 - left bottom
+c0 r0 - left top (0, 0 x,y coords)
+c20 - next screen
+r10 - bottom
+*/
