@@ -50,14 +50,6 @@ window.addEventListener("load", async () => {
     });
   }
 
-  // init({
-  //   screen,
-  //   width,
-  //   height,
-  //   keys,
-  //   fps: 1000 / 60,
-  // });
-
   const game = await runnerGame({ screen, overlay, width, height, actions, fps: 1000/60 });
   game.engine.start();
   console.log("INITIALIZED");

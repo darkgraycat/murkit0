@@ -40,3 +40,4 @@ export class Adapter implements IAdapter {
     return performance.now();
   }
 }
+
