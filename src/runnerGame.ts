@@ -15,14 +15,14 @@ import stageConfigs, { StageConfig } from "./data/runner_stages";
 export type GameConfig = {
   width: number;
   height: number;
-  keys: Set<string>;
+  actions: Set<string>;
   screen: HTMLCanvasElement;
   overlay: HTMLDivElement;
   fps: number;
 };
 
 export default async (config: GameConfig) => {
-  const { width, height, keys, screen, fps } = config;
+  const { width, height, actions, screen, fps } = config;
   // --------------------------------------------------------------------------
   const adapter = new Adapter();
   const screenCtx = screen.getContext("2d") as CanvasRenderingContext2D;
@@ -54,7 +54,7 @@ export default async (config: GameConfig) => {
   //
 
   // --------------------------------------------------------------------------
-  const world = new World({ width, height, gravity: 0.9, friction: 0.95, skyColor: 0xffa09080 });
+  const world = new World({ width, height, gravity: 0.7, friction: 0.95, skyColor: 0xffa09080 });
   const {
     sMovement, sAnimation, sCollideBounds,
     sDrawing, sControllerRunner,
@@ -66,7 +66,7 @@ export default async (config: GameConfig) => {
     cVelocity: { vx: 0, vy: 0 },
     cShape: { w: 10, h: 14 },
     cMeta: { air: true, speed: 0.4 },
-    cInput: { keys },
+    cInputRunner: { actions, jumping: false, acceleration: 0 },
     cSprite: { spriteIdx: 0, sprites: playerSprites, offsetX: -3, offsetY: -2 },
     cAnimation: { animations: [ [0, 0, 3, 3], [1, 2, 3, 0], [1, 1, 2, 2] ], current: 0, length: 4, time: 0, coef: 0.4 },
   });

@@ -8,6 +8,7 @@ import {
   cSprite,
   cAnimation,
   cInput,
+  cInputRunner,
   cMeta,
 } from "./components";
 import {
@@ -169,21 +170,21 @@ export function Systems(world: World, viewport: Bitmap) {
 
     /*Listen for user input for runner mode*/
     sControllerRunner: new System(
-      { cVelocity, cInput, cMeta, cAnimation },
+      { cVelocity, cInputRunner, cMeta, cAnimation },
       (_, comp, entities) => {
         const { current, coef } = comp.cAnimation.storage;
-        const { keys } = comp.cInput.storage;
+        const { actions, jumping } = comp.cInputRunner.storage;
         const { vx, vy } = comp.cVelocity.storage;
         const { air, speed } = comp.cMeta.storage;
         for (const e of entities) {
-          if (!keys[e].size) {
+          if (!actions[e].size) {
             current[e] = air[e] ? 2 : 1;
             coef[e] = 0.24
             continue;
           }
-          if (keys[e].has("KeyQ"))      vx[e] -= speed[e], coef[e] = 0.12, current[e] = 1;
-          else if (keys[e].has("KeyW")) vx[e] += speed[e], coef[e] = 0.48, current[e] = 1;
-          if (keys[e].has("KeyP"))      !air[e] && (air[e] = true, vy[e] = -10);
+          if (actions[e].has("Left"))      vx[e] -= speed[e], coef[e] = 0.12, current[e] = 1;
+          else if (actions[e].has("Right")) vx[e] += speed[e], coef[e] = 0.48, current[e] = 1;
+          if (actions[e].has("Jump"))      !air[e] && (air[e] = true, vy[e] = -10);
         }
       },
     ),
