@@ -497,21 +497,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+// 0xfff5ca75
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([
     {
-        name: "TestConfig", bgwidth: 10, length: 200,
-        bgfill: 0xff002200, fgfill: 0xff002200,
+        name: "MorningCity", bgwidth: 10, length: 2000,
+        bgfill: 0xfff5ca75, fgfill: 0xff002200,
         bgrows: [
-            { layout: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], offset: 0.5, speed: 1.0, colors: [0x00000000, 0xff3366ee, 0xff2d1f1e] },
-            { layout: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], offset: 0.0, speed: 2.0, colors: [0x00000000, 0xff2d1f1e, 0xff2255bb] },
-            { layout: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], offset: 2.5, speed: 2.0, colors: [0xffee6633, 0x00000000, 0x00000000] },
-            { layout: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3], offset: 3.0, speed: 3.0, colors: [0xff883311, 0x00000000, 0x00000000] },
-            { layout: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3], offset: 3.5, speed: 3.5, colors: [0xffee6633, 0x00000000, 0x00000000] },
-            { layout: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3], offset: 4.0, speed: 4.0, colors: [0xff883311, 0x00000000, 0x00000000] },
+            { layout: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], offset: 0.5, speed: 1.0, colors: [0x00000000, 0xffe5aa45, 0xffeac770] },
+            { layout: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], offset: 0.0, speed: 2.0, colors: [0x00000000, 0xffd59a55, 0xffb57a35] },
+            { layout: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], offset: 2.5, speed: 2.0, colors: [0xff556622, 0x00000000, 0x00000000] },
+            { layout: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], offset: 3.0, speed: 3.0, colors: [0xff445522, 0x00000000, 0x00000000] },
+            { layout: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3], offset: 3.5, speed: 3.5, colors: [0xff33312e, 0x00000000, 0x00000000] },
+            { layout: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5], offset: 4.0, speed: 4.0, colors: [0xff222120, 0xff303030, 0x00000000] },
         ],
     },
     {
-        name: "SunsetCity", bgwidth: 10, length: 300,
+        name: "SunsetCity", bgwidth: 10, length: 3000,
         bgfill: 0xff4499fd, fgfill: 0xff202122,
         bgrows: [
             { layout: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], offset: 0.5, speed: 1.0, colors: [0x00000000, 0xff3366ee, 0xff2244aa] },
@@ -523,7 +524,7 @@ __webpack_require__.r(__webpack_exports__);
         ],
     },
     {
-        name: "NightCity", bgwidth: 10, length: 3000,
+        name: "NightCity", bgwidth: 10, length: 5000,
         bgfill: 0xff361d20, fgfill: 0xff2b1b1b,
         bgrows: [
             { layout: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], offset: 0.5, speed: 1.0, colors: [0x00000000, 0xff402026, 0xff6a3e4f] },
@@ -846,6 +847,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   platformPlacer: () => (/* binding */ platformPlacer)
 /* harmony export */ });
 /* harmony import */ var _bitmap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./bitmap */ "./src/bitmap.ts");
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! . */ "./src/index.ts");
+
 
 var bulkTileableBitmapLoad = function (adapter) {
     var configs = [];
@@ -923,14 +926,25 @@ var collision = {
 //   last = { x, y };
 //   return [nx, ny];
 // })({ x: 0, y: 0 }, 96, 48);
-var platformPlacer = (function (last, maxw, maxh) { return function (px, py, pw, ph) {
+var platformPlacer = (function (last, maxw, maxh) { return function (px, py, pw, ph, e) {
     var grid = 16;
     var x = last.x, y = last.y;
     var dx = x + 16;
     var dy = y;
-    last = { x: dx, y: dy };
+    ___WEBPACK_IMPORTED_MODULE_1__.debug.set("".concat(e, ": ").concat(px.toFixed(2), " ").concat(py.toFixed(2), " size: ").concat(pw, " ").concat(ph), "Last: ".concat(x.toFixed(2), " ").concat(y.toFixed(2)), "Dest: ".concat(dx, " ").concat(dy, " - ").concat(dx | 0, " ").concat(dy | 0));
+    console.log("".concat(e, ": ").concat(px.toFixed(2), " ").concat(py.toFixed(2), " size: ").concat(pw, " ").concat(ph), "Last: ".concat(x.toFixed(2), " ").concat(y.toFixed(2)), "Dest: ".concat(dx, " ").concat(dy, " - ").concat(dx | 0, " ").concat(dy | 0));
+    last = { x: dx + pw, y: dy };
     return [dx | 0, dy | 0];
 }; })({ x: 0, y: 0 }, 96, 48);
+/*
+1: -97.51  120.00 size: 96  96 Last: 0.00   0.00 Dest: 16  0 - 16  0
+2: -192.58 120.00 size: 192 64 Last: 112.00 0.00 Dest: 128 0 - 128 0
+1: -96.05  120.00 size: 96  96 Last: 320.00 0.00 Dest: 336 0 - 336 0
+2: -193.00 120.00 size: 192 64 Last: 432.00 0.00 Dest: 448 0 - 448 0
+1: -97.01  120.00 size: 96  96 Last: 640.00 0.00 Dest: 656 0 - 656 0
+2: -193.30 120.00 size: 192 64 Last: 752.00 0.00 Dest: 768 0 - 768 0
+1: -96.08  120.00 size: 96  96 Last: 960.00 0.00 Dest: 976 0 - 976 0
+*/
 /*
 grid: 16
 c17 r8 - right bottom
@@ -939,6 +953,150 @@ c0 r0 - left top (0, 0 x,y coords)
 c20 - next screen
 r10 - bottom
 */
+
+
+/***/ }),
+
+/***/ "./src/index.ts":
+/*!**********************!*\
+  !*** ./src/index.ts ***!
+  \**********************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   debug: () => (/* binding */ debug)
+/* harmony export */ });
+/* harmony import */ var _runnerGame__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./runnerGame */ "./src/runnerGame.ts");
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+// import { init } from "./main";
+
+var debug = {};
+window.addEventListener("load", function () { return __awaiter(void 0, void 0, void 0, function () {
+    var debugEl, width, height, screen, overlay, buttons, actions, actionsMapping, _i, buttons_1, btn, game;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                debugEl = document.getElementById("debug");
+                debug.set = function () {
+                    var msg = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        msg[_i] = arguments[_i];
+                    }
+                    return (debugEl.innerHTML = msg.join(", "));
+                };
+                debug.add = function () {
+                    var msg = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        msg[_i] = arguments[_i];
+                    }
+                    return (debugEl.innerHTML += "<br>" + msg.join(", "));
+                };
+                width = 320;
+                height = 160;
+                console.log(document);
+                screen = document.getElementById("screen");
+                overlay = document.getElementById("overlay");
+                overlay.set = function () {
+                    var msg = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        msg[_i] = arguments[_i];
+                    }
+                    return (debugEl.innerHTML = msg.join("<br>"));
+                };
+                overlay.add = function () {
+                    var msg = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        msg[_i] = arguments[_i];
+                    }
+                    return (debugEl.innerHTML += msg.join("<br>"));
+                };
+                buttons = [
+                    document.getElementById("btn-left"),
+                    document.getElementById("btn-right"),
+                    document.getElementById("btn-jump"),
+                ];
+                screen.width = width;
+                screen.height = height;
+                actions = new Set();
+                actionsMapping = {
+                    KeyQ: "Left", KeyW: "Right", KeyP: "Jump",
+                    KeyA: "Left", KeyD: "Right", Space: "Jump",
+                    ArrowLeft: "Left", ArrowRight: "Right", ArrowUp: "Jump",
+                    "btn-left": "Left", "btn-right": "Right", "btn-jump": "Jump",
+                };
+                window.addEventListener("keydown", function (_a) {
+                    var code = _a.code;
+                    return actionsMapping[code] && actions.add(actionsMapping[code]);
+                });
+                window.addEventListener("keyup", function (_a) {
+                    var code = _a.code;
+                    return actionsMapping[code] && actions.delete(actionsMapping[code]);
+                });
+                for (_i = 0, buttons_1 = buttons; _i < buttons_1.length; _i++) {
+                    btn = buttons_1[_i];
+                    btn.addEventListener("touchstart", function (_a) {
+                        var id = _a.target.id;
+                        return actionsMapping[id] && actions.add(actionsMapping[id]);
+                    });
+                    btn.addEventListener("touchend", function (_a) {
+                        var id = _a.target.id;
+                        return actionsMapping[id] && actions.delete(actionsMapping[id]);
+                    });
+                    btn.addEventListener("mousedown", function (_a) {
+                        var id = _a.target.id;
+                        return actionsMapping[id] && actions.add(actionsMapping[id]);
+                    });
+                    btn.addEventListener("mouseup", function (_a) {
+                        var id = _a.target.id;
+                        return actionsMapping[id] && actions.delete(actionsMapping[id]);
+                    });
+                }
+                ;
+                return [4 /*yield*/, (0,_runnerGame__WEBPACK_IMPORTED_MODULE_0__["default"])({ screen: screen, overlay: overlay, width: width, height: height, actions: actions, fps: 1000 / 60 })];
+            case 1:
+                game = _a.sent();
+                game.engine.start();
+                console.log("INITIALIZED");
+                return [2 /*return*/];
+        }
+    });
+}); });
 
 
 /***/ }),
@@ -1021,9 +1179,9 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (function (config) { return __awaiter(void 0, void 0, void 0, function () {
-    var width, height, actions, screen, fps, adapter, screenCtx, screenImageData, viewport, playerTiles, bgTiles, houseTiles, playerSprites, houseSprites, currentStage, stages, world, _a, sMovement, sAnimation, sCollideBounds, sCollideShapes, sDrawing, sControllerRunner, sBuildingsRunner, eManager, ePlayer, createBuilding, eBuildings, collideBounds, collideShapes, platforms, move, draw, control, animate, render, update, engine;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+    var width, height, actions, screen, fps, adapter, screenCtx, screenImageData, viewport, playerTiles, bgTiles, houseTiles, playerSprites, houseSprites, colors, housePalletes, currentStage, stages, world, _a, sMovement, sAnimation, sCollideBounds, sCollideShapes, sDrawing, sControllerRunner, sBuildingsRunner, eManager, ePlayer, createBuilding, eBuildings, collideBounds, collideShapes, platforms, move, draw, control, animate, _b, x, y, render, update, engine;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
             case 0:
                 width = config.width, height = config.height, actions = config.actions, screen = config.screen, fps = config.fps;
                 adapter = new _adapter__WEBPACK_IMPORTED_MODULE_0__.Adapter();
@@ -1032,13 +1190,13 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                 viewport = _bitmap__WEBPACK_IMPORTED_MODULE_2__.Bitmap.from(screenImageData.data.buffer, width, height);
                 return [4 /*yield*/, adapter.loadImage(_assets_player_png__WEBPACK_IMPORTED_MODULE_7__["default"]).then(function (img) { return _bitmap__WEBPACK_IMPORTED_MODULE_2__.TileableBitmap.from(img.data, 16, 16, 4, 1); })];
             case 1:
-                playerTiles = _b.sent();
+                playerTiles = _c.sent();
                 return [4 /*yield*/, adapter.loadImage(_assets_backgrounds_png__WEBPACK_IMPORTED_MODULE_8__["default"]).then(function (img) { return _bitmap__WEBPACK_IMPORTED_MODULE_2__.TileableBitmap.from(img.data, 32, 32, 6, 1); })];
             case 2:
-                bgTiles = _b.sent();
+                bgTiles = _c.sent();
                 return [4 /*yield*/, adapter.loadImage(_assets_backgrounds_houses_png__WEBPACK_IMPORTED_MODULE_9__["default"]).then(function (img) { return _bitmap__WEBPACK_IMPORTED_MODULE_2__.TileableBitmap.from(img.data, 48, 32, 5, 1); })];
             case 3:
-                houseTiles = _b.sent();
+                houseTiles = _c.sent();
                 playerSprites = playerTiles.split().concat(playerTiles.flipV().split());
                 houseSprites = [
                     houseTiles.reorder([1, 0, 2, 2, 0, 1], 2, 3),
@@ -1055,16 +1213,20 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                     houseTiles.reorder([2, 4, 3, 1, 2, 2, 1, 3, 0, 2, 0, 0, 3, 0, 0], 5, 3),
                     houseTiles.reorder([0], 1, 1),
                 ];
+                colors = [0xff101010, 0xff303030, 0];
+                housePalletes = houseSprites.map(function (sprite) { return new _bitmap__WEBPACK_IMPORTED_MODULE_2__.BitmapPallete(sprite); });
+                housePalletes.forEach(function (p) { return p.pallete = colors; });
                 stages = _data_runner_stages__WEBPACK_IMPORTED_MODULE_10__["default"].map(function (config) { return new Stage(config, bgTiles, houseTiles); });
                 stages.forEach(function (stage, i) { return i > 0 && stages[i - 1].setNext(stage); });
                 stages.forEach(function (stage, i) { return stage.onfinish(function (curr, next) {
                     currentStage = next;
                     console.debug("Switching ".concat(i));
                 }); });
-                currentStage = stages[1];
+                currentStage = stages[0];
                 stages[stages.length - 1].onfinish(function () {
-                    // window.alert("You win!");
-                    console.log("You win!");
+                    window.alert("Дякую що увагу! Будьте щасливі!");
+                    engine.stop();
+                    // console.log("You win!");
                 });
                 world = new _world__WEBPACK_IMPORTED_MODULE_4__.World({ width: width, height: height, gravity: 0.5, friction: 0.75, skyColor: 0xffa09080 });
                 _a = (0,_systems__WEBPACK_IMPORTED_MODULE_5__.Systems)(world, viewport), sMovement = _a.sMovement, sAnimation = _a.sAnimation, sCollideBounds = _a.sCollideBounds, sCollideShapes = _a.sCollideShapes, sDrawing = _a.sDrawing, sControllerRunner = _a.sControllerRunner, sBuildingsRunner = _a.sBuildingsRunner;
@@ -1085,10 +1247,14 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                 }); };
                 eBuildings = [
                     // createBuilding(11, 0, 6),
-                    // createBuilding(0,  6, 7),
-                    createBuilding(1, 12, 6),
-                    // createBuilding(2,  18, 7),
-                    createBuilding(3, 24, 6),
+                    createBuilding(0, 0, 5),
+                    createBuilding(6, 8, 6),
+                    createBuilding(1, 16, 5),
+                    createBuilding(2, 24, 6),
+                    createBuilding(1, 32, 6),
+                    createBuilding(0, 40, 7),
+                    createBuilding(7, 48, 5),
+                    // createBuilding(3,  24, 6),
                 ];
                 collideBounds = sCollideBounds.setup([ePlayer]);
                 collideShapes = sCollideShapes.setup([ePlayer], eBuildings);
@@ -1097,6 +1263,7 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                 draw = sDrawing.setup(__spreadArray([ePlayer], eBuildings, true));
                 control = sControllerRunner.setup([ePlayer]);
                 animate = sAnimation.setup([ePlayer]);
+                _b = _components__WEBPACK_IMPORTED_MODULE_6__.cPosition.storage, x = _b.x, y = _b.y;
                 render = function (dt, time) {
                     currentStage.renderBg(dt, viewport);
                     animate(dt);
@@ -1105,6 +1272,10 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                 };
                 update = function (dt, time) {
                     currentStage.update(dt);
+                    if (y[ePlayer] > 200) {
+                        x[ePlayer] = 32;
+                        y[ePlayer] = 64;
+                    }
                     platforms(dt),
                         move(dt);
                     collideBounds(dt);
@@ -1165,6 +1336,8 @@ var Stage = /** @class */ (function () {
     Stage.prototype.renderFg = function (dt, viewport) {
     };
     Stage.prototype.interpolateBgPallete = function (step) {
+        if (!this.next)
+            return;
         var _a = this.config, sbgrows = _a.bgrows, sbgfill = _a.bgfill;
         var _b = this.next.config, dbgrows = _b.bgrows, dbgfill = _b.bgfill;
         this.bgFill = helpers.interpolate(sbgfill, dbgfill, step);
@@ -1276,11 +1449,7 @@ function Systems(world, viewport) {
                         vy[e] = 1;
                         y[e] = 0;
                         break;
-                    case _helpers__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Bottom:
-                        vy[e] = 0;
-                        y[e] = height - h[e];
-                        air[e] = false;
-                        break;
+                    // case CollisionSide.Bottom: vy[e] = 0; y[e] = height - h[e]; air[e] = false; break;
                 }
             }
         }),
@@ -1441,9 +1610,10 @@ function Systems(world, viewport) {
                 // no replace if still visible
                 if (x[e] >= -w[e])
                     continue;
-                var _c = (0,_helpers__WEBPACK_IMPORTED_MODULE_2__.platformPlacer)(x[e], y[e], w[e], h[e]), dx = _c[0], dy = _c[1];
-                x[e] += width + w[e] + dx;
-                y[e] += dy;
+                x[e] += width + w[e];
+                //const [dx, dy] = platformPlacer(x[e], y[e], w[e], h[e], e);
+                // x[e] += width + w[e] + dx;
+                // y[e] += dy;
             }
         }),
         // TODO: ability to add modifiers to the system
@@ -1812,149 +1982,12 @@ var StageBgRow = /** @class */ (function () {
 /******/ 	})();
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-(() => {
-/*!**********************!*\
-  !*** ./src/index.ts ***!
-  \**********************/
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   debug: () => (/* binding */ debug)
-/* harmony export */ });
-/* harmony import */ var _runnerGame__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./runnerGame */ "./src/runnerGame.ts");
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-// import { init } from "./main";
-
-var debug = {};
-window.addEventListener("load", function () { return __awaiter(void 0, void 0, void 0, function () {
-    var debugEl, width, height, screen, overlay, buttons, actions, actionsMapping, _i, buttons_1, btn, game;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                debugEl = document.getElementById("debug");
-                debug.set = function () {
-                    var msg = [];
-                    for (var _i = 0; _i < arguments.length; _i++) {
-                        msg[_i] = arguments[_i];
-                    }
-                    return (debugEl.innerHTML = msg.join(", "));
-                };
-                debug.add = function () {
-                    var msg = [];
-                    for (var _i = 0; _i < arguments.length; _i++) {
-                        msg[_i] = arguments[_i];
-                    }
-                    return (debugEl.innerHTML += "<br>" + msg.join(", "));
-                };
-                width = 320;
-                height = 160;
-                console.log(document);
-                screen = document.getElementById("screen");
-                overlay = document.getElementById("overlay");
-                overlay.set = function () {
-                    var msg = [];
-                    for (var _i = 0; _i < arguments.length; _i++) {
-                        msg[_i] = arguments[_i];
-                    }
-                    return (debugEl.innerHTML = msg.join("<br>"));
-                };
-                overlay.add = function () {
-                    var msg = [];
-                    for (var _i = 0; _i < arguments.length; _i++) {
-                        msg[_i] = arguments[_i];
-                    }
-                    return (debugEl.innerHTML += msg.join("<br>"));
-                };
-                buttons = [
-                    document.getElementById("btn-left"),
-                    document.getElementById("btn-right"),
-                    document.getElementById("btn-jump"),
-                ];
-                screen.width = width;
-                screen.height = height;
-                actions = new Set();
-                actionsMapping = {
-                    KeyQ: "Left", KeyW: "Right", KeyP: "Jump",
-                    KeyA: "Left", KeyD: "Right", Space: "Jump",
-                    ArrowLeft: "Left", ArrowRight: "Right", ArrowUp: "Jump",
-                    "btn-left": "Left", "btn-right": "Right", "btn-jump": "Jump",
-                };
-                window.addEventListener("keydown", function (_a) {
-                    var code = _a.code;
-                    return actionsMapping[code] && actions.add(actionsMapping[code]);
-                });
-                window.addEventListener("keyup", function (_a) {
-                    var code = _a.code;
-                    return actionsMapping[code] && actions.delete(actionsMapping[code]);
-                });
-                for (_i = 0, buttons_1 = buttons; _i < buttons_1.length; _i++) {
-                    btn = buttons_1[_i];
-                    btn.addEventListener("touchstart", function (_a) {
-                        var id = _a.target.id;
-                        return actionsMapping[id] && actions.add(actionsMapping[id]);
-                    });
-                    btn.addEventListener("touchend", function (_a) {
-                        var id = _a.target.id;
-                        return actionsMapping[id] && actions.delete(actionsMapping[id]);
-                    });
-                    btn.addEventListener("mousedown", function (_a) {
-                        var id = _a.target.id;
-                        return actionsMapping[id] && actions.add(actionsMapping[id]);
-                    });
-                    btn.addEventListener("mouseup", function (_a) {
-                        var id = _a.target.id;
-                        return actionsMapping[id] && actions.delete(actionsMapping[id]);
-                    });
-                }
-                ;
-                return [4 /*yield*/, (0,_runnerGame__WEBPACK_IMPORTED_MODULE_0__["default"])({ screen: screen, overlay: overlay, width: width, height: height, actions: actions, fps: 1000 / 60 })];
-            case 1:
-                game = _a.sent();
-                game.engine.start();
-                console.log("INITIALIZED");
-                return [2 /*return*/];
-        }
-    });
-}); });
-
-})();
-
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __webpack_require__("./src/index.ts");
+/******/ 	
 /******/ })()
 ;
 //# sourceMappingURL=main.js.map

@@ -46,7 +46,7 @@ export function Systems(world: World, viewport: Bitmap) {
             case CollisionSide.Left: vx[e] = 0; x[e] = 0; break;
             case CollisionSide.Right: vx[e] = 0; x[e] = width - w[e]; break;
             case CollisionSide.Top: vy[e] = 1; y[e] = 0; break;
-            case CollisionSide.Bottom: vy[e] = 0; y[e] = height - h[e]; air[e] = false; break;
+            // case CollisionSide.Bottom: vy[e] = 0; y[e] = height - h[e]; air[e] = false; break;
           }
         }
       },
@@ -209,9 +209,10 @@ export function Systems(world: World, viewport: Bitmap) {
           x[e] -= speed * dt;
           // no replace if still visible
           if (x[e] >= -w[e]) continue;
-          const [dx, dy] = platformPlacer(x[e], y[e], w[e], h[e]);
-          x[e] += width + w[e] + dx;
-          y[e] += dy;
+          x[e] += width + w[e];
+          //const [dx, dy] = platformPlacer(x[e], y[e], w[e], h[e], e);
+          // x[e] += width + w[e] + dx;
+          // y[e] += dy;
         }
       }
     ),

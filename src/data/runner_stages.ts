@@ -13,21 +13,23 @@ export type BgRow = {
   speed: number,
 };
 
+// 0xfff5ca75
+
 export default [
   {
-    name: "TestConfig", bgwidth: 10, length: 200,
-    bgfill: 0xff002200, fgfill: 0xff002200,
+    name: "MorningCity", bgwidth: 10, length: 2000,
+    bgfill: 0xfff5ca75, fgfill: 0xff002200,
     bgrows: [
-      { layout: [0,0,0,0,0,0,0,0,0,0], offset: 0.5, speed: 1.0, colors: [0x00000000, 0xff3366ee, 0xff2d1f1e] },
-      { layout: [0,0,0,0,0,0,0,0,0,0], offset: 0.0, speed: 2.0, colors: [0x00000000, 0xff2d1f1e, 0xff2255bb] },
-      { layout: [2,2,2,2,2,2,2,2,2,2], offset: 2.5, speed: 2.0, colors: [0xffee6633, 0x00000000, 0x00000000] },
-      { layout: [3,3,3,3,3,3,3,3,3,3], offset: 3.0, speed: 3.0, colors: [0xff883311, 0x00000000, 0x00000000] },
-      { layout: [3,3,3,3,3,3,3,3,3,3], offset: 3.5, speed: 3.5, colors: [0xffee6633, 0x00000000, 0x00000000] },
-      { layout: [3,3,3,3,3,3,3,3,3,3], offset: 4.0, speed: 4.0, colors: [0xff883311, 0x00000000, 0x00000000] },
+      { layout: [0,0,0,0,0,0,0,0,0,0], offset: 0.5, speed: 1.0, colors: [0x00000000, 0xffe5aa45, 0xffeac770] },
+      { layout: [0,0,0,0,0,0,0,0,0,0], offset: 0.0, speed: 2.0, colors: [0x00000000, 0xffd59a55, 0xffb57a35] },
+      { layout: [2,2,2,2,2,2,2,2,2,2], offset: 2.5, speed: 2.0, colors: [0xff556622, 0x00000000, 0x00000000] },
+      { layout: [2,2,2,2,2,2,2,2,2,2], offset: 3.0, speed: 3.0, colors: [0xff445522, 0x00000000, 0x00000000] },
+      { layout: [3,3,3,3,3,3,3,3,3,3], offset: 3.5, speed: 3.5, colors: [0xff33312e, 0x00000000, 0x00000000] },
+      { layout: [5,5,5,5,5,5,5,5,5,5], offset: 4.0, speed: 4.0, colors: [0xff222120, 0xff303030, 0x00000000] },
     ],
   },
   {
-    name: "SunsetCity", bgwidth: 10, length: 300,
+    name: "SunsetCity", bgwidth: 10, length: 3000,
     bgfill: 0xff4499fd, fgfill: 0xff202122,
     bgrows: [
       { layout: [0,0,0,0,0,0,0,0,0,0], offset: 0.5, speed: 1.0, colors: [0x00000000, 0xff3366ee, 0xff2244aa] },
@@ -39,7 +41,7 @@ export default [
     ],
   },
   {
-    name: "NightCity", bgwidth: 10, length: 3000,
+    name: "NightCity", bgwidth: 10, length: 5000,
     bgfill: 0xff361d20, fgfill: 0xff2b1b1b,
     bgrows: [
       { layout: [0,0,0,0,0,0,0,0,0,0], offset: 0.5, speed: 1.0, colors: [0x00000000, 0xff402026, 0xff6a3e4f] },

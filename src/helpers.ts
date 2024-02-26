@@ -106,16 +106,37 @@ export const collision = {
 export const platformPlacer = ((last, maxw, maxh) => (
   px: number, py: number,
   pw: number, ph: number,
+  e: number,
 ): [number, number] => {
   const grid = 16;
   let { x, y } = last;
   let dx = x + 16;
   let dy = y;
 
-  last = { x: dx, y: dy };
+  debug.set(
+    `${e}: ${px.toFixed(2)} ${py.toFixed(2)} size: ${pw} ${ph}`,
+    `Last: ${x.toFixed(2)} ${y.toFixed(2)}`,
+    `Dest: ${dx} ${dy} - ${dx | 0} ${dy | 0}`,
+  )
+  console.log(
+    `${e}: ${px.toFixed(2)} ${py.toFixed(2)} size: ${pw} ${ph}`,
+    `Last: ${x.toFixed(2)} ${y.toFixed(2)}`,
+    `Dest: ${dx} ${dy} - ${dx | 0} ${dy | 0}`,
+  );
+
+  last = { x: dx + pw, y: dy };
   return [dx | 0, dy | 0];
 })({ x: 0, y: 0 }, 96, 48);
 
+/*
+1: -97.51  120.00 size: 96  96 Last: 0.00   0.00 Dest: 16  0 - 16  0
+2: -192.58 120.00 size: 192 64 Last: 112.00 0.00 Dest: 128 0 - 128 0
+1: -96.05  120.00 size: 96  96 Last: 320.00 0.00 Dest: 336 0 - 336 0
+2: -193.00 120.00 size: 192 64 Last: 432.00 0.00 Dest: 448 0 - 448 0
+1: -97.01  120.00 size: 96  96 Last: 640.00 0.00 Dest: 656 0 - 656 0
+2: -193.30 120.00 size: 192 64 Last: 752.00 0.00 Dest: 768 0 - 768 0
+1: -96.08  120.00 size: 96  96 Last: 960.00 0.00 Dest: 976 0 - 976 0
+*/
 
 /*
 grid: 16

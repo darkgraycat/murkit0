@@ -50,9 +50,11 @@ export default async (config: GameConfig) => {
     houseTiles.reorder([2,4,3,1,2, 2,1,3,0,2, 0,0,3,0,0], 5, 3),
     houseTiles.reorder([0], 1, 1),
   ];
+  const colors = [0xff101010, 0xff303030, 0];
+  const housePalletes = houseSprites.map(sprite => new BitmapPallete(sprite));
+  housePalletes.forEach(p => p.pallete = colors);
 
   // TODO: the current pallete depends on progress
-  // i suggest to have some adjuster (1.2, 0.9. 0.8) for ex and apply it every N
   let currentStage: Stage;
   const stages = stageConfigs.map(config => new Stage(config, bgTiles, houseTiles));
 
@@ -61,11 +63,11 @@ export default async (config: GameConfig) => {
     currentStage = next;
     console.debug(`Switching ${i}`);
   }));
-  currentStage = stages[1];
+  currentStage = stages[0];
   stages[stages.length - 1].onfinish(() => {
-    // window.alert("You win!");
-    console.log("You win!");
-
+    window.alert("Дякую що увагу! Будьте щасливі!");
+    engine.stop();
+    // console.log("You win!");
   });
   // TODO: make 0 - entry, 3 - morning, 4 - ending
   //
@@ -94,13 +96,17 @@ export default async (config: GameConfig) => {
   });
   const eBuildings = [
     // createBuilding(11, 0, 6),
-    // createBuilding(0,  6, 7),
-    createBuilding(1,  12, 6),
-    // createBuilding(2,  18, 7),
-    createBuilding(3,  24, 6),
+    createBuilding(0,  0,  5),
+    createBuilding(6,  8, 6),
+    createBuilding(1,  16, 5),
+    createBuilding(2,  24, 6),
+    createBuilding(1,  32, 6),
+    createBuilding(0,  40, 7),
+    createBuilding(7,  48, 5),
+    // createBuilding(3,  24, 6),
   ];
-
-
+  // housePalletes[1].pallete = [ 0xff2d1f1e, 0xff2255bb ];
+  // housePalletes[3].pallete = [ 0xff302422, 0xff5060a0 ];
 
   // --------------------------------------------------------------------------
   const collideBounds = sCollideBounds.setup([ePlayer]);
@@ -111,6 +117,8 @@ export default async (config: GameConfig) => {
   const control = sControllerRunner.setup([ePlayer]);
   const animate = sAnimation.setup([ePlayer]);
 
+  const { x, y } = components.cPosition.storage;
+
   // --------------------------------------------------------------------------
   const render = (dt: number, time: number) => {
     currentStage.renderBg(dt, viewport);
@@ -120,6 +128,10 @@ export default async (config: GameConfig) => {
   };
   const update = (dt: number, time: number) => {
     currentStage.update(dt);
+    if (y[ePlayer] > 200) {
+      x[ePlayer] = 32;
+      y[ePlayer] = 64;
+    }
     platforms(dt),
     move(dt);
     collideBounds(dt);
@@ -205,6 +217,7 @@ class Stage {
 
   }
   interpolateBgPallete(step: number) {
+    if (!this.next) return;
     const { bgrows: sbgrows, bgfill: sbgfill } = this.config;
     const { bgrows: dbgrows, bgfill: dbgfill } = this.next.config;
     this.bgFill = helpers.interpolate(sbgfill, dbgfill, step);
