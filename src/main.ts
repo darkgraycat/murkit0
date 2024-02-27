@@ -76,16 +76,16 @@ export const init = async (config: MainConfig): Promise<void> => {
   world.skyColor = 0xff4499ff;
 
   // TODO: NOTE! HERE LEVEL
-  animatedBgPalletes[0].pallete = [0, 0xff3366ee, 0xff2244aa];
-  animatedBgPalletes[1].pallete = [0, 0xff113388, 0xff2255bb];
-  animatedBgPalletes[2].pallete = [0xff303030, 0];
-  animatedBgPalletes[3].pallete = [0xff292929, 0];
-  animatedBgPalletes[4].pallete = [0xff333333, 0xff206090];
-  animatedBgPalletes[5].pallete = [0xff303030, 0xff206090];
-  animatedBgPalletes[6].pallete = [0xff252525, 0xff206090];
-  animatedBgPalletes[7].pallete = [0xff202020, 0xff206090];
+  animatedBgPalletes[0].colors = [0, 0xff3366ee, 0xff2244aa];
+  animatedBgPalletes[1].colors = [0, 0xff113388, 0xff2255bb];
+  animatedBgPalletes[2].colors = [0xff303030, 0];
+  animatedBgPalletes[3].colors = [0xff292929, 0];
+  animatedBgPalletes[4].colors = [0xff333333, 0xff206090];
+  animatedBgPalletes[5].colors = [0xff303030, 0xff206090];
+  animatedBgPalletes[6].colors = [0xff252525, 0xff206090];
+  animatedBgPalletes[7].colors = [0xff202020, 0xff206090];
 
-  // animatedFgPalletes[0].pallete = [0, 0xff101010, 0xff303030];
+  // animatedFgPalletes[0].colors = [0, 0xff101010, 0xff303030];
 
   // debug tools
   const renderBench = benchmark("render bench", 2);

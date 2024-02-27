@@ -1,5 +1,5 @@
 import { Adapter } from "./adapter";
-import { Engine, TimeoutEngine } from "./engine";
+import { Engine, TimeoutEngine, WindowRafEngine } from "./engine";
 import { Bitmap, BitmapPallete, TileableBitmap } from "./bitmap";
 
 import { EntityManager } from "./ecs/simple.ecs";
@@ -52,7 +52,7 @@ export default async (config: GameConfig) => {
   ];
   const colors = [0xff101010, 0xff303030, 0];
   const housePalletes = houseSprites.map(sprite => new BitmapPallete(sprite));
-  housePalletes.forEach(p => p.pallete = colors);
+  housePalletes.forEach(p => p.colors = colors);
 
   // TODO: the current pallete depends on progress
   let currentStage: Stage;
@@ -84,7 +84,7 @@ export default async (config: GameConfig) => {
     cPosition: { x: 32, y: 64 },
     cVelocity: { vx: 0, vy: 0 },
     cShape: { w: 10, h: 14 },
-    cMeta: { air: true, speed: 0.6, power: 6 },
+    cMeta: { air: true, speed: 0.6, power: 4 },
     cInputRunner: { actions, jumping: false, acceleration: 0 },
     cSprite: { spriteIdx: 0, sprites: playerSprites, offsetX: -3, offsetY: -2 },
     cAnimation: { animations: [ [0, 0, 3, 3], [1, 2, 3, 0], [1, 1, 2, 2] ], current: 0, length: 4, time: 0, coef: 0.4 },
@@ -105,8 +105,8 @@ export default async (config: GameConfig) => {
     createBuilding(7,  48, 5),
     // createBuilding(3,  24, 6),
   ];
-  // housePalletes[1].pallete = [ 0xff2d1f1e, 0xff2255bb ];
-  // housePalletes[3].pallete = [ 0xff302422, 0xff5060a0 ];
+  // housePalletes[1].colors = [ 0xff2d1f1e, 0xff2255bb ];
+  // housePalletes[3].colors = [ 0xff302422, 0xff5060a0 ];
 
   // --------------------------------------------------------------------------
   const collideBounds = sCollideBounds.setup([ePlayer]);
@@ -139,8 +139,11 @@ export default async (config: GameConfig) => {
     control(dt);
   };
   // --------------------------------------------------------------------------
-  const engine = new Engine(adapter, fps, update, render, 60 / 1000);
+  // const engine = new Engine(adapter, fps, update, render, 60 / 1000);
   // const engine = new TimeoutEngine(adapter, fps, update, render, 60 / 1000);
+  const engine = new WindowRafEngine(adapter, fps, update, render, 60 / 1000);
+  // TODO: try raf engine
+  //
 
   return { engine }
 }
@@ -189,7 +192,7 @@ class Stage {
       const { layout, colors, offset, speed } = bgrows[i];
       const sprite = bgTiles.reorder(layout.concat(layout), bgwidth * 2, 1);
       const pallete = new BitmapPallete(sprite);
-      pallete.pallete = colors; 
+      pallete.colors = colors; 
       this.bgRows[i] = { sprite, pallete, speed: speed * speedQuickFix, shift: 0, offset: offset * sprite.theight };
     }
   }
@@ -225,7 +228,7 @@ class Stage {
       const spal = sbgrows[i].colors;
       const dpal = dbgrows[i].colors;
       const colors = spal.map((_, j) => helpers.interpolate(spal[j], dpal[j], step));
-      row.pallete.pallete = colors;
+      row.pallete.colors = colors;
     });
   }
   setNext(stage: Stage) {

@@ -270,13 +270,13 @@ export class BitmapPallete {
 
   /** Get pallete as array of numbers
   * @returns colors */
-  public get pallete(): number[] {
+  public get colors(): number[] {
     return Array.from(this.palleteData);
   }
 
   /** Set new pallete and apply on source Bitmap
   * @param pallete new pallete to apply */
-  public set pallete(pallete: number[]) {
+  public set colors(pallete: number[]) {
     const length = this.palleteData.length;
     this.palleteData.set(pallete.slice(0, length));
     this.remap();

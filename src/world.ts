@@ -120,7 +120,7 @@ export type StageConfig = {
  
      const parsedBgLayout = bgLayout.map(row => tiles.reorder(row.concat(row), row.length * 2, 1));
      const parsedBgColors = parsedBgLayout.map((tbitmap) => new BitmapPallete(tbitmap));
-     bgColors.forEach((color, i) => parsedBgColors[i].pallete = color);
+     bgColors.forEach((colors, i) => parsedBgColors[i].colors = colors);
  
      return new Stage(name, parsedBgLayout, parsedBgColors, bgOffset, bgSpeed, bgFill, fgFill);
    }
@@ -205,7 +205,7 @@ export class StageBg {
       const rowOffset = offset[i];
       const rowSprite = tiles.reorder(rowLayout, rowLayout.length, 1);
       const rowColor = new BitmapPallete(rowSprite);
-      rowColor.pallete = colors[i];
+      rowColor.colors = colors[i];
       this.rows.push(new StageBgRow(rowSprite, rowSpeed, rowOffset));
     }
   }
@@ -229,7 +229,7 @@ export class StageBg {
   transition(layout: number[][], colors: number[][], bgFill: number, fgFill: number, tiles: TileableBitmap) {
     for (let i = 0; i < layout.length; i++) {
       const row = tiles.reorder(layout[i], layout[i].length, 1);
-      new BitmapPallete(row).pallete = colors[i];
+      new BitmapPallete(row).colors = colors[i];
       this.rows[i].transition(row);
     }
   }

@@ -14,7 +14,25 @@ export class Engine {
     readonly deltaCoef: number = 0.05,
   ) {}
 
-  async tick() {
+  start() {
+    if (this.running) return;
+    this.running = true;
+    this.tick();
+  }
+
+  stop() {
+    this.running = false;
+  }
+
+  isRunning() {
+    return this.running;
+  }
+
+  getTimestamp() {
+    return this.timestamp;
+  }
+
+  protected async tick() {
     while (this.running) {
       const now = this.adapter.now();
       const dt = (now - this.timestamp) * this.deltaCoef;
@@ -27,19 +45,10 @@ export class Engine {
     }
   }
 
-  start() {
-    if (this.running) return;
-    this.running = true;
-    this.tick();
-  }
-
-  stop() {
-    this.running = false;
-  }
 }
 
 export class TimeoutEngine extends Engine {
-  async tick() {
+  protected async tick() {
     if (!this.running) return;
     const now = this.adapter.now();
     const dt = (now - this.timestamp) * this.deltaCoef;
@@ -50,5 +59,20 @@ export class TimeoutEngine extends Engine {
     setTimeout(() => this.tick(), this.rate)
     this.update(dt, time);
     this.render(dt, time);
+  }
+}
+
+export class WindowRafEngine extends Engine {
+  protected async tick() {
+    if (!this.running) return;
+    const step = (now: number) => {
+      const dt = (now - this.timestamp) * this.deltaCoef;
+      const time = now * this.deltaCoef;
+      this.timestamp = now;
+      this.update(dt, time)
+      this.render(dt, time)
+      window.requestAnimationFrame(step);
+    };
+    step(this.adapter.now());
   }
 }

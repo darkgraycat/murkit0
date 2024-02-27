@@ -377,7 +377,7 @@ var BitmapPallete = /** @class */ (function () {
         this.palleteMap = new Uint8Array(map);
         this.palleteData = new Uint32Array(colors);
     }
-    Object.defineProperty(BitmapPallete.prototype, "pallete", {
+    Object.defineProperty(BitmapPallete.prototype, "colors", {
         /** Get pallete as array of numbers
         * @returns colors */
         get: function () {
@@ -701,7 +701,8 @@ var System = /** @class */ (function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Engine: () => (/* binding */ Engine),
-/* harmony export */   TimeoutEngine: () => (/* binding */ TimeoutEngine)
+/* harmony export */   TimeoutEngine: () => (/* binding */ TimeoutEngine),
+/* harmony export */   WindowRafEngine: () => (/* binding */ WindowRafEngine)
 /* harmony export */ });
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -765,6 +766,21 @@ var Engine = /** @class */ (function () {
         this.timestamp = 0;
         this.running = false;
     }
+    Engine.prototype.start = function () {
+        if (this.running)
+            return;
+        this.running = true;
+        this.tick();
+    };
+    Engine.prototype.stop = function () {
+        this.running = false;
+    };
+    Engine.prototype.isRunning = function () {
+        return this.running;
+    };
+    Engine.prototype.getTimestamp = function () {
+        return this.timestamp;
+    };
     Engine.prototype.tick = function () {
         return __awaiter(this, void 0, void 0, function () {
             var now, dt, time;
@@ -788,15 +804,6 @@ var Engine = /** @class */ (function () {
                 }
             });
         });
-    };
-    Engine.prototype.start = function () {
-        if (this.running)
-            return;
-        this.running = true;
-        this.tick();
-    };
-    Engine.prototype.stop = function () {
-        this.running = false;
     };
     return Engine;
 }());
@@ -826,6 +833,34 @@ var TimeoutEngine = /** @class */ (function (_super) {
         });
     };
     return TimeoutEngine;
+}(Engine));
+
+var WindowRafEngine = /** @class */ (function (_super) {
+    __extends(WindowRafEngine, _super);
+    function WindowRafEngine() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    WindowRafEngine.prototype.tick = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var step;
+            var _this = this;
+            return __generator(this, function (_a) {
+                if (!this.running)
+                    return [2 /*return*/];
+                step = function (now) {
+                    var dt = (now - _this.timestamp) * _this.deltaCoef;
+                    var time = now * _this.deltaCoef;
+                    _this.timestamp = now;
+                    _this.update(dt, time);
+                    _this.render(dt, time);
+                    window.requestAnimationFrame(step);
+                };
+                step(this.adapter.now());
+                return [2 /*return*/];
+            });
+        });
+    };
+    return WindowRafEngine;
 }(Engine));
 
 
@@ -1215,7 +1250,7 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                 ];
                 colors = [0xff101010, 0xff303030, 0];
                 housePalletes = houseSprites.map(function (sprite) { return new _bitmap__WEBPACK_IMPORTED_MODULE_2__.BitmapPallete(sprite); });
-                housePalletes.forEach(function (p) { return p.pallete = colors; });
+                housePalletes.forEach(function (p) { return p.colors = colors; });
                 stages = _data_runner_stages__WEBPACK_IMPORTED_MODULE_10__["default"].map(function (config) { return new Stage(config, bgTiles, houseTiles); });
                 stages.forEach(function (stage, i) { return i > 0 && stages[i - 1].setNext(stage); });
                 stages.forEach(function (stage, i) { return stage.onfinish(function (curr, next) {
@@ -1235,7 +1270,7 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                     cPosition: { x: 32, y: 64 },
                     cVelocity: { vx: 0, vy: 0 },
                     cShape: { w: 10, h: 14 },
-                    cMeta: { air: true, speed: 0.6, power: 6 },
+                    cMeta: { air: true, speed: 0.6, power: 4 },
                     cInputRunner: { actions: actions, jumping: false, acceleration: 0 },
                     cSprite: { spriteIdx: 0, sprites: playerSprites, offsetX: -3, offsetY: -2 },
                     cAnimation: { animations: [[0, 0, 3, 3], [1, 2, 3, 0], [1, 1, 2, 2]], current: 0, length: 4, time: 0, coef: 0.4 },
@@ -1282,8 +1317,9 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                     collideShapes(dt);
                     control(dt);
                 };
-                engine = new _engine__WEBPACK_IMPORTED_MODULE_1__.Engine(adapter, fps, update, render, 60 / 1000);
-                // const engine = new TimeoutEngine(adapter, fps, update, render, 60 / 1000);
+                engine = new _engine__WEBPACK_IMPORTED_MODULE_1__.WindowRafEngine(adapter, fps, update, render, 60 / 1000);
+                // TODO: try raf engine
+                //
                 return [2 /*return*/, { engine: engine }];
         }
     });
@@ -1306,7 +1342,7 @@ var Stage = /** @class */ (function () {
             var _a = bgrows[i], layout = _a.layout, colors = _a.colors, offset = _a.offset, speed = _a.speed;
             var sprite = bgTiles.reorder(layout.concat(layout), bgwidth * 2, 1);
             var pallete = new _bitmap__WEBPACK_IMPORTED_MODULE_2__.BitmapPallete(sprite);
-            pallete.pallete = colors;
+            pallete.colors = colors;
             this.bgRows[i] = { sprite: sprite, pallete: pallete, speed: speed * speedQuickFix, shift: 0, offset: offset * sprite.theight };
         }
     }
@@ -1345,7 +1381,7 @@ var Stage = /** @class */ (function () {
             var spal = sbgrows[i].colors;
             var dpal = dbgrows[i].colors;
             var colors = spal.map(function (_, j) { return helpers.interpolate(spal[j], dpal[j], step); });
-            row.pallete.pallete = colors;
+            row.pallete.colors = colors;
         });
     };
     Stage.prototype.setNext = function (stage) {
@@ -1751,7 +1787,7 @@ var Stage = /** @class */ (function () {
             throw new Error("Error during Stage parsing: ".concat(lengths));
         var parsedBgLayout = bgLayout.map(function (row) { return tiles.reorder(row.concat(row), row.length * 2, 1); });
         var parsedBgColors = parsedBgLayout.map(function (tbitmap) { return new _bitmap__WEBPACK_IMPORTED_MODULE_0__.BitmapPallete(tbitmap); });
-        bgColors.forEach(function (color, i) { return parsedBgColors[i].pallete = color; });
+        bgColors.forEach(function (colors, i) { return parsedBgColors[i].colors = colors; });
         return new Stage(name, parsedBgLayout, parsedBgColors, bgOffset, bgSpeed, bgFill, fgFill);
     };
     return Stage;
@@ -1826,7 +1862,7 @@ var StageBg = /** @class */ (function () {
             var rowOffset = offset[i];
             var rowSprite = tiles.reorder(rowLayout, rowLayout.length, 1);
             var rowColor = new _bitmap__WEBPACK_IMPORTED_MODULE_0__.BitmapPallete(rowSprite);
-            rowColor.pallete = colors[i];
+            rowColor.colors = colors[i];
             this.rows.push(new StageBgRow(rowSprite, rowSpeed, rowOffset));
         }
     }
@@ -1847,7 +1883,7 @@ var StageBg = /** @class */ (function () {
     StageBg.prototype.transition = function (layout, colors, bgFill, fgFill, tiles) {
         for (var i = 0; i < layout.length; i++) {
             var row = tiles.reorder(layout[i], layout[i].length, 1);
-            new _bitmap__WEBPACK_IMPORTED_MODULE_0__.BitmapPallete(row).pallete = colors[i];
+            new _bitmap__WEBPACK_IMPORTED_MODULE_0__.BitmapPallete(row).colors = colors[i];
             this.rows[i].transition(row);
         }
     };
