@@ -898,6 +898,10 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                     colorSpace: 'srgb',
                     willReadFrequently: true,
                 });
+                screenCtx.mozImageSmoothingEnabled = false;
+                screenCtx.webkitImageSmoothingEnabled = false;
+                screenCtx.msImageSmoothingEnabled = false;
+                screenCtx.imageSmoothingEnabled = false;
                 screenImageData = screenCtx.getImageData(0, 0, width, height);
                 viewport = _bitmap__WEBPACK_IMPORTED_MODULE_1__.Bitmap.from(screenImageData.data.buffer, width, height);
                 return [4 /*yield*/, _utils__WEBPACK_IMPORTED_MODULE_8__.fileHelpers.loadImagesAsTileableBitmaps([_assets_player_png__WEBPACK_IMPORTED_MODULE_9__["default"], 16, 16, 4, 1], [_assets_backgrounds_houses_png__WEBPACK_IMPORTED_MODULE_10__["default"], 48, 32, 5, 1], [_assets_backgrounds_png__WEBPACK_IMPORTED_MODULE_11__["default"], 32, 32, 6, 1])];

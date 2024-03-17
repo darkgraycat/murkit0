@@ -33,6 +33,10 @@ export default async (config: GameConfig) => {
     colorSpace: 'srgb',
     willReadFrequently: true,
   }) as CanvasRenderingContext2D;
+  screenCtx.mozImageSmoothingEnabled = false;
+  screenCtx.webkitImageSmoothingEnabled = false;
+  screenCtx.msImageSmoothingEnabled = false;
+  screenCtx.imageSmoothingEnabled = false;
   // const screenCtx = screen.getContext("2d") as CanvasRenderingContext2D;
   const screenImageData = screenCtx.getImageData(0, 0, width, height) as ImageData;
   const viewport = Bitmap.from(screenImageData.data.buffer, width, height);
