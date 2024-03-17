@@ -95,7 +95,7 @@ export default async (config: GameConfig) => {
     cPosition: { x: 32, y: 64 },
     cVelocity: { vx: 0, vy: 0 },
     cShape: { w: 10, h: 14 },
-    cMeta: { air: true, speed: 0.8, power: 6 },
+    cPlayer: { air: true, speed: 0.8, power: 6 },
     cInputRunner: { actions, jumping: false, acceleration: 0 },
     cSprite: { spriteIdx: 0, sprites: spritesPlayer, offsetX: -3, offsetY: -2 },
     cAnimation: { animations: [ [0, 0, 3, 3], [1, 2, 3, 0], [1, 1, 2, 2] ], current: 0, length: 4, time: 0, coef: 0.4 },
@@ -138,10 +138,10 @@ export default async (config: GameConfig) => {
   };
   const update = (dt: number, time: number) => {
     currentStage.update(dt);
-    if (y[ePlayer] > 200) { // reset player
-      x[ePlayer] = 32;
-      y[ePlayer] = 64;
-    }
+    // if (y[ePlayer] > 200) { // reset player
+    //   x[ePlayer] = 32;
+    //   y[ePlayer] = 64;
+    // }
     platforms(dt),
     move(dt);
     collideBounds(dt);
