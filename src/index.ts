@@ -40,7 +40,25 @@ window.addEventListener("load", async () => {
     btn.addEventListener("mouseup", ({ target: { id } }: any) => actionsMapping[id] && actions.delete(actionsMapping[id]))
   };
 
+  window.addEventListener("orientationchange", (event) => {
+    const message = `the orientation of the device is now ${event.target.screen.orientation.angle}`; 
+    alert(message);
+  });
+
   const game = await runnerGame({ screen, overlay, width, height, actions, fps: 1000/60 });
   game.engine.start();
   console.log("INITIALIZED");
 });
+
+function enableFS() {
+  const elem = document.getElementById("container");
+  const enterFullscreen = elem.requestFullscreen
+    || elem.webkitRequestFullscreen
+    || elem.msRequestFullscreen;
+  enterFullscreen();
+}
+function disableFS() {
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  }
+}

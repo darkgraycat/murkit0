@@ -1143,6 +1143,7 @@ function Systems(world, viewport) {
                     case _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Bottom:
                         x[e] = 32;
                         y[e] = 32;
+                        air[e] = true;
                         break;
                     case _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Left:
                         vx[e] = 0;
@@ -1753,6 +1754,10 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                     });
                 }
                 ;
+                window.addEventListener("orientationchange", function (event) {
+                    var message = "the orientation of the device is now ".concat(event.target.screen.orientation.angle);
+                    alert(message);
+                });
                 return [4 /*yield*/, (0,_runnerGame__WEBPACK_IMPORTED_MODULE_0__["default"])({ screen: screen, overlay: overlay, width: width, height: height, actions: actions, fps: 1000 / 60 })];
             case 1:
                 game = _a.sent();
@@ -1762,6 +1767,18 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
         }
     });
 }); });
+function enableFS() {
+    var elem = document.getElementById("container");
+    var enterFullscreen = elem.requestFullscreen
+        || elem.webkitRequestFullscreen
+        || elem.msRequestFullscreen;
+    enterFullscreen();
+}
+function disableFS() {
+    if (document.fullscreenElement) {
+        document.exitFullscreen();
+    }
+}
 
 })();
 

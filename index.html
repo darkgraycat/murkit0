@@ -19,6 +19,7 @@
       #debug { width: 98%; height: 100px; display: block; position: absolute; top: 500px }
 
       .button {
+        border: 1px solid red;
         background-color: var(--buttons-inactive);
         opacity: .1;
       }
@@ -27,18 +28,21 @@
         border-top: var(--buttons-size) solid transparent;
         border-bottom: var(--buttons-size) solid transparent;
         position: absolute;
+        margin: 20px;
       }
 
       .triangle-left {
         background-color: transparent;
         border-right: var(--buttons-size) solid var(--buttons-inactive);
         top: 0px; left: 0px;
+        margin: 20px;
       }
 
       .triangle-right {
         background-color: transparent;
         border-left: var(--buttons-size) solid var(--buttons-inactive);
         top: 0px; left: 20vw;
+        margin: 20px;
       }
 
       .circle-jump {
@@ -48,6 +52,7 @@
         width: 120px;
         height: 120px;
         border-radius: 120px;
+        margin: 20px;
       }
 
       .text { color: #ddf; font-family: monospace;}
@@ -65,6 +70,7 @@
           <div id="btn-right" class="button triangle triangle-right"></div>
           <div id="btn-jump" class="button circle-jump"></div>
         </div>
+        <button onclick="makeFs()">Fullscreen</button>
         <div id="overlay" class="text">󰄛Це демоверсія гри про пригоди коцика Грицика󰄛</div>
       </div>
     <div id="debug" class="text"></div>
@@ -83,6 +89,16 @@
         colors.push(converted);
         console.log(converted);
         label.innerHTML = colors;
+      }
+      function makeFs() {
+        const screen = document.getElementById("screen");
+        if (screen.requestFullscreen) {
+          screen.requestFullscreen()
+        } else if (screen.webkitRequestFullscreen) { /* Safari */
+          screen.webkitRequestFullscreen();
+        } else if (screen.msRequestFullscreen) { /* IE11 */
+          screen.msRequestFullscreen();
+        }
       }
     </script>
   </body>

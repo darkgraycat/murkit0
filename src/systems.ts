@@ -39,7 +39,7 @@ export function Systems(world: World, viewport: Bitmap) {
           );
           if (collisionSide == CollisionSide.None) continue;
           switch (collisionSide) {
-            case CollisionSide.Bottom: x[e] = 32; y[e] = 32; break;
+            case CollisionSide.Bottom: x[e] = 32; y[e] = 32; air[e] = true; break;
             case CollisionSide.Left: vx[e] = 0; x[e] = 0; break;
             case CollisionSide.Right: vx[e] = 0; x[e] = width - w[e]; break;
             case CollisionSide.Top: vy[e] = 1; y[e] = 0; break;
