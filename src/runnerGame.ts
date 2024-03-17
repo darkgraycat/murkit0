@@ -1,5 +1,5 @@
 import { Engine, TimeoutEngine, WindowRafEngine } from "./engine";
-import { Bitmap, BitmapPallete } from "./bitmap";
+import { Bitmap, BitmapPallete, TileableBitmap } from "./bitmap";
 
 import { EntityManager } from "./ecs/simple.ecs";
 import * as components from "./components";
@@ -7,13 +7,15 @@ import { Systems } from "./systems";
 import { World } from "./world";
 import { Stage } from "./stage";
 
-import stageConfigs from "./data/runner_stages";
+import runnerStages from "./data/runner_stages";
+import runnerSprites from "./data/runner_sprites";
 
 import { fileHelpers } from "./utils";
 
-import assetsPlayer from "../assets/player.png";
-import assetsHouses from "../assets/backgrounds_houses.png";
-import assetsBackgrounds from "../assets/backgrounds.png";
+// import assetsPlayer from "../assets/player.png";
+// import assetsHouses from "../assets/backgrounds_houses.png";
+// import assetsBackgrounds from "../assets/backgrounds.png";
+
 
 export type GameConfig = {
   width: number;
@@ -46,11 +48,15 @@ export default async (config: GameConfig) => {
   const viewport = Bitmap.from(screenImageData.data.buffer, width, height);
 
   // --------------------------------------------------------------------------
-  const [tilesPlayer, tilesHouses, tilesBg] = await fileHelpers.loadImagesAsTileableBitmaps(
-    [assetsPlayer, 16, 16, 4, 1],
-    [assetsHouses, 48, 32, 5, 1],
-    [assetsBackgrounds, 32, 32, 6, 1],
-  );
+  // const [tilesPlayer, tilesHouses, tilesBg] = await fileHelpers.loadImagesAsTileableBitmaps(
+  //   [assetsPlayer, 16, 16, 4, 1],
+  //   [assetsHouses, 48, 32, 5, 1],
+  //   [assetsBackgrounds, 32, 32, 6, 1],
+  // );
+  const tilesPlayer = fileHelpers.jsonToTileableBitmap(JSON.stringify(runnerSprites.player));
+  const tilesHouses = fileHelpers.jsonToTileableBitmap(JSON.stringify(runnerSprites.houses));
+  const tilesBg = fileHelpers.jsonToTileableBitmap(JSON.stringify(runnerSprites.backgrounds));
+
   const spritesPlayer = tilesPlayer.split().concat(tilesPlayer.flipV().split());
   const spritesHouses = [
     tilesHouses.reorder([1,0, 2,2, 0,1], 2, 3),
@@ -80,7 +86,7 @@ export default async (config: GameConfig) => {
       skyColor: 0xffa09080,
   });
   let currentStage: Stage;
-  const stages = stageConfigs.map(config => new Stage(
+  const stages = runnerStages.map(config => new Stage(
     world,
     config,
     tilesBg,
@@ -147,6 +153,7 @@ export default async (config: GameConfig) => {
     currentStage.renderBg(dt, viewport);
     animate(dt);
     draw(dt);
+
     screenCtx.putImageData(screenImageData, 0, 0);
   };
   const update = (dt: number, time: number) => {

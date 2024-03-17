@@ -52,6 +52,42 @@ export const fileHelpers = {
       }),
     ));
   },
+  bitmapToJSON(bitmap: Bitmap): string {
+    return JSON.stringify({
+      width: bitmap.width,
+      height: bitmap.height,
+      cols: 1,
+      rows: 1,
+      pixels: bitmap.pixels.toString(),
+    });
+  },
+  jsonToBitmap(json: string): Bitmap {
+    const { width, height, pixels } = JSON.parse(json);
+    return Bitmap.from(
+      pixels.split(",").map(Number),
+      width,
+      height,
+    );
+  },
+  tileableBitmapToJSON(tbitmap: TileableBitmap): string {
+    return JSON.stringify({
+      width: tbitmap.twidth,
+      height: tbitmap.theight,
+      cols: tbitmap.cols,
+      rows: tbitmap.rows,
+      pixels: tbitmap.pixels.toString(),
+    });
+  },
+  jsonToTileableBitmap(json: string): TileableBitmap {
+    const { width, height, cols, rows, pixels } = JSON.parse(json);
+    return TileableBitmap.from(
+      pixels.split(",").map(Number),
+      width,
+      height,
+      cols,
+      rows,
+    );
+  }
 };
 
 // color helpers
