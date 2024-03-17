@@ -1,19 +1,4 @@
-export type StageConfig = {
-  name: string,
-  length: number,
-  bgrows: BgRow[],
-  bgwidth: number,
-  bgfill: number,
-  fgfill: number,
-};
-export type BgRow = {
-  layout: number[],
-  colors: number[]
-  offset: number,
-  speed: number,
-};
-
-// 0xfff5ca75
+import { StageConfig } from "../stage";
 
 export default [
   {

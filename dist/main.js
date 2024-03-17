@@ -2,104 +2,6 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./assets/backgrounds.png":
-/*!********************************!*\
-  !*** ./assets/backgrounds.png ***!
-  \********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "0cf532bff767a70b1f42a0fbad6e2993.png");
-
-/***/ }),
-
-/***/ "./assets/backgrounds_houses.png":
-/*!***************************************!*\
-  !*** ./assets/backgrounds_houses.png ***!
-  \***************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "8187ace7b4001245dd05b63fe2dafb86.png");
-
-/***/ }),
-
-/***/ "./assets/player.png":
-/*!***************************!*\
-  !*** ./assets/player.png ***!
-  \***************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "f3db62483c3871176da392987e68805e.png");
-
-/***/ }),
-
-/***/ "./src/adapter.ts":
-/*!************************!*\
-  !*** ./src/adapter.ts ***!
-  \************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Adapter: () => (/* binding */ Adapter)
-/* harmony export */ });
-var Adapter = /** @class */ (function () {
-    function Adapter() {
-    }
-    /** Load image
-    * @param src URI
-    * @returns image
-    * */
-    Adapter.prototype.loadImage = function (src) {
-        return new Promise(function (resolve, reject) {
-            var image = new Image();
-            image.onload = function () {
-                var canvas = document.createElement("canvas");
-                var context = canvas.getContext("2d");
-                var width = image.width, height = image.height;
-                canvas.width = width;
-                canvas.height = height;
-                context.drawImage(image, 0, 0);
-                var imageData = context.getImageData(0, 0, width, height);
-                return resolve({ width: width, height: height, data: imageData.data.buffer });
-            };
-            image.onerror = function (error) {
-                console.error("ADAPTER: Error loading image:", src);
-                reject(error);
-            };
-            image.src = src;
-        });
-    };
-    /** Pause execution
-    * @param ms period in milliseconds
-    * */
-    Adapter.prototype.sleep = function (ms) {
-        return new Promise(function (resolve) { return setTimeout(resolve, ms); });
-    };
-    /** Get current time in milliseconds
-    * @returns time
-    * */
-    Adapter.prototype.now = function () {
-        return performance.now();
-    };
-    return Adapter;
-}());
-
-
-
-/***/ }),
-
 /***/ "./src/bitmap.ts":
 /*!***********************!*\
   !*** ./src/bitmap.ts ***!
@@ -497,7 +399,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-// 0xfff5ca75
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([
     {
         name: "MorningCity", bgwidth: 10, length: 2000,
@@ -704,6 +605,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   TimeoutEngine: () => (/* binding */ TimeoutEngine),
 /* harmony export */   WindowRafEngine: () => (/* binding */ WindowRafEngine)
 /* harmony export */ });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/utils.ts");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -755,10 +657,10 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+
 var Engine = /** @class */ (function () {
-    function Engine(adapter, rate, update, render, deltaCoef) {
+    function Engine(rate, update, render, deltaCoef) {
         if (deltaCoef === void 0) { deltaCoef = 0.05; }
-        this.adapter = adapter;
         this.rate = rate;
         this.update = update;
         this.render = render;
@@ -788,14 +690,12 @@ var Engine = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         if (!this.running) return [3 /*break*/, 2];
-                        now = this.adapter.now();
+                        now = _utils__WEBPACK_IMPORTED_MODULE_0__.timeHelpers.now();
                         dt = (now - this.timestamp) * this.deltaCoef;
                         time = now * this.deltaCoef;
                         this.timestamp = now;
-                        // calc next interval
-                        return [4 /*yield*/, this.adapter.sleep(this.rate)];
+                        return [4 /*yield*/, _utils__WEBPACK_IMPORTED_MODULE_0__.timeHelpers.sleep(this.rate)];
                     case 1:
-                        // calc next interval
                         _a.sent();
                         this.update(dt, time);
                         this.render(dt, time);
@@ -820,11 +720,10 @@ var TimeoutEngine = /** @class */ (function (_super) {
             return __generator(this, function (_a) {
                 if (!this.running)
                     return [2 /*return*/];
-                now = this.adapter.now();
+                now = _utils__WEBPACK_IMPORTED_MODULE_0__.timeHelpers.now();
                 dt = (now - this.timestamp) * this.deltaCoef;
                 time = now * this.deltaCoef;
                 this.timestamp = now;
-                // calc next interval
                 setTimeout(function () { return _this.tick(); }, this.rate);
                 this.update(dt, time);
                 this.render(dt, time);
@@ -855,7 +754,7 @@ var WindowRafEngine = /** @class */ (function (_super) {
                     _this.render(dt, time);
                     window.requestAnimationFrame(step);
                 };
-                step(this.adapter.now());
+                step(_utils__WEBPACK_IMPORTED_MODULE_0__.timeHelpers.now());
                 return [2 /*return*/];
             });
         });
@@ -863,275 +762,6 @@ var WindowRafEngine = /** @class */ (function (_super) {
     return WindowRafEngine;
 }(Engine));
 
-
-
-/***/ }),
-
-/***/ "./src/helpers.ts":
-/*!************************!*\
-  !*** ./src/helpers.ts ***!
-  \************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   CollisionSide: () => (/* binding */ CollisionSide),
-/* harmony export */   bulkTileableBitmapLoad: () => (/* binding */ bulkTileableBitmapLoad),
-/* harmony export */   collision: () => (/* binding */ collision),
-/* harmony export */   createStaticDrawableEntity: () => (/* binding */ createStaticDrawableEntity),
-/* harmony export */   platformPlacer: () => (/* binding */ platformPlacer)
-/* harmony export */ });
-/* harmony import */ var _bitmap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./bitmap */ "./src/bitmap.ts");
-/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! . */ "./src/index.ts");
-
-
-var bulkTileableBitmapLoad = function (adapter) {
-    var configs = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        configs[_i - 1] = arguments[_i];
-    }
-    return Promise.all(configs.map(function (_a) {
-        var path = _a[0], w = _a[1], h = _a[2], cols = _a[3], rows = _a[4];
-        return adapter
-            .loadImage(path)
-            .then(function (img) { return _bitmap__WEBPACK_IMPORTED_MODULE_0__.TileableBitmap.from(img.data, w, h, cols, rows); })
-            .catch(function (error) {
-            console.error("HELPERS: bulkTileableBitmapLoad", path, error);
-            return _bitmap__WEBPACK_IMPORTED_MODULE_0__.TileableBitmap.from(new ArrayBuffer(w * h), w, h, cols, rows);
-        });
-    }));
-};
-var createStaticDrawableEntity = function (em, sprites, spriteIdx, x, y, w, h) { return em.add({
-    cPosition: { x: x, y: y },
-    cShape: { w: w, h: h },
-    cSprite: { sprites: sprites, spriteIdx: spriteIdx, flipped: false },
-}); };
-var CollisionSide;
-(function (CollisionSide) {
-    CollisionSide["None"] = "none";
-    CollisionSide["Left"] = "left";
-    CollisionSide["Right"] = "right";
-    CollisionSide["Top"] = "top";
-    CollisionSide["Bottom"] = "bottom";
-})(CollisionSide || (CollisionSide = {}));
-var collision = {
-    circle: function (x0, y0, d0, x1, y1, d1) {
-        var dist = Math.sqrt(Math.pow((x1 - x0), 2) +
-            Math.pow((y1 - y0), 2));
-        return dist <= (d0 + d1);
-    },
-    rectangle: function (x0, y0, r0, b0, x1, y1, r1, b1) {
-        if (x0 > r1 || x1 > r0 || y0 > b1 || y1 > b0)
-            return CollisionSide.None;
-        var dx = Math.min(r0 - x1, r1 - x0);
-        var dy = Math.min(b0 - y1, b1 - y0);
-        return dx < dy
-            ? x0 > x1 ? CollisionSide.Left : CollisionSide.Right
-            : y0 > y1 ? CollisionSide.Top : CollisionSide.Bottom;
-    },
-    bounds: function (x0, y0, r0, b0, bl, bt, br, bb) {
-        if (y0 < bt)
-            return CollisionSide.Top;
-        if (b0 > bb)
-            return CollisionSide.Bottom;
-        if (x0 < bl)
-            return CollisionSide.Left;
-        if (r0 > br)
-            return CollisionSide.Right;
-        return CollisionSide.None;
-    }
-};
-// export const platformPlacer = ((last, maxw, maxh) => (
-//   px: number, py: number,
-//   pw: number, ph: number,
-// ): [number, number] => {
-//   const cell = 16;
-//   let { x, y } = last;
-//   let nx = Math.random() * 2 * (px - x);
-//   let ny = Math.random() * 2 * (py - y);
-//   if (nx > maxw) nx /= 2;
-//   if (ny > maxh) ny /= 2;
-//   if (ny + ph < 160) ny /= 2;
-//   
-//   nx = Math.round(nx / cell) * cell;
-//   ny = Math.round(ny / cell) * cell;
-//   x = Math.round(x / cell) * cell;
-//   y = Math.round(y / cell) * cell;
-// 
-//   last = { x, y };
-//   return [nx, ny];
-// })({ x: 0, y: 0 }, 96, 48);
-var platformPlacer = (function (last, maxw, maxh) { return function (px, py, pw, ph, e) {
-    var grid = 16;
-    var x = last.x, y = last.y;
-    var dx = x + 16;
-    var dy = y;
-    ___WEBPACK_IMPORTED_MODULE_1__.debug.set("".concat(e, ": ").concat(px.toFixed(2), " ").concat(py.toFixed(2), " size: ").concat(pw, " ").concat(ph), "Last: ".concat(x.toFixed(2), " ").concat(y.toFixed(2)), "Dest: ".concat(dx, " ").concat(dy, " - ").concat(dx | 0, " ").concat(dy | 0));
-    console.log("".concat(e, ": ").concat(px.toFixed(2), " ").concat(py.toFixed(2), " size: ").concat(pw, " ").concat(ph), "Last: ".concat(x.toFixed(2), " ").concat(y.toFixed(2)), "Dest: ".concat(dx, " ").concat(dy, " - ").concat(dx | 0, " ").concat(dy | 0));
-    last = { x: dx + pw, y: dy };
-    return [dx | 0, dy | 0];
-}; })({ x: 0, y: 0 }, 96, 48);
-/*
-1: -97.51  120.00 size: 96  96 Last: 0.00   0.00 Dest: 16  0 - 16  0
-2: -192.58 120.00 size: 192 64 Last: 112.00 0.00 Dest: 128 0 - 128 0
-1: -96.05  120.00 size: 96  96 Last: 320.00 0.00 Dest: 336 0 - 336 0
-2: -193.00 120.00 size: 192 64 Last: 432.00 0.00 Dest: 448 0 - 448 0
-1: -97.01  120.00 size: 96  96 Last: 640.00 0.00 Dest: 656 0 - 656 0
-2: -193.30 120.00 size: 192 64 Last: 752.00 0.00 Dest: 768 0 - 768 0
-1: -96.08  120.00 size: 96  96 Last: 960.00 0.00 Dest: 976 0 - 976 0
-*/
-/*
-grid: 16
-c17 r8 - right bottom
-c0 r8 - left bottom
-c0 r0 - left top (0, 0 x,y coords)
-c20 - next screen
-r10 - bottom
-*/
-
-
-/***/ }),
-
-/***/ "./src/index.ts":
-/*!**********************!*\
-  !*** ./src/index.ts ***!
-  \**********************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   debug: () => (/* binding */ debug)
-/* harmony export */ });
-/* harmony import */ var _runnerGame__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./runnerGame */ "./src/runnerGame.ts");
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-// import { init } from "./main";
-
-var debug = {};
-window.addEventListener("load", function () { return __awaiter(void 0, void 0, void 0, function () {
-    var debugEl, width, height, screen, overlay, buttons, actions, actionsMapping, _i, buttons_1, btn, game;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                debugEl = document.getElementById("debug");
-                debug.set = function () {
-                    var msg = [];
-                    for (var _i = 0; _i < arguments.length; _i++) {
-                        msg[_i] = arguments[_i];
-                    }
-                    return (debugEl.innerHTML = msg.join(", "));
-                };
-                debug.add = function () {
-                    var msg = [];
-                    for (var _i = 0; _i < arguments.length; _i++) {
-                        msg[_i] = arguments[_i];
-                    }
-                    return (debugEl.innerHTML += "<br>" + msg.join(", "));
-                };
-                width = 320;
-                height = 160;
-                console.log(document);
-                screen = document.getElementById("screen");
-                overlay = document.getElementById("overlay");
-                overlay.set = function () {
-                    var msg = [];
-                    for (var _i = 0; _i < arguments.length; _i++) {
-                        msg[_i] = arguments[_i];
-                    }
-                    return (debugEl.innerHTML = msg.join("<br>"));
-                };
-                overlay.add = function () {
-                    var msg = [];
-                    for (var _i = 0; _i < arguments.length; _i++) {
-                        msg[_i] = arguments[_i];
-                    }
-                    return (debugEl.innerHTML += msg.join("<br>"));
-                };
-                buttons = [
-                    document.getElementById("btn-left"),
-                    document.getElementById("btn-right"),
-                    document.getElementById("btn-jump"),
-                ];
-                screen.width = width;
-                screen.height = height;
-                actions = new Set();
-                actionsMapping = {
-                    KeyQ: "Left", KeyW: "Right", KeyP: "Jump",
-                    KeyA: "Left", KeyD: "Right", Space: "Jump",
-                    ArrowLeft: "Left", ArrowRight: "Right", ArrowUp: "Jump",
-                    "btn-left": "Left", "btn-right": "Right", "btn-jump": "Jump",
-                };
-                window.addEventListener("keydown", function (_a) {
-                    var code = _a.code;
-                    return actionsMapping[code] && actions.add(actionsMapping[code]);
-                });
-                window.addEventListener("keyup", function (_a) {
-                    var code = _a.code;
-                    return actionsMapping[code] && actions.delete(actionsMapping[code]);
-                });
-                for (_i = 0, buttons_1 = buttons; _i < buttons_1.length; _i++) {
-                    btn = buttons_1[_i];
-                    btn.addEventListener("touchstart", function (_a) {
-                        var id = _a.target.id;
-                        return actionsMapping[id] && actions.add(actionsMapping[id]);
-                    });
-                    btn.addEventListener("touchend", function (_a) {
-                        var id = _a.target.id;
-                        return actionsMapping[id] && actions.delete(actionsMapping[id]);
-                    });
-                    btn.addEventListener("mousedown", function (_a) {
-                        var id = _a.target.id;
-                        return actionsMapping[id] && actions.add(actionsMapping[id]);
-                    });
-                    btn.addEventListener("mouseup", function (_a) {
-                        var id = _a.target.id;
-                        return actionsMapping[id] && actions.delete(actionsMapping[id]);
-                    });
-                }
-                ;
-                return [4 /*yield*/, (0,_runnerGame__WEBPACK_IMPORTED_MODULE_0__["default"])({ screen: screen, overlay: overlay, width: width, height: height, actions: actions, fps: 1000 / 60 })];
-            case 1:
-                game = _a.sent();
-                game.engine.start();
-                console.log("INITIALIZED");
-                return [2 /*return*/];
-        }
-    });
-}); });
 
 
 /***/ }),
@@ -1146,17 +776,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _adapter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./adapter */ "./src/adapter.ts");
-/* harmony import */ var _engine__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./engine */ "./src/engine.ts");
-/* harmony import */ var _bitmap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./bitmap */ "./src/bitmap.ts");
-/* harmony import */ var _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ecs/simple.ecs */ "./src/ecs/simple.ecs.ts");
-/* harmony import */ var _world__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./world */ "./src/world.ts");
-/* harmony import */ var _systems__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./systems */ "./src/systems.ts");
-/* harmony import */ var _components__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components */ "./src/components.ts");
-/* harmony import */ var _assets_player_png__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../assets/player.png */ "./assets/player.png");
-/* harmony import */ var _assets_backgrounds_png__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../assets/backgrounds.png */ "./assets/backgrounds.png");
-/* harmony import */ var _assets_backgrounds_houses_png__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../assets/backgrounds_houses.png */ "./assets/backgrounds_houses.png");
-/* harmony import */ var _data_runner_stages__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./data/runner_stages */ "./src/data/runner_stages.ts");
+/* harmony import */ var _engine__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./engine */ "./src/engine.ts");
+/* harmony import */ var _bitmap__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./bitmap */ "./src/bitmap.ts");
+/* harmony import */ var _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ecs/simple.ecs */ "./src/ecs/simple.ecs.ts");
+/* harmony import */ var _components__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components */ "./src/components.ts");
+/* harmony import */ var _systems__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./systems */ "./src/systems.ts");
+/* harmony import */ var _world__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./world */ "./src/world.ts");
+/* harmony import */ var _stage__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./stage */ "./src/stage.ts");
+/* harmony import */ var _data_runner_stages__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./data/runner_stages */ "./src/data/runner_stages.ts");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./utils */ "./src/utils.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -1211,47 +839,47 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
 
 
 
-
-
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (function (config) { return __awaiter(void 0, void 0, void 0, function () {
-    var width, height, actions, screen, fps, adapter, screenCtx, screenImageData, viewport, playerTiles, bgTiles, houseTiles, playerSprites, houseSprites, colors, housePalletes, currentStage, stages, world, _a, sMovement, sAnimation, sCollideBounds, sCollideShapes, sDrawing, sControllerRunner, sBuildingsRunner, eManager, ePlayer, createBuilding, eBuildings, collideBounds, collideShapes, platforms, move, draw, control, animate, _b, x, y, render, update, engine;
+    var width, height, actions, screen, fps, screenCtx, screenImageData, viewport, _a, tilesPlayer, tilesHouses, tilesBg, spritesPlayer, spritesHouses, colors, palletesHouses, world, currentStage, stages, eManager, eSystems, ePlayer, createBuilding, eBuildings, collideBounds, collideShapes, platforms, move, draw, control, animate, _b, x, y, render, update, engine;
     return __generator(this, function (_c) {
         switch (_c.label) {
             case 0:
                 width = config.width, height = config.height, actions = config.actions, screen = config.screen, fps = config.fps;
-                adapter = new _adapter__WEBPACK_IMPORTED_MODULE_0__.Adapter();
                 screenCtx = screen.getContext("2d");
                 screenImageData = screenCtx.getImageData(0, 0, width, height);
-                viewport = _bitmap__WEBPACK_IMPORTED_MODULE_2__.Bitmap.from(screenImageData.data.buffer, width, height);
-                return [4 /*yield*/, adapter.loadImage(_assets_player_png__WEBPACK_IMPORTED_MODULE_7__["default"]).then(function (img) { return _bitmap__WEBPACK_IMPORTED_MODULE_2__.TileableBitmap.from(img.data, 16, 16, 4, 1); })];
+                viewport = _bitmap__WEBPACK_IMPORTED_MODULE_1__.Bitmap.from(screenImageData.data.buffer, width, height);
+                return [4 /*yield*/, _utils__WEBPACK_IMPORTED_MODULE_8__.fileHelpers.loadImagesAsTileableBitmaps(["../assets/player.png", 16, 16, 4, 1], ["../assets/backgrounds_houses.png", 48, 32, 5, 1], ["../assets/backgrounds.png", 32, 32, 6, 1])];
             case 1:
-                playerTiles = _c.sent();
-                return [4 /*yield*/, adapter.loadImage(_assets_backgrounds_png__WEBPACK_IMPORTED_MODULE_8__["default"]).then(function (img) { return _bitmap__WEBPACK_IMPORTED_MODULE_2__.TileableBitmap.from(img.data, 32, 32, 6, 1); })];
-            case 2:
-                bgTiles = _c.sent();
-                return [4 /*yield*/, adapter.loadImage(_assets_backgrounds_houses_png__WEBPACK_IMPORTED_MODULE_9__["default"]).then(function (img) { return _bitmap__WEBPACK_IMPORTED_MODULE_2__.TileableBitmap.from(img.data, 48, 32, 5, 1); })];
-            case 3:
-                houseTiles = _c.sent();
-                playerSprites = playerTiles.split().concat(playerTiles.flipV().split());
-                houseSprites = [
-                    houseTiles.reorder([1, 0, 2, 2, 0, 1], 2, 3),
-                    houseTiles.reorder([2, 2, 1, 1, 1, 1], 2, 3),
-                    houseTiles.reorder([3, 4, 3, 1, 2, 2], 2, 3),
-                    houseTiles.reorder([2, 2, 2, 2, 0, 0, 0, 0], 4, 2),
-                    houseTiles.reorder([1, 2, 3, 1, 0, 2, 2, 0], 4, 2),
-                    houseTiles.reorder([3, 4, 1, 4, 1, 3, 2, 4], 4, 2),
-                    houseTiles.reorder([1, 1, 1, 1], 2, 2),
-                    houseTiles.reorder([3, 2, 1, 1], 2, 2),
-                    houseTiles.reorder([1, 2, 2, 1, 1, 2, 2, 1, 0, 2, 2, 0], 4, 3),
-                    houseTiles.reorder([2, 0, 1, 4, 2, 0, 1, 1, 0, 0, 0, 0], 4, 3),
-                    houseTiles.reorder([1, 1, 1, 1, 2, 2, 3, 3], 2, 4),
-                    houseTiles.reorder([2, 4, 3, 1, 2, 2, 1, 3, 0, 2, 0, 0, 3, 0, 0], 5, 3),
-                    houseTiles.reorder([0], 1, 1),
+                _a = _c.sent(), tilesPlayer = _a[0], tilesHouses = _a[1], tilesBg = _a[2];
+                spritesPlayer = tilesPlayer.split().concat(tilesPlayer.flipV().split());
+                spritesHouses = [
+                    tilesHouses.reorder([1, 0, 2, 2, 0, 1], 2, 3),
+                    tilesHouses.reorder([2, 2, 1, 1, 1, 1], 2, 3),
+                    tilesHouses.reorder([3, 4, 3, 1, 2, 2], 2, 3),
+                    tilesHouses.reorder([2, 2, 2, 2, 0, 0, 0, 0], 4, 2),
+                    tilesHouses.reorder([1, 2, 3, 1, 0, 2, 2, 0], 4, 2),
+                    tilesHouses.reorder([3, 4, 1, 4, 1, 3, 2, 4], 4, 2),
+                    tilesHouses.reorder([1, 1, 1, 1], 2, 2),
+                    tilesHouses.reorder([3, 2, 1, 1], 2, 2),
+                    tilesHouses.reorder([1, 2, 2, 1, 1, 2, 2, 1, 0, 2, 2, 0], 4, 3),
+                    tilesHouses.reorder([2, 0, 1, 4, 2, 0, 1, 1, 0, 0, 0, 0], 4, 3),
+                    tilesHouses.reorder([1, 1, 1, 1, 2, 2, 3, 3], 2, 4),
+                    tilesHouses.reorder([2, 4, 3, 1, 2, 2, 1, 3, 0, 2, 0, 0, 3, 0, 0], 5, 3),
+                    tilesHouses.reorder([0], 1, 1),
                 ];
                 colors = [0xff101010, 0xff303030, 0];
-                housePalletes = houseSprites.map(function (sprite) { return new _bitmap__WEBPACK_IMPORTED_MODULE_2__.BitmapPallete(sprite); });
-                housePalletes.forEach(function (p) { return p.colors = colors; });
-                stages = _data_runner_stages__WEBPACK_IMPORTED_MODULE_10__["default"].map(function (config) { return new Stage(config, bgTiles, houseTiles); });
+                palletesHouses = spritesHouses.map(function (sprite) { return new _bitmap__WEBPACK_IMPORTED_MODULE_1__.BitmapPallete(sprite); });
+                palletesHouses.forEach(function (p) { return p.colors = colors; }); // TODO: remove
+                world = new _world__WEBPACK_IMPORTED_MODULE_5__.World({
+                    width: width,
+                    height: height,
+                    gravity: 0.5,
+                    friction: 0.75,
+                    skyColor: 0xffa09080,
+                });
+                stages = _data_runner_stages__WEBPACK_IMPORTED_MODULE_7__["default"].map(function (config) { return new _stage__WEBPACK_IMPORTED_MODULE_6__.Stage(world, config, tilesBg, tilesHouses); });
+                // TODO: check what should be removed
+                // TODO: make 0 - entry, 3 - morning, 4 - ending
                 stages.forEach(function (stage, i) { return i > 0 && stages[i - 1].setNext(stage); });
                 stages.forEach(function (stage, i) { return stage.onfinish(function (curr, next) {
                     currentStage = next;
@@ -1259,26 +887,25 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                 }); });
                 currentStage = stages[0];
                 stages[stages.length - 1].onfinish(function () {
-                    window.alert("Дякую що увагу! Будьте щасливі!");
+                    window.alert("Дякую за увагу! Будьте щасливі!");
                     engine.stop();
                     // console.log("You win!");
                 });
-                world = new _world__WEBPACK_IMPORTED_MODULE_4__.World({ width: width, height: height, gravity: 0.5, friction: 0.75, skyColor: 0xffa09080 });
-                _a = (0,_systems__WEBPACK_IMPORTED_MODULE_5__.Systems)(world, viewport), sMovement = _a.sMovement, sAnimation = _a.sAnimation, sCollideBounds = _a.sCollideBounds, sCollideShapes = _a.sCollideShapes, sDrawing = _a.sDrawing, sControllerRunner = _a.sControllerRunner, sBuildingsRunner = _a.sBuildingsRunner;
-                eManager = new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_3__.EntityManager(_components__WEBPACK_IMPORTED_MODULE_6__);
+                eManager = new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_2__.EntityManager(_components__WEBPACK_IMPORTED_MODULE_3__);
+                eSystems = (0,_systems__WEBPACK_IMPORTED_MODULE_4__.Systems)(world, viewport);
                 ePlayer = eManager.add({
                     cPosition: { x: 32, y: 64 },
                     cVelocity: { vx: 0, vy: 0 },
                     cShape: { w: 10, h: 14 },
                     cMeta: { air: true, speed: 0.8, power: 6 },
                     cInputRunner: { actions: actions, jumping: false, acceleration: 0 },
-                    cSprite: { spriteIdx: 0, sprites: playerSprites, offsetX: -3, offsetY: -2 },
+                    cSprite: { spriteIdx: 0, sprites: spritesPlayer, offsetX: -3, offsetY: -2 },
                     cAnimation: { animations: [[0, 0, 3, 3], [1, 2, 3, 0], [1, 1, 2, 2]], current: 0, length: 4, time: 0, coef: 0.4 },
                 });
                 createBuilding = function (spriteIdx, col, row) { return eManager.add({
                     cPosition: { x: col * 16, y: row * 20, },
-                    cSprite: { spriteIdx: spriteIdx, sprites: houseSprites },
-                    cShape: { w: houseSprites[spriteIdx].width, h: houseSprites[spriteIdx].height },
+                    cSprite: { spriteIdx: spriteIdx, sprites: spritesHouses },
+                    cShape: { w: spritesHouses[spriteIdx].width, h: spritesHouses[spriteIdx].height },
                 }); };
                 eBuildings = [
                     // createBuilding(11, 0, 6),
@@ -1291,14 +918,14 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                     createBuilding(7, 48, 5),
                     // createBuilding(3,  24, 6),
                 ];
-                collideBounds = sCollideBounds.setup([ePlayer]);
-                collideShapes = sCollideShapes.setup([ePlayer], eBuildings);
-                platforms = sBuildingsRunner.setup(eBuildings);
-                move = sMovement.setup([ePlayer]);
-                draw = sDrawing.setup(__spreadArray([ePlayer], eBuildings, true));
-                control = sControllerRunner.setup([ePlayer]);
-                animate = sAnimation.setup([ePlayer]);
-                _b = _components__WEBPACK_IMPORTED_MODULE_6__.cPosition.storage, x = _b.x, y = _b.y;
+                collideBounds = eSystems.sCollideBounds.setup([ePlayer]);
+                collideShapes = eSystems.sCollideShapes.setup([ePlayer], eBuildings);
+                platforms = eSystems.sBuildingsRunner.setup(eBuildings);
+                move = eSystems.sMovement.setup([ePlayer]);
+                draw = eSystems.sDrawing.setup(__spreadArray([ePlayer], eBuildings, true));
+                control = eSystems.sControllerRunner.setup([ePlayer]);
+                animate = eSystems.sAnimation.setup([ePlayer]);
+                _b = _components__WEBPACK_IMPORTED_MODULE_3__.cPosition.storage, x = _b.x, y = _b.y;
                 render = function (dt, time) {
                     currentStage.renderBg(dt, viewport);
                     animate(dt);
@@ -1317,16 +944,33 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                     collideShapes(dt);
                     control(dt);
                 };
-                engine = new _engine__WEBPACK_IMPORTED_MODULE_1__.WindowRafEngine(adapter, fps, update, render, 60 / 1000);
-                // TODO: try raf engine
-                //
+                engine = new _engine__WEBPACK_IMPORTED_MODULE_0__.WindowRafEngine(fps, update, render, 60 / 1000);
                 return [2 /*return*/, { engine: engine }];
         }
     });
 }); });
+
+
+/***/ }),
+
+/***/ "./src/stage.ts":
+/*!**********************!*\
+  !*** ./src/stage.ts ***!
+  \**********************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Stage: () => (/* binding */ Stage)
+/* harmony export */ });
+/* harmony import */ var _bitmap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./bitmap */ "./src/bitmap.ts");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/utils.ts");
+
+
 var Stage = /** @class */ (function () {
-    function Stage(config, bgTiles, fgTiles) {
+    function Stage(world, config, bgTiles, fgTiles) {
         var bgfill = config.bgfill, fgfill = config.fgfill, bgwidth = config.bgwidth, bgrows = config.bgrows, length = config.length;
+        this.world = world;
         this.config = config;
         this.bgFill = bgfill;
         this.fgFill = fgfill;
@@ -1341,7 +985,7 @@ var Stage = /** @class */ (function () {
         for (var i = 0; i < bgrows.length; i++) {
             var _a = bgrows[i], layout = _a.layout, colors = _a.colors, offset = _a.offset, speed = _a.speed;
             var sprite = bgTiles.reorder(layout.concat(layout), bgwidth * 2, 1);
-            var pallete = new _bitmap__WEBPACK_IMPORTED_MODULE_2__.BitmapPallete(sprite);
+            var pallete = new _bitmap__WEBPACK_IMPORTED_MODULE_0__.BitmapPallete(sprite);
             pallete.colors = colors;
             this.bgRows[i] = { sprite: sprite, pallete: pallete, speed: speed * speedQuickFix, shift: 0, offset: offset * sprite.theight };
         }
@@ -1376,17 +1020,17 @@ var Stage = /** @class */ (function () {
             return;
         var _a = this.config, sbgrows = _a.bgrows, sbgfill = _a.bgfill;
         var _b = this.next.config, dbgrows = _b.bgrows, dbgfill = _b.bgfill;
-        this.bgFill = helpers.interpolate(sbgfill, dbgfill, step);
+        this.bgFill = _utils__WEBPACK_IMPORTED_MODULE_1__.colorHelpers.interpolate(sbgfill, dbgfill, step);
         this.bgRows.forEach(function (row, i) {
             var spal = sbgrows[i].colors;
             var dpal = dbgrows[i].colors;
-            var colors = spal.map(function (_, j) { return helpers.interpolate(spal[j], dpal[j], step); });
+            var colors = spal.map(function (_, j) { return _utils__WEBPACK_IMPORTED_MODULE_1__.colorHelpers.interpolate(spal[j], dpal[j], step); });
             row.pallete.colors = colors;
         });
     };
     Stage.prototype.setNext = function (stage) {
         this.next = stage;
-        var _a = helpers.calccoefs(helpers.hex2abgr(this.config.bgfill), helpers.hex2abgr(stage.config.bgfill)), _ = _a[0], B = _a[1], G = _a[2], R = _a[3];
+        var _a = _utils__WEBPACK_IMPORTED_MODULE_1__.colorHelpers.calccoefs(_utils__WEBPACK_IMPORTED_MODULE_1__.colorHelpers.hex2abgr(this.config.bgfill), _utils__WEBPACK_IMPORTED_MODULE_1__.colorHelpers.hex2abgr(stage.config.bgfill)), _ = _a[0], B = _a[1], G = _a[2], R = _a[3];
         // TODO: no need for now. interpolation is used for all rows
         this.bgFadeoutCoefs = [B, G, R];
     };
@@ -1404,36 +1048,7 @@ var Stage = /** @class */ (function () {
     Stage.prototype.onfinish = function (cb) { this.handlers.onfinish = cb; };
     return Stage;
 }());
-var helpers = {
-    hex2abgr: function (hex) { return ([hex >>> 24 & 0xff, hex >>> 16 & 0xff, hex >>> 8 & 0xff, hex & 0xff]); },
-    abgr2hex: function (_a) {
-        var a = _a[0], b = _a[1], g = _a[2], r = _a[3];
-        return ((a << 24) | (b << 16) | (g << 8) | r) >>> 0;
-    },
-    hexadjust: function (hex, _a) {
-        var A = _a[0], B = _a[1], G = _a[2], R = _a[3];
-        var _b = helpers.hex2abgr(hex), a = _b[0], b = _b[1], g = _b[2], r = _b[3];
-        return helpers.abgr2hex([Math.min(a * A, 255), Math.min(b * B, 255), Math.min(g * G, 255), Math.min(r * R, 255)]);
-    },
-    calccoefs: function (colora, colorb, K) {
-        if (K === void 0) { K = 1; }
-        var A = colora[0] == 0 ? 255 : colorb[0] / colora[0] * K;
-        var B = colora[1] == 0 ? 255 : colorb[1] / colora[1] * K;
-        var G = colora[2] == 0 ? 255 : colorb[2] / colora[2] * K;
-        var R = colora[3] == 0 ? 255 : colorb[3] / colora[3] * K;
-        return [A, B, G, R];
-    },
-    interpolate: function (hexa, hexb, step) {
-        var colora = helpers.hex2abgr(hexa);
-        var colorb = helpers.hex2abgr(hexb);
-        var a = colora[0] + (colorb[0] - colora[0]) * step | 0;
-        var b = colora[1] + (colorb[1] - colora[1]) * step | 0;
-        var g = colora[2] + (colorb[2] - colora[2]) * step | 0;
-        var r = colora[3] + (colorb[3] - colora[3]) * step | 0;
-        // TODO: Point to improve: by avoiding conversion;
-        return helpers.abgr2hex([a, b, g, r]);
-    }
-};
+
 
 
 /***/ }),
@@ -1450,11 +1065,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ecs/simple.ecs */ "./src/ecs/simple.ecs.ts");
 /* harmony import */ var _components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components */ "./src/components.ts");
-/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./helpers */ "./src/helpers.ts");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/utils.ts");
 
 
 
-var rectangle = _helpers__WEBPACK_IMPORTED_MODULE_2__.collision.rectangle, bounds = _helpers__WEBPACK_IMPORTED_MODULE_2__.collision.bounds;
+var rectangle = _utils__WEBPACK_IMPORTED_MODULE_2__.collisionHelpers.rectangle, bounds = _utils__WEBPACK_IMPORTED_MODULE_2__.collisionHelpers.bounds;
 function Systems(world, viewport) {
     console.debug("SYSYEMS: initialization");
     var width = world.width, height = world.height;
@@ -1470,36 +1085,24 @@ function Systems(world, viewport) {
                 var eRight = x[e] + w[e];
                 var eBottom = y[e] + h[e];
                 var collisionSide = bounds(x[e], y[e], eRight, eBottom, 0, 0, width, height);
-                if (collisionSide == _helpers__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.None)
+                if (collisionSide == _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.None)
                     continue;
                 switch (collisionSide) {
-                    case _helpers__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Left:
+                    case _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Left:
                         vx[e] = 0;
                         x[e] = 0;
                         break;
-                    case _helpers__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Right:
+                    case _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Right:
                         vx[e] = 0;
                         x[e] = width - w[e];
                         break;
-                    case _helpers__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Top:
+                    case _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Top:
                         vy[e] = 1;
                         y[e] = 0;
                         break;
                     // case CollisionSide.Bottom: vy[e] = 0; y[e] = height - h[e]; air[e] = false; break;
                 }
             }
-        }),
-        /* Collide entities with a world tiles */
-        sCollideLevel: new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.System({ cPosition: _components__WEBPACK_IMPORTED_MODULE_1__.cPosition, cVelocity: _components__WEBPACK_IMPORTED_MODULE_1__.cVelocity, cShape: _components__WEBPACK_IMPORTED_MODULE_1__.cShape, cMeta: _components__WEBPACK_IMPORTED_MODULE_1__.cMeta }, function (_, comp, entities) {
-            throw new Error("Not implemented yet");
-            // get entity cell cx, cy - current row and column
-            // get index world.level.collisions[top * columns + left]
-            // and collide with top, left, bottom, right
-            // input: same as collide shapes + level collision map
-            // algo:
-            // for all entities:
-            //  get top, left, right, bottom cells (ghost, no actualy an object)
-            //  check if collide for each side
         }),
         /* Collide entities from groupA with entities from groupB */
         sCollideShapes: new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.System({ cPosition: _components__WEBPACK_IMPORTED_MODULE_1__.cPosition, cVelocity: _components__WEBPACK_IMPORTED_MODULE_1__.cVelocity, cShape: _components__WEBPACK_IMPORTED_MODULE_1__.cShape, cMeta: _components__WEBPACK_IMPORTED_MODULE_1__.cMeta }, function (_, comp, entities, blocks) {
@@ -1519,27 +1122,24 @@ function Systems(world, viewport) {
                     var bRight = x[b] + w[b];
                     var bBottom = y[b] + h[b];
                     var collisionSide = rectangle(x[e], y[e], eRight, eBottom, x[b], y[b], bRight, bBottom);
-                    // TODO: remove debug
-                    // debug.set(collisionSide.toUpperCase(), air[e] ? "^" : "_", `${x[e].toFixed(2).padStart(6, "0")}:${y[e].toFixed(2).padStart(6, "0")}`, vy[e].toFixed(2));
-                    if (collisionSide === _helpers__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.None)
+                    if (collisionSide === _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.None)
                         continue;
-                    // if (collisionSide !== CollisionSide.Bottom) console.log(collisionSide,b);
                     totalCollisions++;
                     switch (collisionSide) {
-                        case _helpers__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Bottom:
+                        case _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Bottom:
                             vy[e] = 0;
                             y[e] = y[b] - h[e];
                             air[e] = false;
                             break;
-                        case _helpers__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Right:
+                        case _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Right:
                             vx[e] = 0;
                             x[e] = x[b] - w[e] - 0.01;
                             break;
-                        case _helpers__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Left:
+                        case _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Left:
                             vx[e] = 0;
                             x[e] = bRight + 0.01;
                             break;
-                        case _helpers__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Top:
+                        case _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Top:
                             vy[e] = 1;
                             y[e] = bBottom;
                             break;
@@ -1652,39 +1252,200 @@ function Systems(world, viewport) {
                 // y[e] += dy;
             }
         }),
-        // TODO: ability to add modifiers to the system
-        // Modifier can store 32 and 48
-        // Also it can store pointer to World
-        /* Dynamic background */
-        sDrawAnimatedBg: new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.System({ cSprite: _components__WEBPACK_IMPORTED_MODULE_1__.cSprite, cAnimation: _components__WEBPACK_IMPORTED_MODULE_1__.cAnimation }, function (dt, comp, entities) {
-            var _a = comp.cSprite.storage, offsetX = _a.offsetX, offsetY = _a.offsetY, sprites = _a.sprites, spriteIdx = _a.spriteIdx;
-            var _b = comp.cAnimation.storage, time = _b.time, coef = _b.coef, animations = _b.animations;
-            // use animations to build up new layouts
-            for (var _i = 0, entities_9 = entities; _i < entities_9.length; _i++) {
-                var e = entities_9[_i];
-                var frameTime = (time[e] + dt * coef[e]) % width;
-                viewport.draw(sprites[e][spriteIdx[e]], Math.round(offsetX[e] + frameTime), Math.round(offsetY[e]));
-                time[e] = frameTime;
-            }
-        }),
-        // sDrawAnimatedFg: new System(
-        //   { cSprite, cAnimation },
-        //   (dt, comp, entities) => {
-        //     const { offsetX, offsetY, sprites, spriteIdx } = comp.cSprite.storage;
-        //     const { time, coef } = comp.cAnimation.storage;
-        //     for (const e of entities) {
-        //       const frameTime = (time[e] + dt * coef[e]) % 384;
-        //       viewport.draw(
-        //         sprites[e][spriteIdx[e]],
-        //         Math.round(offsetX[e] + frameTime),
-        //         Math.round(offsetY[e]),
-        //       );
-        //       time[e] = frameTime;
-        //     }
-        //   }
-        // ),
     };
 }
+
+
+/***/ }),
+
+/***/ "./src/utils.ts":
+/*!**********************!*\
+  !*** ./src/utils.ts ***!
+  \**********************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   CollisionSide: () => (/* binding */ CollisionSide),
+/* harmony export */   benchmark: () => (/* binding */ benchmark),
+/* harmony export */   collisionHelpers: () => (/* binding */ collisionHelpers),
+/* harmony export */   colorHelpers: () => (/* binding */ colorHelpers),
+/* harmony export */   fileHelpers: () => (/* binding */ fileHelpers),
+/* harmony export */   timeHelpers: () => (/* binding */ timeHelpers)
+/* harmony export */ });
+/* harmony import */ var _bitmap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./bitmap */ "./src/bitmap.ts");
+
+var fileHelpers = {
+    loadImage: function (src) {
+        return new Promise(function (resolve, reject) {
+            var image = new Image();
+            image.onload = function () {
+                var canvas = document.createElement("canvas");
+                var context = canvas.getContext("2d");
+                var width = image.width, height = image.height;
+                canvas.width = width;
+                canvas.height = height;
+                context.drawImage(image, 0, 0);
+                var imageData = context.getImageData(0, 0, width, height);
+                return resolve({ width: width, height: height, data: imageData.data.buffer });
+            };
+            image.onerror = function (err) {
+                console.error("Error loading image:", err);
+                reject(err);
+            };
+            image.src = src;
+        });
+    },
+    loadImageAsBitmap: function (src) {
+        return fileHelpers
+            .loadImage(src)
+            .then(function (img) { return _bitmap__WEBPACK_IMPORTED_MODULE_0__.Bitmap.from(img.data, img.width, img.height); })
+            .catch(function (err) {
+            console.error("Error loading bitmap:", src);
+            throw err;
+        });
+    },
+    loadImagesAsTileableBitmaps: function () {
+        var configs = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            configs[_i] = arguments[_i];
+        }
+        return Promise.all(configs.map(function (_a) {
+            var src = _a[0], w = _a[1], h = _a[2], c = _a[3], r = _a[4];
+            return fileHelpers
+                .loadImage(src)
+                .then(function (img) { return _bitmap__WEBPACK_IMPORTED_MODULE_0__.TileableBitmap.from(img.data, w, h, c, r); })
+                .catch(function (err) {
+                console.error("Error loading tileable bitmap:", src, err);
+                return _bitmap__WEBPACK_IMPORTED_MODULE_0__.TileableBitmap.from(new ArrayBuffer(w * h), w, h, c, r);
+            });
+        }));
+    },
+};
+var colorHelpers = {
+    hex2abgr: function (hex) { return ([hex >>> 24 & 0xff, hex >>> 16 & 0xff, hex >>> 8 & 0xff, hex & 0xff]); },
+    abgr2hex: function (_a) {
+        var a = _a[0], b = _a[1], g = _a[2], r = _a[3];
+        return ((a << 24) | (b << 16) | (g << 8) | r) >>> 0;
+    },
+    hexadjust: function (hex, _a) {
+        var A = _a[0], B = _a[1], G = _a[2], R = _a[3];
+        var _b = colorHelpers.hex2abgr(hex), a = _b[0], b = _b[1], g = _b[2], r = _b[3];
+        return colorHelpers.abgr2hex([Math.min(a * A, 255), Math.min(b * B, 255), Math.min(g * G, 255), Math.min(r * R, 255)]);
+    },
+    calccoefs: function (colora, colorb, K) {
+        if (K === void 0) { K = 1; }
+        var A = colora[0] == 0 ? 255 : colorb[0] / colora[0] * K;
+        var B = colora[1] == 0 ? 255 : colorb[1] / colora[1] * K;
+        var G = colora[2] == 0 ? 255 : colorb[2] / colora[2] * K;
+        var R = colora[3] == 0 ? 255 : colorb[3] / colora[3] * K;
+        return [A, B, G, R];
+    },
+    interpolate: function (hexa, hexb, step) {
+        var colora = colorHelpers.hex2abgr(hexa);
+        var colorb = colorHelpers.hex2abgr(hexb);
+        var a = colora[0] + (colorb[0] - colora[0]) * step | 0;
+        var b = colora[1] + (colorb[1] - colora[1]) * step | 0;
+        var g = colora[2] + (colorb[2] - colora[2]) * step | 0;
+        var r = colora[3] + (colorb[3] - colora[3]) * step | 0;
+        return colorHelpers.abgr2hex([a, b, g, r]);
+    }
+};
+// timeHelpers
+var timeHelpers = {
+    sleep: function (ms) {
+        return new Promise(function (resolve) { return setTimeout(resolve, ms); });
+    },
+    now: function () {
+        return performance.now();
+    }
+};
+// colision helpers
+var CollisionSide;
+(function (CollisionSide) {
+    CollisionSide["None"] = "none";
+    CollisionSide["Left"] = "left";
+    CollisionSide["Right"] = "right";
+    CollisionSide["Top"] = "top";
+    CollisionSide["Bottom"] = "bottom";
+})(CollisionSide || (CollisionSide = {}));
+var collisionHelpers = {
+    circle: function (x0, y0, d0, x1, y1, d1) {
+        var dist = Math.sqrt(Math.pow((x1 - x0), 2) +
+            Math.pow((y1 - y0), 2));
+        return dist <= (d0 + d1);
+    },
+    rectangle: function (x0, y0, r0, b0, x1, y1, r1, b1) {
+        if (x0 > r1 || x1 > r0 || y0 > b1 || y1 > b0)
+            return CollisionSide.None;
+        var dx = Math.min(r0 - x1, r1 - x0);
+        var dy = Math.min(b0 - y1, b1 - y0);
+        return dx < dy
+            ? x0 > x1 ? CollisionSide.Left : CollisionSide.Right
+            : y0 > y1 ? CollisionSide.Top : CollisionSide.Bottom;
+    },
+    bounds: function (x0, y0, r0, b0, bl, bt, br, bb) {
+        if (y0 < bt)
+            return CollisionSide.Top;
+        if (b0 > bb)
+            return CollisionSide.Bottom;
+        if (x0 < bl)
+            return CollisionSide.Left;
+        if (r0 > br)
+            return CollisionSide.Right;
+        return CollisionSide.None;
+    },
+};
+// benchmark tools
+var benchmark = function (name, calcMiddleRate, fixedDigit) {
+    if (name === void 0) { name = "default"; }
+    if (calcMiddleRate === void 0) { calcMiddleRate = 10; }
+    if (fixedDigit === void 0) { fixedDigit = 4; }
+    var minimumtime = Infinity;
+    var maximumtime = 0;
+    var lasttime = 0;
+    var calcMiddleIter = calcMiddleRate;
+    var history = [];
+    var middles = [];
+    var A = function () { return lasttime = performance.now(); };
+    var B = function () {
+        var dt = performance.now() - lasttime;
+        if (dt <= 0 && dt >= Infinity) {
+            console.log("lol", dt);
+            return;
+        }
+        calcMiddleIter--;
+        history.push(dt);
+        if (minimumtime > dt)
+            minimumtime = dt;
+        if (maximumtime < dt)
+            maximumtime = dt;
+        if (calcMiddleIter > 0)
+            return;
+        calcMiddleIter = calcMiddleRate;
+        middles.push(middle(history));
+        clear();
+    };
+    var fps = function (time) { return 1 / (time * 0.001); };
+    var clear = function () { return history.length = 0; };
+    var middle = function (arr) { return arr.reduce(function (acc, v) { return acc += v; }, 0) / arr.length; };
+    var fixed = function (num) { return +num.toFixed(fixedDigit); };
+    var filter = function (num) { return num > 0 && num < Infinity; };
+    var resultsTime = function () { return ({
+        name: name,
+        min: fixed(minimumtime),
+        max: fixed(maximumtime),
+        middles: middles.filter(filter).map(fixed),
+    }); };
+    var resultsFps = function () { return ({
+        name: name,
+        maxFps: fixed(fps(minimumtime)),
+        minFps: fixed(fps(maximumtime)),
+        fps: fixed(fps(middle(middles))),
+        middlesFps: middles.filter(filter).map(fps).map(fixed),
+    }); };
+    return { A: A, B: B, resultsTime: resultsTime, resultsFps: resultsFps };
+};
 
 
 /***/ }),
@@ -1697,15 +1458,8 @@ function Systems(world, viewport) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Level: () => (/* binding */ Level),
-/* harmony export */   LevelCellType: () => (/* binding */ LevelCellType),
-/* harmony export */   Stage: () => (/* binding */ Stage),
-/* harmony export */   StageBg: () => (/* binding */ StageBg),
-/* harmony export */   StageBgRow: () => (/* binding */ StageBgRow),
 /* harmony export */   World: () => (/* binding */ World)
 /* harmony export */ });
-/* harmony import */ var _bitmap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./bitmap */ "./src/bitmap.ts");
-
 var World = /** @class */ (function () {
     function World(_a) {
         var width = _a.width, height = _a.height, gravity = _a.gravity, friction = _a.friction, skyColor = _a.skyColor;
@@ -1715,212 +1469,8 @@ var World = /** @class */ (function () {
         this.friction = friction;
         this.skyColor = skyColor;
         this.time = 0;
-        this.currentLevel = "start";
-        this.levelList = new Map();
     }
-    World.prototype.addLevel = function (level) {
-        this.levelList.set(level.name, level);
-    };
-    World.prototype.getCurrentLevel = function () {
-        return this.levelList.get(this.currentLevel);
-    };
     return World;
-}());
-
-/*
-IDEA: to define cell type I can use bits.
-for example first bit is block/notblock
-*/
-var LevelCellType;
-(function (LevelCellType) {
-    LevelCellType[LevelCellType["Block"] = 1] = "Block";
-})(LevelCellType || (LevelCellType = {}));
-// TODO: rewrite implementation and data structure
-var Level = /** @class */ (function () {
-    function Level(name, map, mapping) {
-        this.name = name;
-        this.map = map;
-        this.mapping = mapping;
-        this.width = map[0].length;
-        this.height = map.length;
-        this.collisions = Array(this.height).fill(Array(this.width).fill(false));
-        this.refreshCollistions();
-    }
-    Level.from = function (name, config) {
-        // TODO: make normal level parser
-        var map = config.map, mapping = config.mapping;
-        var parsedMapping = new Map();
-        Object.entries(mapping).forEach(function (_a) {
-            var key = _a[0], value = _a[1];
-            return parsedMapping.set(+key, value);
-        });
-        Object.entries(mapping).forEach(function (_a) {
-            var key = _a[0], value = _a[1];
-            // const cell: LevelCell = {}
-        });
-        return new Level(name, map, parsedMapping);
-    };
-    Level.prototype.filterMap = function (type) {
-        var filtered = this.map.map(function (row) { return row.map(function (col) { return !!(col & type); }); });
-        return filtered;
-    };
-    Level.prototype.refreshCollistions = function () {
-        this.collisions = this.filterMap(LevelCellType.Block);
-    };
-    return Level;
-}());
-
-var Stage = /** @class */ (function () {
-    function Stage(name, bgLayout, bgColors, bgOffset, bgSpeed, bgFill, fgFill) {
-        this.name = name;
-        this.bgLayout = bgLayout;
-        this.bgColors = bgColors;
-        this.bgOffset = bgOffset;
-        this.bgSpeed = bgSpeed;
-        this.bgFill = bgFill;
-        this.fgFill = fgFill;
-    }
-    Stage.from = function (config, tiles) {
-        var name = config.name, bgOffset = config.bgOffset, bgSpeed = config.bgSpeed, bgLayout = config.bgLayout, bgColors = config.bgColors, bgFill = config.bgFill, fgFill = config.fgFill;
-        var lengths = [bgOffset.length, bgSpeed.length, bgLayout.length, bgColors.length];
-        if (lengths.some(function (l) { return l !== lengths[0]; }))
-            throw new Error("Error during Stage parsing: ".concat(lengths));
-        var parsedBgLayout = bgLayout.map(function (row) { return tiles.reorder(row.concat(row), row.length * 2, 1); });
-        var parsedBgColors = parsedBgLayout.map(function (tbitmap) { return new _bitmap__WEBPACK_IMPORTED_MODULE_0__.BitmapPallete(tbitmap); });
-        bgColors.forEach(function (colors, i) { return parsedBgColors[i].colors = colors; });
-        return new Stage(name, parsedBgLayout, parsedBgColors, bgOffset, bgSpeed, bgFill, fgFill);
-    };
-    return Stage;
-}());
-
-// export class Stage {
-//   public progress = 0.0;
-//   private next: Stage;
-//   constructor(
-//     readonly name: string,
-//     readonly bg: StageBg,
-//   ) {}
-//   static from(config: StageConfig, tiles: TileableBitmap): Stage {
-//     const { name, bgLayout, bgOffset, bgColors, bgSpeed, bgFill } = config;
-//     const rows = [];
-//     for (let r = 0; r < bgLayout.length; r++) {
-//       new StageBgRow()
-//     }
-//   }
-// }
-// 
-// export class StageBg {
-//   public colors: TileableBitmap[];
-//   constructor(
-//     public fill: number,
-//     public rows: StageBgRow[],
-//   ) {}
-//   update(dt: number) {
-//     for (const row of this.rows) row.update(dt);
-//   }
-//   transition(step: number) {
-// 
-//   }
-// }
-// 
-// export class StageBgRow {
-//   private shift: number;
-//   private width: number;
-//   constructor (
-//     public layout: TileableBitmap,
-//     public colors: number[],
-//     private offset: number,
-//     private speed: number,
-//   ) { this.shift = 0; this.width = layout.width / 2 }
-// 
-//   update(dt: number) {
-//     this.shift = Math.round(this.shift - this.speed * dt) % this.width;
-//   }
-//   append(row: StageBgRow) {
-//     row.shift = this.shift + this.layout.width;
-//   }
-//   render(viewport: Bitmap) {
-//     viewport.draw(this.layout, this.shift, this.offset);
-//   }
-// }
-/*
-TODO: cleanup
-Fast notes:
-layout transition - input 2 layouts and just reorder again
-
-W: 320
-WW: 640;
-[][]
-*/
-var StageBg = /** @class */ (function () {
-    function StageBg(tiles, fill, layout, colors, offset, speed) {
-        this.fill = fill;
-        this.rows = [];
-        for (var i = 0; i < layout.length; i++) {
-            var rowLayout = layout[i];
-            var rowSpeed = speed[i];
-            var rowOffset = offset[i];
-            var rowSprite = tiles.reorder(rowLayout, rowLayout.length, 1);
-            var rowColor = new _bitmap__WEBPACK_IMPORTED_MODULE_0__.BitmapPallete(rowSprite);
-            rowColor.colors = colors[i];
-            this.rows.push(new StageBgRow(rowSprite, rowSpeed, rowOffset));
-        }
-    }
-    StageBg.from = function (config, tiles) {
-        var bgOffset = config.bgOffset, bgSpeed = config.bgSpeed, bgLayout = config.bgLayout, bgColors = config.bgColors, bgFill = config.bgFill;
-        var lengths = [bgOffset.length, bgSpeed.length, bgLayout.length, bgColors.length];
-        if (lengths.some(function (l) { return l !== lengths[0]; }))
-            throw new Error("Error during Stage parsing: ".concat(lengths));
-        return new StageBg(tiles, bgFill, bgLayout, bgColors, bgOffset, bgSpeed);
-    };
-    StageBg.prototype.render = function (dt, viewport) {
-        viewport.fill(this.fill);
-        for (var _i = 0, _a = this.rows; _i < _a.length; _i++) {
-            var row = _a[_i];
-            row.render(dt, viewport);
-        }
-    };
-    StageBg.prototype.transition = function (layout, colors, bgFill, fgFill, tiles) {
-        for (var i = 0; i < layout.length; i++) {
-            var row = tiles.reorder(layout[i], layout[i].length, 1);
-            new _bitmap__WEBPACK_IMPORTED_MODULE_0__.BitmapPallete(row).colors = colors[i];
-            this.rows[i].transition(row);
-        }
-    };
-    return StageBg;
-}());
-
-var StageBgRow = /** @class */ (function () {
-    function StageBgRow(sprite, speed, offset) {
-        this.spriteA = sprite;
-        this.spriteB = sprite;
-        this.target = sprite;
-        this.shiftA = 0;
-        this.shiftB = sprite.width;
-        this.offset = offset * sprite.theight;
-        this.width = sprite.width;
-        this.speed = speed;
-    }
-    StageBgRow.prototype.render = function (dt, viewport) {
-        var _a = this, width = _a.width, speed = _a.speed, offset = _a.offset;
-        var distance = speed * dt;
-        this.shiftA -= distance;
-        this.shiftB -= distance;
-        if (-width > this.shiftA) {
-            this.spriteA = this.target;
-            this.shiftA = this.shiftB + width;
-        }
-        else if (-width > this.shiftB) {
-            this.spriteB = this.target;
-            this.shiftB = this.shiftA + width;
-        }
-        viewport.draw(this.spriteA, Math.round(this.shiftA), offset);
-        viewport.draw(this.spriteB, Math.round(this.shiftB), offset);
-    };
-    StageBgRow.prototype.transition = function (target) {
-        this.target = target;
-    };
-    return StageBgRow;
 }());
 
 
@@ -1966,18 +1516,6 @@ var StageBgRow = /** @class */ (function () {
 /******/ 		};
 /******/ 	})();
 /******/ 	
-/******/ 	/* webpack/runtime/global */
-/******/ 	(() => {
-/******/ 		__webpack_require__.g = (function() {
-/******/ 			if (typeof globalThis === 'object') return globalThis;
-/******/ 			try {
-/******/ 				return this || new Function('return this')();
-/******/ 			} catch (e) {
-/******/ 				if (typeof window === 'object') return window;
-/******/ 			}
-/******/ 		})();
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
@@ -1994,36 +1532,149 @@ var StageBgRow = /** @class */ (function () {
 /******/ 		};
 /******/ 	})();
 /******/ 	
-/******/ 	/* webpack/runtime/publicPath */
-/******/ 	(() => {
-/******/ 		var scriptUrl;
-/******/ 		if (__webpack_require__.g.importScripts) scriptUrl = __webpack_require__.g.location + "";
-/******/ 		var document = __webpack_require__.g.document;
-/******/ 		if (!scriptUrl && document) {
-/******/ 			if (document.currentScript)
-/******/ 				scriptUrl = document.currentScript.src;
-/******/ 			if (!scriptUrl) {
-/******/ 				var scripts = document.getElementsByTagName("script");
-/******/ 				if(scripts.length) {
-/******/ 					var i = scripts.length - 1;
-/******/ 					while (i > -1 && !scriptUrl) scriptUrl = scripts[i--].src;
-/******/ 				}
-/******/ 			}
-/******/ 		}
-/******/ 		// When supporting browsers where an automatic publicPath is not supported you must specify an output.publicPath manually via configuration
-/******/ 		// or pass an empty string ("") and set the __webpack_public_path__ variable from your code to use your own logic.
-/******/ 		if (!scriptUrl) throw new Error("Automatic publicPath is not supported in this browser");
-/******/ 		scriptUrl = scriptUrl.replace(/#.*$/, "").replace(/\?.*$/, "").replace(/\/[^\/]+$/, "/");
-/******/ 		__webpack_require__.p = scriptUrl;
-/******/ 	})();
-/******/ 	
 /************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./src/index.ts");
-/******/ 	
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
+/*!**********************!*\
+  !*** ./src/index.ts ***!
+  \**********************/
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   debug: () => (/* binding */ debug)
+/* harmony export */ });
+/* harmony import */ var _runnerGame__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./runnerGame */ "./src/runnerGame.ts");
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+
+var debug = {};
+window.addEventListener("load", function () { return __awaiter(void 0, void 0, void 0, function () {
+    var debugEl, width, height, screen, overlay, buttons, actions, actionsMapping, _i, buttons_1, btn, game;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                debugEl = document.getElementById("debug");
+                debug.set = function () {
+                    var msg = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        msg[_i] = arguments[_i];
+                    }
+                    return (debugEl.innerHTML = msg.join(", "));
+                };
+                debug.add = function () {
+                    var msg = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        msg[_i] = arguments[_i];
+                    }
+                    return (debugEl.innerHTML += "<br>" + msg.join(", "));
+                };
+                width = 320;
+                height = 160;
+                console.log(document);
+                screen = document.getElementById("screen");
+                overlay = document.getElementById("overlay");
+                overlay.set = function () {
+                    var msg = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        msg[_i] = arguments[_i];
+                    }
+                    return (debugEl.innerHTML = msg.join("<br>"));
+                };
+                overlay.add = function () {
+                    var msg = [];
+                    for (var _i = 0; _i < arguments.length; _i++) {
+                        msg[_i] = arguments[_i];
+                    }
+                    return (debugEl.innerHTML += msg.join("<br>"));
+                };
+                buttons = [
+                    document.getElementById("btn-left"),
+                    document.getElementById("btn-right"),
+                    document.getElementById("btn-jump"),
+                ];
+                screen.width = width;
+                screen.height = height;
+                actions = new Set();
+                actionsMapping = {
+                    KeyQ: "Left", KeyW: "Right", KeyP: "Jump",
+                    KeyA: "Left", KeyD: "Right", Space: "Jump",
+                    ArrowLeft: "Left", ArrowRight: "Right", ArrowUp: "Jump",
+                    "btn-left": "Left", "btn-right": "Right", "btn-jump": "Jump",
+                };
+                window.addEventListener("keydown", function (_a) {
+                    var code = _a.code;
+                    return actionsMapping[code] && actions.add(actionsMapping[code]);
+                });
+                window.addEventListener("keyup", function (_a) {
+                    var code = _a.code;
+                    return actionsMapping[code] && actions.delete(actionsMapping[code]);
+                });
+                for (_i = 0, buttons_1 = buttons; _i < buttons_1.length; _i++) {
+                    btn = buttons_1[_i];
+                    btn.addEventListener("touchstart", function (_a) {
+                        var id = _a.target.id;
+                        return actionsMapping[id] && actions.add(actionsMapping[id]);
+                    });
+                    btn.addEventListener("touchend", function (_a) {
+                        var id = _a.target.id;
+                        return actionsMapping[id] && actions.delete(actionsMapping[id]);
+                    });
+                    btn.addEventListener("mousedown", function (_a) {
+                        var id = _a.target.id;
+                        return actionsMapping[id] && actions.add(actionsMapping[id]);
+                    });
+                    btn.addEventListener("mouseup", function (_a) {
+                        var id = _a.target.id;
+                        return actionsMapping[id] && actions.delete(actionsMapping[id]);
+                    });
+                }
+                ;
+                return [4 /*yield*/, (0,_runnerGame__WEBPACK_IMPORTED_MODULE_0__["default"])({ screen: screen, overlay: overlay, width: width, height: height, actions: actions, fps: 1000 / 60 })];
+            case 1:
+                game = _a.sent();
+                game.engine.start();
+                console.log("INITIALIZED");
+                return [2 /*return*/];
+        }
+    });
+}); });
+
+})();
+
 /******/ })()
 ;
 //# sourceMappingURL=main.js.map

@@ -1,5 +1,4 @@
-import { IAdapter } from "./common/types";
-
+import { timeHelpers } from "./utils";
 export type EngineHandler = (dt: number, time: number) => void;
 
 export class Engine {
@@ -7,7 +6,6 @@ export class Engine {
   protected running: boolean = false;
 
   constructor(
-    protected adapter: IAdapter,
     protected rate: number,
     protected update: EngineHandler,
     protected render: EngineHandler,
@@ -34,12 +32,11 @@ export class Engine {
 
   protected async tick() {
     while (this.running) {
-      const now = this.adapter.now();
+      const now = timeHelpers.now();
       const dt = (now - this.timestamp) * this.deltaCoef;
       const time = now * this.deltaCoef;
       this.timestamp = now;
-      // calc next interval
-      await this.adapter.sleep(this.rate);
+      await timeHelpers.sleep(this.rate);
       this.update(dt, time)
       this.render(dt, time)
     }
@@ -50,12 +47,10 @@ export class Engine {
 export class TimeoutEngine extends Engine {
   protected async tick() {
     if (!this.running) return;
-    const now = this.adapter.now();
+    const now = timeHelpers.now();
     const dt = (now - this.timestamp) * this.deltaCoef;
     const time = now * this.deltaCoef;
     this.timestamp = now;
-
-    // calc next interval
     setTimeout(() => this.tick(), this.rate)
     this.update(dt, time);
     this.render(dt, time);
@@ -73,6 +68,6 @@ export class WindowRafEngine extends Engine {
       this.render(dt, time)
       window.requestAnimationFrame(step);
     };
-    step(this.adapter.now());
+    step(timeHelpers.now());
   }
 }

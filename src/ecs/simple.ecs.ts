@@ -1,4 +1,5 @@
-import { Imutable } from "../common/types";
+export type Immutable<T> = { +readonly [K in keyof T]: T[K] };
+export type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 
 export type ComponentList<T> = Record<string, Component<T>>;
 
@@ -35,7 +36,7 @@ export class EntityManager<C extends ComponentList<any>> {
   /** Build readonly object of all entity components
   * @param idx entity index
   * @returns readonly entity object */
-  get<K extends keyof C>(idx: number): Imutable<{ [P in K]: C[P]["schema"] }> {
+  get<K extends keyof C>(idx: number): Immutable<{ [P in K]: C[P]["schema"] }> {
     const entries = Object.entries(this.components);
     const result = {} as { [P in K]: C[P]["schema"] };
     for (const [componentName, component] of entries){
@@ -55,8 +56,8 @@ export class EntityManager<C extends ComponentList<any>> {
 /* Component */
 export type Storage<T> = { [K in keyof T]: T[K][] };
 export class Component<T extends Object> {
-  readonly schema: Imutable<T>;
-  readonly storage: Imutable<Storage<T>>;
+  readonly schema: Immutable<T>;
+  readonly storage: Immutable<Storage<T>>;
   /** Create new Component
   * @param schema Plain object with properties */
   constructor(schema: T) {
@@ -70,7 +71,7 @@ export class Component<T extends Object> {
   /** Build readonly object of Component element
   * @param idx entity index
   * @returns readonly Component object */
-  get(idx: number): Imutable<T> {
+  get(idx: number): Immutable<T> {
     const { storage } = this;
     const element = {} as T;
     for (const prop in storage) element[prop] = storage[prop][idx];
