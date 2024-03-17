@@ -898,9 +898,13 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                     colorSpace: 'srgb',
                     willReadFrequently: true,
                 });
+                // @ts-ignore
                 screenCtx.mozImageSmoothingEnabled = false;
+                // @ts-ignore
                 screenCtx.webkitImageSmoothingEnabled = false;
+                // @ts-ignore
                 screenCtx.msImageSmoothingEnabled = false;
+                // @ts-ignore
                 screenCtx.imageSmoothingEnabled = false;
                 screenImageData = screenCtx.getImageData(0, 0, width, height);
                 viewport = _bitmap__WEBPACK_IMPORTED_MODULE_1__.Bitmap.from(screenImageData.data.buffer, width, height);

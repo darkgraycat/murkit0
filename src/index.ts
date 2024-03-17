@@ -40,7 +40,7 @@ window.addEventListener("load", async () => {
     btn.addEventListener("mouseup", ({ target: { id } }: any) => actionsMapping[id] && actions.delete(actionsMapping[id]))
   };
 
-  window.addEventListener("orientationchange", (event) => {
+  window.addEventListener("orientationchange", (event: any) => {
     const message = `the orientation of the device is now ${event.target.screen.orientation.angle}`; 
     alert(message);
   });
@@ -51,7 +51,7 @@ window.addEventListener("load", async () => {
 });
 
 function enableFS() {
-  const elem = document.getElementById("container");
+  const elem = document.getElementById("container") as any;
   const enterFullscreen = elem.requestFullscreen
     || elem.webkitRequestFullscreen
     || elem.msRequestFullscreen;
