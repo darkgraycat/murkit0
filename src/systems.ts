@@ -11,15 +11,11 @@ import {
   cInputRunner,
   cMeta,
 } from "./components";
-import {
-  CollisionSide,
-  collision,
-  platformPlacer,
-} from "./helpers";
+import { collisionHelpers, CollisionSide } from "./utils";
 
 import { debug } from ".";
 
-const { rectangle, bounds } = collision;
+const { rectangle, bounds } = collisionHelpers;
 
 export function Systems(world: World, viewport: Bitmap) {
   console.debug("SYSYEMS: initialization");
@@ -52,22 +48,6 @@ export function Systems(world: World, viewport: Bitmap) {
       },
     ),
 
-    /* Collide entities with a world tiles */
-    sCollideLevel: new System(
-      { cPosition, cVelocity, cShape, cMeta },
-      (_, comp, entities) => {
-        throw new Error("Not implemented yet");
-        // get entity cell cx, cy - current row and column
-        // get index world.level.collisions[top * columns + left]
-        // and collide with top, left, bottom, right
-        // input: same as collide shapes + level collision map
-        // algo:
-        // for all entities:
-        //  get top, left, right, bottom cells (ghost, no actualy an object)
-        //  check if collide for each side
-      }
-    ),
-
     /* Collide entities from groupA with entities from groupB */
     sCollideShapes: new System(
       { cPosition, cVelocity, cShape, cMeta },
@@ -88,10 +68,7 @@ export function Systems(world: World, viewport: Bitmap) {
               x[e], y[e], eRight, eBottom,
               x[b], y[b], bRight, bBottom,
             );
-            // TODO: remove debug
-            // debug.set(collisionSide.toUpperCase(), air[e] ? "^" : "_", `${x[e].toFixed(2).padStart(6, "0")}:${y[e].toFixed(2).padStart(6, "0")}`, vy[e].toFixed(2));
             if (collisionSide === CollisionSide.None) continue;
-            // if (collisionSide !== CollisionSide.Bottom) console.log(collisionSide,b);
             totalCollisions++;
             switch (collisionSide) {
               case CollisionSide.Bottom: vy[e] = 0; y[e] = y[b] - h[e]; air[e] = false; break;
@@ -216,43 +193,5 @@ export function Systems(world: World, viewport: Bitmap) {
         }
       }
     ),
-
-    // TODO: ability to add modifiers to the system
-    // Modifier can store 32 and 48
-    // Also it can store pointer to World
-    /* Dynamic background */
-    sDrawAnimatedBg: new System(
-      { cSprite, cAnimation },
-      (dt, comp, entities) => {
-        const { offsetX, offsetY, sprites, spriteIdx } = comp.cSprite.storage;
-        const { time, coef, animations } = comp.cAnimation.storage;
-        // use animations to build up new layouts
-        for (const e of entities) {
-          const frameTime = (time[e] + dt * coef[e]) % width;
-          viewport.draw(
-            sprites[e][spriteIdx[e]],
-            Math.round(offsetX[e] + frameTime),
-            Math.round(offsetY[e]),
-          );
-          time[e] = frameTime;
-        }
-      }
-    ),
-    // sDrawAnimatedFg: new System(
-    //   { cSprite, cAnimation },
-    //   (dt, comp, entities) => {
-    //     const { offsetX, offsetY, sprites, spriteIdx } = comp.cSprite.storage;
-    //     const { time, coef } = comp.cAnimation.storage;
-    //     for (const e of entities) {
-    //       const frameTime = (time[e] + dt * coef[e]) % 384;
-    //       viewport.draw(
-    //         sprites[e][spriteIdx[e]],
-    //         Math.round(offsetX[e] + frameTime),
-    //         Math.round(offsetY[e]),
-    //       );
-    //       time[e] = frameTime;
-    //     }
-    //   }
-    // ),
   };
 }

@@ -1,4 +1,3 @@
-// import { init } from "./main";
 import runnerGame from "./runnerGame";
 
 export const debug: any = {};
