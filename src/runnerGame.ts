@@ -22,6 +22,7 @@ export type GameConfig = {
 
 export default async (config: GameConfig) => {
   const { width, height, actions, screen, fps } = config;
+
   // --------------------------------------------------------------------------
   const screenCtx = screen.getContext("2d", {
     alpha: false,
@@ -30,6 +31,7 @@ export default async (config: GameConfig) => {
   }) as CanvasRenderingContext2D;
   const screenImageData = screenCtx.getImageData(0, 0, width, height) as ImageData;
   const viewport = Bitmap.from(screenImageData.data.buffer, width, height);
+
   // --------------------------------------------------------------------------
   const [tilesPlayer, tilesHouses, tilesBg] = await fileHelpers.loadImagesAsTileableBitmaps(
     ["../assets/player.png", 16, 16, 4, 1],
