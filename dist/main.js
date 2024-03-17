@@ -321,7 +321,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   cAnimation: () => (/* binding */ cAnimation),
 /* harmony export */   cInput: () => (/* binding */ cInput),
 /* harmony export */   cInputRunner: () => (/* binding */ cInputRunner),
-/* harmony export */   cMeta: () => (/* binding */ cMeta),
+/* harmony export */   cPlayer: () => (/* binding */ cPlayer),
 /* harmony export */   cPosition: () => (/* binding */ cPosition),
 /* harmony export */   cShape: () => (/* binding */ cShape),
 /* harmony export */   cSprite: () => (/* binding */ cSprite),
@@ -364,7 +364,7 @@ var cInputRunner = new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.Component({
     jumping: false,
     acceleration: 0,
 });
-var cMeta = new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.Component({
+var cPlayer = new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.Component({
     air: false,
     speed: 0,
     power: 0,
@@ -901,7 +901,7 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                     cPosition: { x: 32, y: 64 },
                     cVelocity: { vx: 0, vy: 0 },
                     cShape: { w: 10, h: 14 },
-                    cMeta: { air: true, speed: 0.8, power: 6 },
+                    cPlayer: { air: true, speed: 0.8, power: 6 },
                     cInputRunner: { actions: actions, jumping: false, acceleration: 0 },
                     cSprite: { spriteIdx: 0, sprites: spritesPlayer, offsetX: -3, offsetY: -2 },
                     cAnimation: { animations: [[0, 0, 3, 3], [1, 2, 3, 0], [1, 1, 2, 2]], current: 0, length: 4, time: 0, coef: 0.4 },
@@ -938,10 +938,10 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
                 };
                 update = function (dt, time) {
                     currentStage.update(dt);
-                    if (y[ePlayer] > 200) { // reset player
-                        x[ePlayer] = 32;
-                        y[ePlayer] = 64;
-                    }
+                    // if (y[ePlayer] > 200) { // reset player
+                    //   x[ePlayer] = 32;
+                    //   y[ePlayer] = 64;
+                    // }
                     platforms(dt),
                         move(dt);
                     collideBounds(dt);
@@ -1079,11 +1079,11 @@ function Systems(world, viewport) {
     var width = world.width, height = world.height;
     return {
         /* Collide entities with world bounds */
-        sCollideBounds: new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.System({ cPosition: _components__WEBPACK_IMPORTED_MODULE_1__.cPosition, cVelocity: _components__WEBPACK_IMPORTED_MODULE_1__.cVelocity, cShape: _components__WEBPACK_IMPORTED_MODULE_1__.cShape, cMeta: _components__WEBPACK_IMPORTED_MODULE_1__.cMeta }, function (_, comp, entities) {
+        sCollideBounds: new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.System({ cPosition: _components__WEBPACK_IMPORTED_MODULE_1__.cPosition, cVelocity: _components__WEBPACK_IMPORTED_MODULE_1__.cVelocity, cShape: _components__WEBPACK_IMPORTED_MODULE_1__.cShape, cPlayer: _components__WEBPACK_IMPORTED_MODULE_1__.cPlayer }, function (_, comp, entities) {
             var _a = comp.cPosition.storage, x = _a.x, y = _a.y;
             var _b = comp.cVelocity.storage, vx = _b.vx, vy = _b.vy;
             var _c = comp.cShape.storage, w = _c.w, h = _c.h;
-            var air = comp.cMeta.storage.air;
+            var air = comp.cPlayer.storage.air;
             for (var _i = 0, entities_1 = entities; _i < entities_1.length; _i++) {
                 var e = entities_1[_i];
                 var eRight = x[e] + w[e];
@@ -1092,6 +1092,10 @@ function Systems(world, viewport) {
                 if (collisionSide == _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.None)
                     continue;
                 switch (collisionSide) {
+                    case _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Bottom:
+                        x[e] = 32;
+                        y[e] = 32;
+                        break;
                     case _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Left:
                         vx[e] = 0;
                         x[e] = 0;
@@ -1104,16 +1108,15 @@ function Systems(world, viewport) {
                         vy[e] = 1;
                         y[e] = 0;
                         break;
-                    // case CollisionSide.Bottom: vy[e] = 0; y[e] = height - h[e]; air[e] = false; break;
                 }
             }
         }),
         /* Collide entities from groupA with entities from groupB */
-        sCollideShapes: new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.System({ cPosition: _components__WEBPACK_IMPORTED_MODULE_1__.cPosition, cVelocity: _components__WEBPACK_IMPORTED_MODULE_1__.cVelocity, cShape: _components__WEBPACK_IMPORTED_MODULE_1__.cShape, cMeta: _components__WEBPACK_IMPORTED_MODULE_1__.cMeta }, function (_, comp, entities, blocks) {
+        sCollideShapes: new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.System({ cPosition: _components__WEBPACK_IMPORTED_MODULE_1__.cPosition, cVelocity: _components__WEBPACK_IMPORTED_MODULE_1__.cVelocity, cShape: _components__WEBPACK_IMPORTED_MODULE_1__.cShape, cPlayer: _components__WEBPACK_IMPORTED_MODULE_1__.cPlayer }, function (_, comp, entities, blocks) {
             var _a = comp.cPosition.storage, x = _a.x, y = _a.y;
             var _b = comp.cVelocity.storage, vx = _b.vx, vy = _b.vy;
             var _c = comp.cShape.storage, w = _c.w, h = _c.h;
-            var air = comp.cMeta.storage.air;
+            var air = comp.cPlayer.storage.air;
             for (var _i = 0, entities_2 = entities; _i < entities_2.length; _i++) {
                 var e = entities_2[_i];
                 var eRight = x[e] + w[e];
@@ -1152,16 +1155,16 @@ function Systems(world, viewport) {
             }
         }),
         /* Move entity using velocity values */
-        sMovement: new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.System({ cPosition: _components__WEBPACK_IMPORTED_MODULE_1__.cPosition, cVelocity: _components__WEBPACK_IMPORTED_MODULE_1__.cVelocity, cMeta: _components__WEBPACK_IMPORTED_MODULE_1__.cMeta }, function (dt, comp, entities) {
+        sMovement: new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.System({ cPosition: _components__WEBPACK_IMPORTED_MODULE_1__.cPosition, cVelocity: _components__WEBPACK_IMPORTED_MODULE_1__.cVelocity, cPlayer: _components__WEBPACK_IMPORTED_MODULE_1__.cPlayer }, function (dt, comp, entities) {
             var _a = comp.cPosition.storage, x = _a.x, y = _a.y;
             var _b = comp.cVelocity.storage, vx = _b.vx, vy = _b.vy;
-            var air = comp.cMeta.storage.air;
+            var air = comp.cPlayer.storage.air;
             var friction = world.friction, gravity = world.gravity;
             for (var _i = 0, entities_3 = entities; _i < entities_3.length; _i++) {
                 var e = entities_3[_i];
                 x[e] += vx[e] * dt;
                 y[e] += vy[e] * dt;
-                // TODO: think to move it separately, to avoid dependency with cMeta.air
+                // TODO: think to move it separately, to avoid dependency with cPlayer.air
                 vx[e] *= friction;
                 vy[e] += gravity;
             }
@@ -1189,12 +1192,12 @@ function Systems(world, viewport) {
             }
         }),
         /* Listen for user input */
-        sController: new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.System({ cVelocity: _components__WEBPACK_IMPORTED_MODULE_1__.cVelocity, cInput: _components__WEBPACK_IMPORTED_MODULE_1__.cInput, cSprite: _components__WEBPACK_IMPORTED_MODULE_1__.cSprite, cMeta: _components__WEBPACK_IMPORTED_MODULE_1__.cMeta, cAnimation: _components__WEBPACK_IMPORTED_MODULE_1__.cAnimation }, function (_, comp, entities) {
+        sController: new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.System({ cVelocity: _components__WEBPACK_IMPORTED_MODULE_1__.cVelocity, cInput: _components__WEBPACK_IMPORTED_MODULE_1__.cInput, cSprite: _components__WEBPACK_IMPORTED_MODULE_1__.cSprite, cPlayer: _components__WEBPACK_IMPORTED_MODULE_1__.cPlayer, cAnimation: _components__WEBPACK_IMPORTED_MODULE_1__.cAnimation }, function (_, comp, entities) {
             var flipped = comp.cSprite.storage.flipped;
             var current = comp.cAnimation.storage.current;
             var keys = comp.cInput.storage.keys;
             var _a = comp.cVelocity.storage, vx = _a.vx, vy = _a.vy;
-            var _b = comp.cMeta.storage, air = _b.air, speed = _b.speed;
+            var _b = comp.cPlayer.storage, air = _b.air, speed = _b.speed;
             for (var _i = 0, entities_6 = entities; _i < entities_6.length; _i++) {
                 var e = entities_6[_i];
                 if (!keys[e].size) {
@@ -1210,11 +1213,11 @@ function Systems(world, viewport) {
             }
         }),
         /* Listen for user input for runner mode */
-        sControllerRunner: new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.System({ cVelocity: _components__WEBPACK_IMPORTED_MODULE_1__.cVelocity, cInputRunner: _components__WEBPACK_IMPORTED_MODULE_1__.cInputRunner, cMeta: _components__WEBPACK_IMPORTED_MODULE_1__.cMeta, cAnimation: _components__WEBPACK_IMPORTED_MODULE_1__.cAnimation }, function (_, comp, entities) {
+        sControllerRunner: new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.System({ cVelocity: _components__WEBPACK_IMPORTED_MODULE_1__.cVelocity, cInputRunner: _components__WEBPACK_IMPORTED_MODULE_1__.cInputRunner, cPlayer: _components__WEBPACK_IMPORTED_MODULE_1__.cPlayer, cAnimation: _components__WEBPACK_IMPORTED_MODULE_1__.cAnimation }, function (_, comp, entities) {
             var _a = comp.cAnimation.storage, current = _a.current, coef = _a.coef;
             var _b = comp.cInputRunner.storage, actions = _b.actions, jumping = _b.jumping;
             var _c = comp.cVelocity.storage, vx = _c.vx, vy = _c.vy;
-            var _d = comp.cMeta.storage, air = _d.air, speed = _d.speed, power = _d.power;
+            var _d = comp.cPlayer.storage, air = _d.air, speed = _d.speed, power = _d.power;
             for (var _i = 0, entities_7 = entities; _i < entities_7.length; _i++) {
                 var e = entities_7[_i];
                 if (!actions[e].size) {

@@ -9,7 +9,7 @@ import {
   cAnimation,
   cInput,
   cInputRunner,
-  cMeta,
+  cPlayer,
 } from "./components";
 import { collisionHelpers, CollisionSide } from "./utils";
 
@@ -24,12 +24,12 @@ export function Systems(world: World, viewport: Bitmap) {
   return {
     /* Collide entities with world bounds */
     sCollideBounds: new System(
-      { cPosition, cVelocity, cShape, cMeta },
+      { cPosition, cVelocity, cShape, cPlayer },
       (_, comp, entities) => {
         const { x, y } = comp.cPosition.storage;
         const { vx, vy } = comp.cVelocity.storage;
         const { w, h } = comp.cShape.storage;
-        const { air } = comp.cMeta.storage;
+        const { air } = comp.cPlayer.storage;
         for (const e of entities) {
           const eRight = x[e] + w[e];
           const eBottom = y[e] + h[e];
@@ -39,10 +39,10 @@ export function Systems(world: World, viewport: Bitmap) {
           );
           if (collisionSide == CollisionSide.None) continue;
           switch (collisionSide) {
+            case CollisionSide.Bottom: x[e] = 32; y[e] = 32; break;
             case CollisionSide.Left: vx[e] = 0; x[e] = 0; break;
             case CollisionSide.Right: vx[e] = 0; x[e] = width - w[e]; break;
             case CollisionSide.Top: vy[e] = 1; y[e] = 0; break;
-            // case CollisionSide.Bottom: vy[e] = 0; y[e] = height - h[e]; air[e] = false; break;
           }
         }
       },
@@ -50,12 +50,12 @@ export function Systems(world: World, viewport: Bitmap) {
 
     /* Collide entities from groupA with entities from groupB */
     sCollideShapes: new System(
-      { cPosition, cVelocity, cShape, cMeta },
+      { cPosition, cVelocity, cShape, cPlayer },
       (_, comp, entities, blocks) => {
         const { x, y } = comp.cPosition.storage;
         const { vx, vy } = comp.cVelocity.storage;
         const { w, h } = comp.cShape.storage;
-        const { air } = comp.cMeta.storage;
+        const { air } = comp.cPlayer.storage;
         for (const e of entities) {
           const eRight = x[e] + w[e];
           const eBottom = y[e] + h[e];
@@ -83,16 +83,16 @@ export function Systems(world: World, viewport: Bitmap) {
 
     /* Move entity using velocity values */
     sMovement: new System(
-      { cPosition, cVelocity, cMeta },
+      { cPosition, cVelocity, cPlayer },
       (dt, comp, entities) => {
         const { x, y } = comp.cPosition.storage;
         const { vx, vy } = comp.cVelocity.storage;
-        const { air } = comp.cMeta.storage;
+        const { air } = comp.cPlayer.storage;
         const { friction, gravity } = world;
         for (const e of entities) {
           x[e] += vx[e] * dt;
           y[e] += vy[e] * dt;
-          // TODO: think to move it separately, to avoid dependency with cMeta.air
+          // TODO: think to move it separately, to avoid dependency with cPlayer.air
           vx[e] *= friction;
           vy[e] += gravity;
         }
@@ -127,13 +127,13 @@ export function Systems(world: World, viewport: Bitmap) {
 
     /* Listen for user input */
     sController: new System(
-      { cVelocity, cInput, cSprite, cMeta, cAnimation },
+      { cVelocity, cInput, cSprite, cPlayer, cAnimation },
       (_, comp, entities) => {
         const { flipped } = comp.cSprite.storage;
         const { current } = comp.cAnimation.storage;
         const { keys } = comp.cInput.storage;
         const { vx, vy } = comp.cVelocity.storage;
-        const { air, speed } = comp.cMeta.storage;
+        const { air, speed } = comp.cPlayer.storage;
         for (const e of entities) {
           if (!keys[e].size) {
             current[e] = air[e] ? 2 : 0;
@@ -148,12 +148,12 @@ export function Systems(world: World, viewport: Bitmap) {
 
     /* Listen for user input for runner mode */
     sControllerRunner: new System(
-      { cVelocity, cInputRunner, cMeta, cAnimation },
+      { cVelocity, cInputRunner, cPlayer, cAnimation },
       (_, comp, entities) => {
         const { current, coef } = comp.cAnimation.storage;
         const { actions, jumping } = comp.cInputRunner.storage;
         const { vx, vy } = comp.cVelocity.storage;
-        const { air, speed, power } = comp.cMeta.storage;
+        const { air, speed, power } = comp.cPlayer.storage;
         for (const e of entities) {
           if (!actions[e].size) {
             current[e] = air[e] ? 2 : 1;
