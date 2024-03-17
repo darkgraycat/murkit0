@@ -24,11 +24,12 @@ export default async (config: GameConfig) => {
   const { width, height, actions, screen, fps } = config;
 
   // --------------------------------------------------------------------------
-  const screenCtx = screen.getContext("2d", {
-    alpha: false,
-    colorSpace: 'srgb',
-    willReadFrequently: true,
-  }) as CanvasRenderingContext2D;
+  // const screenCtx = screen.getContext("2d", {
+  //   alpha: false,
+  //   colorSpace: 'srgb',
+  //   willReadFrequently: true,
+  // }) as CanvasRenderingContext2D;
+  const screenCtx = screen.getContext("2d") as CanvasRenderingContext2D;
   const screenImageData = screenCtx.getImageData(0, 0, width, height) as ImageData;
   const viewport = Bitmap.from(screenImageData.data.buffer, width, height);
 
