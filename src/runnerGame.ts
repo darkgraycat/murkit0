@@ -11,6 +11,10 @@ import stageConfigs from "./data/runner_stages";
 
 import { fileHelpers } from "./utils";
 
+import assetsPlayer from "../assets/player.png";
+import assetsHouses from "../assets/backgrounds_houses.png";
+import assetsBackgrounds from "../assets/backgrounds.png";
+
 export type GameConfig = {
   width: number;
   height: number;
@@ -24,20 +28,20 @@ export default async (config: GameConfig) => {
   const { width, height, actions, screen, fps } = config;
 
   // --------------------------------------------------------------------------
-  // const screenCtx = screen.getContext("2d", {
-  //   alpha: false,
-  //   colorSpace: 'srgb',
-  //   willReadFrequently: true,
-  // }) as CanvasRenderingContext2D;
-  const screenCtx = screen.getContext("2d") as CanvasRenderingContext2D;
+  const screenCtx = screen.getContext("2d", {
+    alpha: false,
+    colorSpace: 'srgb',
+    willReadFrequently: true,
+  }) as CanvasRenderingContext2D;
+  // const screenCtx = screen.getContext("2d") as CanvasRenderingContext2D;
   const screenImageData = screenCtx.getImageData(0, 0, width, height) as ImageData;
   const viewport = Bitmap.from(screenImageData.data.buffer, width, height);
 
   // --------------------------------------------------------------------------
   const [tilesPlayer, tilesHouses, tilesBg] = await fileHelpers.loadImagesAsTileableBitmaps(
-    ["../assets/player.png", 16, 16, 4, 1],
-    ["../assets/backgrounds_houses.png", 48, 32, 5, 1],
-    ["../assets/backgrounds.png", 32, 32, 6, 1],
+    [assetsPlayer, 16, 16, 4, 1],
+    [assetsHouses, 48, 32, 5, 1],
+    [assetsBackgrounds, 32, 32, 6, 1],
   );
   const spritesPlayer = tilesPlayer.split().concat(tilesPlayer.flipV().split());
   const spritesHouses = [
