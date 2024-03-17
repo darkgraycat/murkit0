@@ -845,7 +845,11 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
         switch (_c.label) {
             case 0:
                 width = config.width, height = config.height, actions = config.actions, screen = config.screen, fps = config.fps;
-                screenCtx = screen.getContext("2d");
+                screenCtx = screen.getContext("2d", {
+                    alpha: false,
+                    colorSpace: 'srgb',
+                    willReadFrequently: true,
+                });
                 screenImageData = screenCtx.getImageData(0, 0, width, height);
                 viewport = _bitmap__WEBPACK_IMPORTED_MODULE_1__.Bitmap.from(screenImageData.data.buffer, width, height);
                 return [4 /*yield*/, _utils__WEBPACK_IMPORTED_MODULE_8__.fileHelpers.loadImagesAsTileableBitmaps(["../assets/player.png", 16, 16, 4, 1], ["../assets/backgrounds_houses.png", 48, 32, 5, 1], ["../assets/backgrounds.png", 32, 32, 6, 1])];
