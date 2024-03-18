@@ -317,7 +317,6 @@ var BitmapPallete = /** @class */ (function () {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   c2AnimatedBg: () => (/* binding */ c2AnimatedBg),
 /* harmony export */   cAnimation: () => (/* binding */ cAnimation),
 /* harmony export */   cInput: () => (/* binding */ cInput),
 /* harmony export */   cInputRunner: () => (/* binding */ cInputRunner),
@@ -369,7 +368,6 @@ var cPlayer = new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.Component({
     speed: 0,
     power: 0,
 });
-var c2AnimatedBg = new _ecs_simple_ecs__WEBPACK_IMPORTED_MODULE_0__.Component({});
 // export const cWorld = new Component<{
 //   time?: number,
 //   width: number,
@@ -418,6 +416,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+// C0FCF8
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([
     {
         name: "MorningCity", bgwidth: 10, length: 2000,
@@ -425,10 +424,10 @@ __webpack_require__.r(__webpack_exports__);
         bgrows: [
             { layout: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], offset: 0.5, speed: 1.0, colors: [0x00000000, 0xffe0b040, 0xffeac770] },
             { layout: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], offset: 0.0, speed: 2.0, colors: [0x00000000, 0xffd09050, 0xffb07030] },
-            { layout: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], offset: 2.5, speed: 2.0, colors: [0xff506020, 0x00000000, 0x00000000] },
-            { layout: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], offset: 3.0, speed: 3.0, colors: [0xff405020, 0x00000000, 0x00000000] },
-            { layout: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3], offset: 3.5, speed: 3.5, colors: [0xff303020, 0x00000000, 0x00000000] },
-            { layout: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5], offset: 4.0, speed: 4.0, colors: [0xff202020, 0xff303030, 0x00000000] },
+            { layout: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], offset: 2.5, speed: 2.5, colors: [0xff697664, 0x00000000, 0x00000000] },
+            { layout: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2], offset: 3.0, speed: 3.0, colors: [0xff575A45, 0x00000000, 0x00000000] },
+            { layout: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3], offset: 3.5, speed: 3.5, colors: [0xff3C3728, 0x00000000, 0x00000000] },
+            { layout: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5], offset: 4.0, speed: 4.0, colors: [0xff201810, 0xff507090, 0x00000000] },
         ],
     },
     {
@@ -896,7 +895,9 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
             tilesHouses.reorder([2, 0, 1, 4, 2, 0, 1, 1, 0, 0, 0, 0], 4, 3),
             tilesHouses.reorder([1, 1, 1, 1, 2, 2, 3, 3], 2, 4),
             tilesHouses.reorder([2, 4, 3, 1, 2, 2, 1, 3, 0, 2, 0, 0, 3, 0, 0], 5, 3),
-            tilesHouses.reorder([0], 1, 1),
+            tilesHouses.reorder([0, 0], 2, 1),
+            tilesHouses.reorder([1, 1], 2, 1),
+            tilesHouses.reorder([2, 2], 2, 1),
         ];
         colors = [0xff101010, 0xff303030, 0];
         palletesHouses = spritesHouses.map(function (sprite) { return new _bitmap__WEBPACK_IMPORTED_MODULE_1__.BitmapPallete(sprite); });
@@ -940,14 +941,17 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
         }); };
         eBuildings = [
             // createBuilding(11, 0, 6),
-            createBuilding(0, 0, 5),
-            createBuilding(6, 8, 6),
-            createBuilding(1, 16, 5),
-            createBuilding(2, 24, 6),
-            createBuilding(1, 32, 6),
-            createBuilding(0, 40, 7),
-            createBuilding(7, 48, 5),
+            // createBuilding(0,  0,  5),
+            // createBuilding(6,  8, 6),
+            // createBuilding(1,  16, 5),
+            // createBuilding(2,  24, 6),
+            // createBuilding(1,  32, 6),
+            // createBuilding(0,  40, 7),
+            // createBuilding(7,  48, 5),
             // createBuilding(3,  24, 6),
+            createBuilding(12, 0, 5),
+            createBuilding(13, 8, 5),
+            // createBuilding(14, 16, 5),
         ];
         collideBounds = eSystems.sCollideBounds.setup([ePlayer]);
         collideShapes = eSystems.sCollideShapes.setup([ePlayer], eBuildings);
@@ -1118,10 +1122,11 @@ function Systems(world, viewport) {
                 if (collisionSide == _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.None)
                     continue;
                 switch (collisionSide) {
+                    // case CollisionSide.Bottom: x[e] = 32; y[e] = 32; vy[e] = 0.25; air[e] = true; break;
                     case _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Bottom:
-                        x[e] = 32;
-                        y[e] = 32;
-                        air[e] = true;
+                        vy[e] = 0;
+                        y[e] = height - h[e];
+                        air[e] = false;
                         break;
                     case _utils__WEBPACK_IMPORTED_MODULE_2__.CollisionSide.Left:
                         vx[e] = 0;
@@ -1281,12 +1286,13 @@ function Systems(world, viewport) {
                 if (x[e] >= -w[e])
                     continue;
                 x[e] += width + w[e];
-                //const [dx, dy] = platformPlacer(x[e], y[e], w[e], h[e], e);
-                // x[e] += width + w[e] + dx;
-                // y[e] += dy;
+                var right = x[e] + w[e];
+                var bottom = y[e] + h[e];
             }
         }),
     };
+}
+function buildingPlacer(x, y, w, h) {
 }
 
 

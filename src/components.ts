@@ -66,11 +66,6 @@ export const cPlayer = new Component<{ air: boolean; speed: number; power: numbe
   power: 0,
 });
 
-export const c2AnimatedBg = new Component<{
-}>({
-
-});
-
 // export const cWorld = new Component<{
 //   time?: number,
 //   width: number,

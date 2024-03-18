@@ -39,7 +39,8 @@ export function Systems(world: World, viewport: Bitmap) {
           );
           if (collisionSide == CollisionSide.None) continue;
           switch (collisionSide) {
-            case CollisionSide.Bottom: x[e] = 32; y[e] = 32; air[e] = true; break;
+            // case CollisionSide.Bottom: x[e] = 32; y[e] = 32; vy[e] = 0.25; air[e] = true; break;
+            case CollisionSide.Bottom: vy[e] = 0; y[e] = height - h[e]; air[e] = false; break;
             case CollisionSide.Left: vx[e] = 0; x[e] = 0; break;
             case CollisionSide.Right: vx[e] = 0; x[e] = width - w[e]; break;
             case CollisionSide.Top: vy[e] = 1; y[e] = 0; break;
@@ -187,11 +188,14 @@ export function Systems(world: World, viewport: Bitmap) {
           // no replace if still visible
           if (x[e] >= -w[e]) continue;
           x[e] += width + w[e];
-          //const [dx, dy] = platformPlacer(x[e], y[e], w[e], h[e], e);
-          // x[e] += width + w[e] + dx;
-          // y[e] += dy;
+          const right = x[e] + w[e];
+          const bottom = y[e] + h[e];
         }
       }
     ),
   };
+}
+
+function buildingPlacer(x: number, y: number, w: number, h: number) {
+
 }

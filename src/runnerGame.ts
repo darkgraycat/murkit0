@@ -16,7 +16,6 @@ import { fileHelpers } from "./utils";
 // import assetsHouses from "../assets/backgrounds_houses.png";
 // import assetsBackgrounds from "../assets/backgrounds.png";
 
-
 export type GameConfig = {
   width: number;
   height: number;
@@ -71,7 +70,9 @@ export default async (config: GameConfig) => {
     tilesHouses.reorder([2,0,1,4, 2,0,1,1, 0,0,0,0], 4, 3),
     tilesHouses.reorder([1,1, 1,1, 2,2, 3,3], 2, 4),
     tilesHouses.reorder([2,4,3,1,2, 2,1,3,0,2, 0,0,3,0,0], 5, 3),
-    tilesHouses.reorder([0], 1, 1),
+    tilesHouses.reorder([0, 0], 2, 1),
+    tilesHouses.reorder([1, 1], 2, 1),
+    tilesHouses.reorder([2, 2], 2, 1),
   ]
   const colors = [0xff101010, 0xff303030, 0];
   const palletesHouses = spritesHouses.map(sprite => new BitmapPallete(sprite));
@@ -126,14 +127,17 @@ export default async (config: GameConfig) => {
   });
   const eBuildings = [
     // createBuilding(11, 0, 6),
-    createBuilding(0,  0,  5),
-    createBuilding(6,  8, 6),
-    createBuilding(1,  16, 5),
-    createBuilding(2,  24, 6),
-    createBuilding(1,  32, 6),
-    createBuilding(0,  40, 7),
-    createBuilding(7,  48, 5),
+    // createBuilding(0,  0,  5),
+    // createBuilding(6,  8, 6),
+    // createBuilding(1,  16, 5),
+    // createBuilding(2,  24, 6),
+    // createBuilding(1,  32, 6),
+    // createBuilding(0,  40, 7),
+    // createBuilding(7,  48, 5),
     // createBuilding(3,  24, 6),
+    createBuilding(12, 0, 5),
+    createBuilding(13, 8, 5),
+    // createBuilding(14, 16, 5),
   ];
 
   // --------------------------------------------------------------------------
